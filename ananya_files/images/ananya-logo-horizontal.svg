@@ -1,0 +1,41 @@
+<!-- Ananya Horizontal Logo SVG -->
+<svg width="200" height="35" viewBox="0 0 200 35" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="horizontalIconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="horizontalTextGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon -->
+  <path d="M 2 17.5 L 7 7 L 23 7 L 28 17.5 L 23 28 L 7 28 Z" 
+        fill="url(#horizontalIconGradient)" stroke="#fbbf24" stroke-width="1"/>
+  
+  <!-- "A" in icon -->
+  <path d="M 11 24 L 13.5 15 L 15 10 L 16.5 15 L 19 24 M 13.5 19 L 16.5 19" 
+        stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Main text "ANANYA" -->
+  <text x="35" y="22" font-family="'Inter', sans-serif" font-size="20" font-weight="700" 
+        fill="url(#horizontalTextGradient)" letter-spacing="1px">
+    ANANYA
+  </text>
+  
+  <!-- Tagline -->
+  <text x="140" y="18" font-family="'Inter', sans-serif" font-size="10" font-weight="400" 
+        fill="#94a3b8" opacity="0.9">
+    Where Telugu Meets Technology
+  </text>
+  
+  <!-- Telugu text -->
+  <text x="140" y="28" font-family="'Noto Sans Telugu', sans-serif" font-size="8" 
+        fill="#94a3b8" opacity="0.8">
+    అనన్య - తెలుగు టెక్నాలజీ
+  </text>
+</svg>

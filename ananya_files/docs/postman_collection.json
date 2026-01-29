@@ -1,0 +1,792 @@
+{
+  "info": {
+    "name": "Indic Language Word Processor API",
+    "description": "A comprehensive REST API for processing Telugu and English text, providing advanced linguistic analysis and manipulation capabilities.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "indic-wp-api-collection",
+    "version": {
+      "major": 1,
+      "minor": 0,
+      "patch": 0
+    }
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://ananya.telugupuzzles.com/api",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "String Operations",
+      "item": [
+        {
+          "name": "Get Length",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getLength.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getLength.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language (English/Telugu)"
+                }
+              ]
+            },
+            "description": "Returns the logical length of a string"
+          },
+          "response": [
+            {
+              "name": "Success Response",
+              "originalRequest": {
+                "method": "GET",
+                "url": {
+                  "raw": "{{baseUrl}}/getLength.php?string=hello&language=English",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["getLength.php"],
+                  "query": [
+                    {"key": "string", "value": "hello"},
+                    {"key": "language", "value": "English"}
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "body": "{\n  \"response_code\": 200,\n  \"message\": \"Length Calculated\",\n  \"string\": \"hello\",\n  \"language\": \"English\",\n  \"data\": 5\n}"
+            }
+          ]
+        },
+        {
+          "name": "Reverse String",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/reverse.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["reverse.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language (English/Telugu)"
+                }
+              ]
+            },
+            "description": "Returns the reverse of the input string"
+          }
+        },
+        {
+          "name": "Randomize String",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/randomize.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["randomize.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language (English/Telugu)"
+                }
+              ]
+            },
+            "description": "Returns the input string with characters in random order"
+          }
+        },
+        {
+          "name": "Replace Substring",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/replace.php?input1=hello&input2=English&input3=ell&input4=i",
+              "host": ["{{baseUrl}}"],
+              "path": ["replace.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Original string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "ell",
+                  "description": "String to replace"
+                },
+                {
+                  "key": "input4",
+                  "value": "i",
+                  "description": "Replacement string"
+                }
+              ]
+            },
+            "description": "Replaces occurrences of a substring with another string"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Character Analysis",
+      "item": [
+        {
+          "name": "Get Code Point Length",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getCodePointLength.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getCodePointLength.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language (English/Telugu)"
+                }
+              ]
+            },
+            "description": "Returns the number of Unicode code points in the string"
+          }
+        },
+        {
+          "name": "Get Code Points",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getCodePoints.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getCodePoints.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language (English/Telugu)"
+                }
+              ]
+            },
+            "description": "Returns an array of Unicode code points for each character"
+          }
+        },
+        {
+          "name": "Get Logical Characters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getLogicalChars.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getLogicalChars.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language (English/Telugu)"
+                }
+              ]
+            },
+            "description": "Returns an array of logical characters from the string"
+          }
+        },
+        {
+          "name": "Logical Character At Position",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/logicalCharAt.php?input1=hello&input2=English&input3=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["logicalCharAt.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "2",
+                  "description": "Position index (0-based)"
+                }
+              ]
+            },
+            "description": "Returns the logical character at the specified position"
+          }
+        }
+      ]
+    },
+    {
+      "name": "String Comparison",
+      "item": [
+        {
+          "name": "Check Equality",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/equals.php?input1=hello&input2=English&input3=hello",
+              "host": ["{{baseUrl}}"],
+              "path": ["equals.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "First string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "hello",
+                  "description": "Second string"
+                }
+              ]
+            },
+            "description": "Checks if two strings are exactly equal"
+          }
+        },
+        {
+          "name": "Is Anagram",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/isAnagram.php?input1=listen&input2=English&input3=silent",
+              "host": ["{{baseUrl}}"],
+              "path": ["isAnagram.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "listen",
+                  "description": "First string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "silent",
+                  "description": "Second string"
+                }
+              ]
+            },
+            "description": "Determines if two strings are anagrams of each other"
+          }
+        },
+        {
+          "name": "Is Palindrome",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/isPalindrome.php?string=racecar&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["isPalindrome.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "racecar",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Determines if a string reads the same forwards and backwards"
+          }
+        },
+        {
+          "name": "Compare To",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/compareTo.php?input1=hello&input2=English&input3=world",
+              "host": ["{{baseUrl}}"],
+              "path": ["compareTo.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "First string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "world",
+                  "description": "Second string"
+                }
+              ]
+            },
+            "description": "Compares two strings lexicographically"
+          }
+        }
+      ]
+    },
+    {
+      "name": "String Search",
+      "item": [
+        {
+          "name": "Starts With",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/startsWith.php?input1=hello&input2=English&input3=h",
+              "host": ["{{baseUrl}}"],
+              "path": ["startsWith.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "h",
+                  "description": "Character to check"
+                }
+              ]
+            },
+            "description": "Checks if the string begins with the specified character"
+          }
+        },
+        {
+          "name": "Ends With",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/endsWith.php?input1=hello&input2=English&input3=o",
+              "host": ["{{baseUrl}}"],
+              "path": ["endsWith.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "o",
+                  "description": "Character to check"
+                }
+              ]
+            },
+            "description": "Checks if the string ends with the specified character"
+          }
+        },
+        {
+          "name": "Contains String",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/containsString.php?input1=hello&input2=English&input3=ell",
+              "host": ["{{baseUrl}}"],
+              "path": ["containsString.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "ell",
+                  "description": "Substring to find"
+                }
+              ]
+            },
+            "description": "Checks if the first string contains the second string"
+          }
+        },
+        {
+          "name": "Index Of",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/indexOf.php?input1=hello&input2=English&input3=l",
+              "host": ["{{baseUrl}}"],
+              "path": ["indexOf.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "l",
+                  "description": "Character to find"
+                }
+              ]
+            },
+            "description": "Returns the zero-based index of the first occurrence of a character"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Word Analysis",
+      "item": [
+        {
+          "name": "Get Word Level",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getWordLevel.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getWordLevel.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Returns the word level as an integer value"
+          }
+        },
+        {
+          "name": "Get Word Strength",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getWordStrength.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getWordStrength.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Returns the word strength as an integer value"
+          }
+        },
+        {
+          "name": "Get Word Weight",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getWordWeight.php?string=hello&language=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getWordWeight.php"],
+              "query": [
+                {
+                  "key": "string",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "language",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Returns the word weight as an integer value"
+          }
+        },
+        {
+          "name": "Split Word",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/splitWord.php?input1=hello&input2=English&input3=2",
+              "host": ["{{baseUrl}}"],
+              "path": ["splitWord.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                },
+                {
+                  "key": "input3",
+                  "value": "2",
+                  "description": "Number of chunks"
+                }
+              ]
+            },
+            "description": "Splits a string into chunks based on the specified number"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Language Processing",
+      "item": [
+        {
+          "name": "Detect Language",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getLangForString.php?input1=hello",
+              "host": ["{{baseUrl}}"],
+              "path": ["getLangForString.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "hello",
+                  "description": "Input string"
+                }
+              ]
+            },
+            "description": "Automatically detects if a string is English, Telugu, or mixed"
+          }
+        },
+        {
+          "name": "Is Character Vowel",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/isCharVowel.php?input1=a&input2=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["isCharVowel.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "a",
+                  "description": "Character to check"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Determines if a character is a vowel in the specified language"
+          }
+        },
+        {
+          "name": "Is Character Consonant",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/isCharConsonant.php?input1=b&input2=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["isCharConsonant.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "b",
+                  "description": "Character to check"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Determines if a character is a consonant in the specified language"
+          }
+        },
+        {
+          "name": "Get Random Logical Characters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getRandomLogicalChars.php?input1=5&input2=English",
+              "host": ["{{baseUrl}}"],
+              "path": ["getRandomLogicalChars.php"],
+              "query": [
+                {
+                  "key": "input1",
+                  "value": "5",
+                  "description": "Number of characters"
+                },
+                {
+                  "key": "input2",
+                  "value": "English",
+                  "description": "Language"
+                }
+              ]
+            },
+            "description": "Returns a random set of logical characters"
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Management",
+      "item": [
+        {
+          "name": "Check User Exists",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/userExists.php?email=user@example.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["userExists.php"],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "user@example.com",
+                  "description": "User email address"
+                }
+              ]
+            },
+            "description": "Checks if a user exists in the system by email"
+          }
+        },
+        {
+          "name": "User Login",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ws_login.php?email=user@example.com&password=password123",
+              "host": ["{{baseUrl}}"],
+              "path": ["ws_login.php"],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "user@example.com",
+                  "description": "User email address"
+                },
+                {
+                  "key": "password",
+                  "value": "password123",
+                  "description": "User password"
+                }
+              ]
+            },
+            "description": "Authenticates a user with email and password"
+          }
+        },
+        {
+          "name": "Get User Role",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/getRole.php?email=user@example.com",
+              "host": ["{{baseUrl}}"],
+              "path": ["getRole.php"],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "user@example.com",
+                  "description": "User email address"
+                }
+              ]
+            },
+            "description": "Returns the role of a user by email"
+          }
+        }
+      ]
+    }
+  ]
+}
