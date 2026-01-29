@@ -1,0 +1,21 @@
+<!-- Ananya Favicon SVG -->
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="faviconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7c3aed;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f97316;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Hexagonal background -->
+  <path d="M 4 16 L 8 8 L 24 8 L 28 16 L 24 24 L 8 24 Z" 
+        fill="url(#faviconGradient)" stroke="#fbbf24" stroke-width="1"/>
+  
+  <!-- Stylized "A" -->
+  <path d="M 12 22 L 14 14 L 16 10 L 18 14 L 20 22 M 14 17 L 18 17" 
+        stroke="white" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Small accent dot -->
+  <circle cx="16" cy="23" r="1" fill="white" opacity="0.8"/>
+</svg>
