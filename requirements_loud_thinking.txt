@@ -1,0 +1,15 @@
+Visitors to our site are interacting with AI chatbot with such kind of questions.
+You must rely on the APIs to parse the text and to respond these questions.
+
+AI/LLM --> mapping to MCP Server --> Tools/APIs --> (web search / relying on the generic capabilities of LLM tools) --> Providing the response.
+
+Until you gain the familiarity with the APIs, just work on English language.
+
+1. Can you give me 3 char words that rhyme with cat?
+2. Can you give me 5 char words with a prefix "al" and give me 10 such words?
+3. Can you reverse the word "abracadabra"?
+4. Can you make 10 legal words from the given word "minneapolis"?
+5. 4. Can you make 10 legal words which are of 4 char length from the given word "minneapolis"?
+6.
+7.
+What are the some typical questions QUIZ makers face while parsing words or test?
