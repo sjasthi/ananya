@@ -1,3 +1,5 @@
+Web Application that has Chat interface where visitors can ask questions.
+
 Visitors to our site are interacting with AI chatbot with such kind of questions.
 You must rely on the APIs to parse the text and to respond these questions.
 
