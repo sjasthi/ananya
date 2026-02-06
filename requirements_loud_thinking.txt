@@ -15,3 +15,8 @@ Until you gain the familiarity with the APIs, just work on English language.
 6.
 7.
 What are the some typical questions QUIZ makers face while parsing words or test?
+
+===========
+Niner Puzzle App : fixed grid - crossword (9x9)
+Generating puzzles in English and Telugu through AI/LLM
+placing the words - generating the corresponding hints 
