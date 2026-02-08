@@ -1,0 +1,12 @@
+1. Do we rename the files to their proper name? 
+Example: validation/containsSpace.php -> validation/contains-space.php
+
+2. Leftover files unsure of their place:
+getLength_refactored.php
+getLength.php
+getLength2.php -> Duplicate?
+getLogicalChars2.php -> Duplicate?
+getRole.php
+parseToLogicalChars2.php -> Duplicate?
+test_simple.php
+ws_login.php -> /auth/login?
