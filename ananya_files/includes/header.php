@@ -30,6 +30,11 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
                 <li class="nav-item">
+                    <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'chat.php') ? 'active' : ''; ?>" href="<?php echo (isset($root_path) ? $root_path : '') ?>chat.php">
+                        <i class="fas fa-comments"></i> Chat
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link <?php echo (basename($_SERVER['PHP_SELF']) == 'api.php') ? 'active' : ''; ?>" href="<?php echo (isset($root_path) ? $root_path : '') ?>docs/api.php">
                         <i class="fas fa-book"></i> Documentation
                     </a>
