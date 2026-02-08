@@ -125,31 +125,30 @@
                 <div class="input-section">
                     <div class="row">
                         <div class="col-md-6">
-                            <h5 class="mb-3"><i class="fas fa-language me-2"></i>Language Selection</h5>
-                            <select id="language-select" class="form-select">
-                                <option value="english">English</option>
-                                <!--To Do: Uncomment when Telegu is implemented-->
-                                <!--option value="telugu" selected>Telugu (తెలుగు)</option-->
-                            </select>
-                        </div>
-                        <div class="col-md-6 d-flex align-items-end">
-                                                        <button id="process-btn" class="btn btn-primary process-btn" onclick="console.log('Button clicked!'); updateParseTable();">
-                                <i class="fas fa-cogs me-2"></i>Process Text
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div class="mt-4">
-                        <h5 class="mb-3"><i class="fas fa-edit me-2"></i>Text Input</h5>
-                        <textarea id="parsing-input" class="form-control" rows="8" 
-                                  placeholder="How can I help you today?"></textarea>
-                        <small class="form-text text-muted mt-2">
+                            <div class="input-group mt-2">
+                                <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
+                                <button id="chat-send" class="btn btn-primary process-btn">
+                                    <i class="fas fa-paper-plane me-2"></i>Send
+                                </button>
+                            <small class="form-text text-muted mt-2">
                             <i class="fas fa-info-circle me-1"></i>
                             You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Process Text" to see the response.
-                        </small>
+                            </small>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="mt-3">
+                            <div id="chat-window" style="height:320px; overflow:auto; padding:12px; background:#fff; border:1px solid #e9ecef; border-radius:8px;"></div>
+                            <div class="input-group mt-2">
+                
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </body>
+
+    <script src="js/chat.js"></script>
 </html>
