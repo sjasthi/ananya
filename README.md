@@ -196,3 +196,6 @@ This project is open source. See the source files for more information.
 - **Full documentation** with interactive examples
 - **Unicode compliant** with proper handling of complex characters
 - **Production ready** with error handling and response caching
+
+## 🎯 Key Features
+- Go to **https://ananya.telugupuzzles.com** to play with Telugu and Technology.
