@@ -1,3 +1,31 @@
+(Local) FP3:  English natural language text --> API
+(Local)  FP4:  English prompot with Telugu Words --> API
+      Telugu prompt with Telugu words --> API
+
+(Remote) FP5:  Hosted the APIs at http://ananya.telugupuzzle.com
+        Make sure that it works on remote host
+
+(Remote) FP6: Stablization and closing any gaps at http://ananya.telugupuzzle.com
+
+(Remote) FP7, F8, FP9, FP10:  Based a prompt, you generate a word search puzzle.
+
+--> Give me a Telugu puzzle on Dances of India  (default count = 10, gird size 16 x 12)
+---> Using AI features, identify 10 words
+--> Using our ananya API, break it into logical characters
+--> Build the word search puzzle
+--> Build the solution to the word search puzzle
+--> If I give a text file having 100 themes, you mass generate that many puzzles.
+All the puzzles (and solutions) will be shown in HTML and I can use browser print to produce PDF.
+
+
+
+
+
+
+
+
+==========
+
 Web Application that has Chat interface where visitors can ask questions.
 
 Visitors to our site are interacting with AI chatbot with such kind of questions.
