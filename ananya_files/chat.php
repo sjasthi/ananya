@@ -16,6 +16,10 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap5.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         
+        <!-- Markdown rendering for chat responses -->
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+        
         <style>
             .parser-container {
                 max-width: 1200px;
@@ -85,6 +89,82 @@
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             }
+
+            /* Chat-specific styles */
+            #chat-window {
+                height: 420px;
+                overflow-y: auto;
+                padding: 16px;
+                background: #fff;
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+            }
+
+            .chat-bubble {
+                max-width: 80%;
+                padding: 10px 14px;
+                border-radius: 12px;
+                word-wrap: break-word;
+                font-size: 0.95rem;
+                line-height: 1.5;
+            }
+
+            .chat-bubble.user {
+                background: linear-gradient(135deg, #2563eb, #7c3aed);
+                color: white;
+                border-bottom-right-radius: 4px;
+            }
+
+            .chat-bubble.assistant {
+                background: #f1f3f5;
+                color: #212529;
+                border-bottom-left-radius: 4px;
+            }
+
+            .chat-bubble.assistant p { margin-bottom: 0.4rem; }
+            .chat-bubble.assistant p:last-child { margin-bottom: 0; }
+            .chat-bubble.assistant code {
+                background: #e2e6ea;
+                padding: 1px 4px;
+                border-radius: 3px;
+                font-size: 0.88em;
+            }
+            .chat-bubble.assistant pre {
+                background: #1e1e2e;
+                color: #cdd6f4;
+                padding: 10px;
+                border-radius: 6px;
+                overflow-x: auto;
+                font-size: 0.85em;
+            }
+
+            .chat-typing {
+                display: inline-flex;
+                gap: 4px;
+                padding: 8px 14px;
+            }
+            .chat-typing span {
+                width: 8px; height: 8px;
+                background: #adb5bd;
+                border-radius: 50%;
+                animation: chatBounce 1.4s infinite both;
+            }
+            .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
+            .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
+            @keyframes chatBounce {
+                0%, 80%, 100% { transform: scale(0); }
+                40% { transform: scale(1); }
+            }
+
+            .source-badge {
+                font-size: 0.7rem;
+                padding: 2px 6px;
+                border-radius: 4px;
+                margin-top: 4px;
+                display: inline-block;
+            }
+            .source-badge.mcp { background: #d3f9d8; color: #2b8a3e; }
+            .source-badge.fallback { background: #fff3bf; color: #e67700; }
             
         </style>
         
@@ -124,26 +204,28 @@
                 
                 <div class="input-section">
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <div class="input-group mt-2">
-                                <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
+                                <select id="language-select" class="form-select" style="max-width: 130px;">
+                                    <option value="english" selected>English</option>
+                                    <option value="telugu">Telugu</option>
+                                    <option value="hindi">Hindi</option>
+                                    <option value="gujarati">Gujarati</option>
+                                    <option value="malayalam">Malayalam</option>
+                                </select>
+                                <input id="chat-input" class="form-control" placeholder="Ask me about words, text analysis, palindromes, anagrams..." />
                                 <button id="chat-send" class="btn btn-primary process-btn">
                                     <i class="fas fa-paper-plane me-2"></i>Send
                                 </button>
-                            <small class="form-text text-muted mt-2">
-                            <i class="fas fa-info-circle me-1"></i>
-                            You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Process Text" to see the response.
-                            </small>
                             </div>
+                            <small class="form-text text-muted mt-2">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Try: "Reverse the word abracadabra", "Is racecar a palindrome?", "Can you make the word 'mine' from 'minneapolis'?"
+                            </small>
                         </div>
                     </div>
-                        <div class="mt-3">
-                            <div id="chat-window" style="height:320px; overflow:auto; padding:12px; background:#fff; border:1px solid #e9ecef; border-radius:8px;"></div>
-                            <div class="input-group mt-2">
-                
-                            </div>
-
-                        </div>
+                    <div class="mt-3">
+                        <div id="chat-window"></div>
                     </div>
                 </div>
             </div>

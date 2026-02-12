@@ -1,0 +1,16 @@
+MCP Server running on http://localhost:8000 — 34 tools registered
+/health endpoint returns OK
+/chat endpoint receives questions, correctly calls OpenAI (returns 401 because key is placeholder)
+
+
+Data flow:
+User (chat.php) → chat.js → chat_api.php → MCP Server (/chat)
+    → OpenAI gpt-4o-mini (with 34 tools defined)
+    → LLM decides which tools to call
+    → MCP executes tools → calls PHP api.php endpoints
+    → Results fed back to LLM → final answer → user
+
+Edit mcp_server/.env and replace with OPENAI_API_KEY
+restart server
+cd c:\xampp\htdocs\ananya\ananya_files\mcp_server
+.\venv\Scripts\python.exe server.py
