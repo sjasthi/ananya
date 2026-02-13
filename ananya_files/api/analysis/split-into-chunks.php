@@ -12,10 +12,9 @@ if (isset($_GET['string']) && isset($_GET['language'])) {
 
 if (!empty($string) && !empty($language)) {
     $processor = new wordProcessor($string, $language);
-    //convert string to an array (randomize() only takes arrays).
-    $stringArray = str_split($string);
-    $randomizedString = $processor->randomize($stringArray);
-    response(200, "String Randomized", $string, $language, $randomizedString);
+    $logicalChars = $processor->splitInto15Chunks();
+
+    response(200, "Split into 15 chunks calculated", $string, $language, $logicalChars);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
@@ -39,6 +38,6 @@ function response($responseCode, $message, $string, $language, $data)
 
     http_response_code($responseCode);
     $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "language" => $language, "data" => $data);
-    $json = json_encode($response);
+    $json = json_encode($response, JSON_UNESCAPED_UNICODE);
     echo $json;
 }

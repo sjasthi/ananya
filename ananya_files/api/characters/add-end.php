@@ -1,27 +1,26 @@
 <?php
-
 require_once("../../word_processor.php");
 
-if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['secondString'])) {
+if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['char'])) {
     $string = $_GET['string'];
     $language = $_GET['language'];
-    $secondString = $_GET['secondString'];
+    $char = $_GET['char'];
 } else if (isset($_GET['input1']) && isset($_GET['input2']) && isset($_GET['input3'])) {
     $string = $_GET['input1'];
     $language = $_GET['input2'];
-    $secondString = $_GET['input3'];
+    $char = $_GET['input3'];
 }
 
-if (!empty($string) && !empty($language) && !empty($secondString)) {
+if (!empty($string) && !empty($language) && !empty($char)) {
     $processor = new wordProcessor($string, $language);
-    $equals = $processor->equals($secondString);
-    response(200, "String Equals", $string, $secondString, $language, $equals);
+    $result = $processor->addCharacterAtEnd($char);
+    response(200, "addCharacterAtEnd() Processed", $string, $language, $result, $char);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
     invalidResponse("Invalid or Empty Language");
-} else if (isset($language) && isset($string) && empty($secondString)) {
-    invalidResponse("Invalid Column Number");
+} else if (empty($char)) {
+    invalidResponse("Invalid or Empty Char");
 } else {
     invalidResponse("Invalid Request");
 }
@@ -31,7 +30,7 @@ function invalidResponse($message)
     response(400, $message, NULL, NULL, NULL, NULL);
 }
 
-function response($responseCode, $message, $string, $secondString, $language, $data)
+function response($responseCode, $message, $string, $language, $data, $char)
 {
     // Locally cache results for two hours
     header('Cache-Control: max-age=7200');
@@ -40,7 +39,7 @@ function response($responseCode, $message, $string, $secondString, $language, $d
     header('Content-type:application/json;charset=utf-8');
 
     http_response_code($responseCode);
-    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "second string" => $secondString, "language" => $language, "data" => $data);
-    $json = json_encode($response);
+    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "language" => $language, "char" => $char, "data" => $data);
+    $json = json_encode($response, JSON_UNESCAPED_UNICODE);
     echo $json;
 }

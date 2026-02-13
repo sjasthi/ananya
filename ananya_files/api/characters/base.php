@@ -2,14 +2,14 @@
 // Clean URL proxy for characters/base endpoint
 require_once("../../word_processor.php");
 
-if(isset($_GET['string']) && isset($_GET['language'])) {
+if (isset($_GET['string']) && isset($_GET['language'])) {
     $string = $_GET['string'];
     $language = $_GET['language'];
-    
-    if(!empty($string) && !empty($language)) {
+
+    if (!empty($string) && !empty($language)) {
         $processor = new wordProcessor($string, $language);
         $baseCharacters = $processor->getBaseCharacters();
-        
+
         response(200, "Base characters processed.", $string, $language, $baseCharacters);
     } else {
         invalidResponse("Invalid or Empty Input");
@@ -18,23 +18,24 @@ if(isset($_GET['string']) && isset($_GET['language'])) {
     invalidResponse("Missing required parameters: string and language");
 }
 
-function invalidResponse($message) {
+function invalidResponse($message)
+{
     response(400, $message, NULL, NULL, NULL);
 }
 
-function response($responseCode, $message, $string, $language, $data) {
+function response($responseCode, $message, $string, $language, $data)
+{
     header('Cache-Control: max-age=7200');
     header('Content-type:application/json;charset=utf-8');
     http_response_code($responseCode);
-    
+
     $response = array(
-        "response_code" => $responseCode, 
-        "message" => $message, 
-        "string" => $string, 
-        "language" => $language, 
+        "response_code" => $responseCode,
+        "message" => $message,
+        "string" => $string,
+        "language" => $language,
         "data" => $data
     );
-    
+
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
 }
-?>

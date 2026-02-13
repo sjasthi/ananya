@@ -1,20 +1,21 @@
 <?php
-
 require_once("../../word_processor.php");
 
-if (isset($_GET['string']) && isset($_GET['language'])) {
-    $string = $_GET['string'];
+if (isset($_GET['int']) && isset($_GET['language'])) {
+    $count = $_GET['int'];
     $language = $_GET['language'];
 } else if (isset($_GET['input1']) && isset($_GET['input2'])) {
-    $string = $_GET['input1'];
+    $count = $_GET['input1'];
     $language = $_GET['input2'];
 }
 
-if (!empty($string) && !empty($language)) {
-    $processor = new wordProcessor($string, $language);
-    $reversedString = $processor->reverse();
-    response(200, "String Reversed", $string, $language, $reversedString);
-} else if (isset($string) && empty($string)) {
+if (!empty($count) && !empty($language)) {
+    $processor = new wordProcessor("", $language);
+    $logicalChars = $processor->getRandomLogicalChars($count);
+    #$logicalChars = "CheckingMethod";
+
+    response(200, "Random Logical Chars", $count, $language, $logicalChars);
+} else if (isset($count) && empty($count)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
     invalidResponse("Invalid or Empty Language");
@@ -27,7 +28,7 @@ function invalidResponse($message)
     response(400, $message, NULL, NULL, NULL);
 }
 
-function response($responseCode, $message, $string, $language, $data)
+function response($responseCode, $message, $count, $language, $data)
 {
     // Locally cache results for two hours
     header('Cache-Control: max-age=7200');
@@ -36,7 +37,7 @@ function response($responseCode, $message, $string, $language, $data)
     header('Content-type:application/json;charset=utf-8');
 
     http_response_code($responseCode);
-    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "language" => $language, "data" => $data);
+    $response = array("response_code" => $responseCode, "message" => $message, "N" => $count, "language" => $language, "data" => $data);
     $json = json_encode($response, JSON_UNESCAPED_UNICODE);
     echo $json;
 }

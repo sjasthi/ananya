@@ -1,28 +1,28 @@
 <?php
 require_once("../../word_processor.php");
 
-if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['target']) && isset($_GET['new'])) {
+if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['index']) && isset($_GET['char'])) {
     $string = $_GET['string'];
     $language = $_GET['language'];
-    $target = $_GET['target'];
-    $new = $_GET['new'];
+    $index = $_GET['index'];
+    $char = $_GET['char'];
 } else if (isset($_GET['input1']) && isset($_GET['input2']) && isset($_GET['input3']) && isset($_GET['input4'])) {
     $string = $_GET['input1'];
     $language = $_GET['input2'];
-    $target = $_GET['input3'];
-    $new = $_GET['input4'];
+    $index = $_GET['input3'];
+    $char = $_GET['input4'];
 }
 
-if (!empty($string) && !empty($language) && !empty($target) && !empty($new)) {
+if (!empty($string) && !empty($language) && !empty($index) && !empty($char)) {
     $processor = new wordProcessor($string, $language);
-    $result = $processor->replace($target, $new);
-    response(200, "replace() Processed", $string, $language, $result, $target, $new);
+    $result = $processor->addCharacterAt($index, $char);
+    response(200, "addCharacterAt() Processed", $string, $language, $result, $index, $char);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
     invalidResponse("Invalid or Empty Language");
-} else if (empty($target) || empty($new)) {
-    invalidResponse("Invalid or Empty Target or New");
+} else if (empty($index) || empty($char)) {
+    invalidResponse("Invalid or Empty Index or Char");
 } else {
     invalidResponse("Invalid Request");
 }
@@ -32,7 +32,7 @@ function invalidResponse($message)
     response(400, $message, NULL, NULL, NULL, NULL, NULL);
 }
 
-function response($responseCode, $message, $string, $language, $data, $target, $new)
+function response($responseCode, $message, $string, $language, $data, $index, $char)
 {
     // Locally cache results for two hours
     header('Cache-Control: max-age=7200');
@@ -41,7 +41,7 @@ function response($responseCode, $message, $string, $language, $data, $target, $
     header('Content-type:application/json;charset=utf-8');
 
     http_response_code($responseCode);
-    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "language" => $language, "target" => $target, "new" => $new, "data" => $data);
+    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "language" => $language, "index" => $index, "char" => $char, "data" => $data);
     $json = json_encode($response, JSON_UNESCAPED_UNICODE);
     echo $json;
 }
