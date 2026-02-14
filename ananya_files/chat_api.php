@@ -14,6 +14,9 @@ header('Content-Type: application/json; charset=utf-8');
 // chat_api.php - receives question, proxies to MCP server for LLM + tool orchestration
 // Falls back to direct LLM call if MCP server is unreachable
 
+require_once __DIR__ . '/includes/api_reference.php';
+require_once __DIR__ . '/includes/llm_handler.php';
+
 // MCP Server settings
 $MCP_SERVER_URL = 'http://localhost:8000/chat';
 $MCP_TIMEOUT = 60; // seconds — tool-calling loops can take a while
@@ -36,10 +39,12 @@ function call_detected_api($api_name, $params) {
         return null;
     }
     
-    // Build REST API URL using the new router
+    // Build REST API URL using the current script base path
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $url = $protocol . '://' . $host . '/ananya/ananya_files/' . $api['path'];
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '/ananya/ananya_files/chat_api.php');
+    $basePath = rtrim(str_replace('\\', '/', $scriptDir), '/');
+    $url = $protocol . '://' . $host . $basePath . '/' . $api['path'];
     
     // Add query parameters
     $url .= '?' . http_build_query($params);
@@ -54,9 +59,31 @@ function call_detected_api($api_name, $params) {
     $result = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
-    
+
     error_log("API Response ($http_code): " . substr($result, 0, 200));
-    
+
+    // If non-JSON response, try router endpoint as fallback
+    if ($result && json_decode($result, true) === null && json_last_error() !== JSON_ERROR_NONE) {
+        if (preg_match('#^api/([^/]+)/([^/]+)\.php$#i', $api['path'], $m)) {
+            $category = $m[1];
+            $action = $m[2];
+            $routerUrl = $protocol . '://' . $host . $basePath . '/api.php/' . $category . '/' . $action;
+            $routerUrl .= '?' . http_build_query($params);
+            error_log("Non-JSON API response, retrying via router: $routerUrl");
+
+            $ch2 = curl_init($routerUrl);
+            curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch2, CURLOPT_TIMEOUT, 10);
+            curl_setopt($ch2, CURLOPT_HEADER, false);
+            $retry = curl_exec($ch2);
+            $retry_code = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
+            curl_close($ch2);
+
+            error_log("Router Response ($retry_code): " . substr($retry, 0, 200));
+            return $retry ?: $result;
+        }
+    }
+
     return $result ?: null;
 }
 
@@ -110,6 +137,103 @@ function resolve_doc_label($api_name) {
     return null;
 }
 
+function number_to_words_small($num) {
+    $map = [
+        0 => 'zero', 1 => 'one', 2 => 'two', 3 => 'three', 4 => 'four', 5 => 'five',
+        6 => 'six', 7 => 'seven', 8 => 'eight', 9 => 'nine', 10 => 'ten',
+        11 => 'eleven', 12 => 'twelve', 13 => 'thirteen', 14 => 'fourteen',
+        15 => 'fifteen', 16 => 'sixteen', 17 => 'seventeen', 18 => 'eighteen',
+        19 => 'nineteen', 20 => 'twenty'
+    ];
+    return $map[$num] ?? (string)$num;
+}
+
+function format_api_result($api_name, $params, $api_result, $language) {
+    if (!$api_result) return null;
+
+    $decoded = json_decode($api_result, true);
+    $is_success = false;
+    if (is_array($decoded)) {
+        if (isset($decoded['success'])) {
+            $is_success = (bool)$decoded['success'];
+        } elseif (isset($decoded['response_code'])) {
+            $is_success = ($decoded['response_code'] >= 200 && $decoded['response_code'] < 300);
+        }
+    }
+
+    if (is_array($decoded) && $is_success) {
+        $result_value = $decoded['result'] ?? $decoded['data'] ?? null;
+        if ($api_name === 'text_length' && is_numeric($result_value)) {
+            $word = $params['string'] ?? '';
+            $count_word = number_to_words_small((int)$result_value);
+            return "The length of the word \"$word\" in $language is $count_word characters.";
+        }
+        return "Result: " . json_encode($result_value, JSON_UNESCAPED_UNICODE);
+    }
+
+    if ($decoded === null && json_last_error() !== JSON_ERROR_NONE) {
+        return "I could not complete that request: API returned a non-JSON response.";
+    }
+
+    $error_message = is_array($decoded) ? ($decoded['message'] ?? 'API error') : 'API error';
+    return "I could not complete that request: $error_message.";
+}
+
+function detect_intent($question, $language) {
+    $q = strtolower($question);
+
+    if (preg_match('/\b(length|how long|how many characters)\b/', $q)) {
+        return [
+            'api_id' => 'text_length',
+            'params' => infer_params_from_question('text_length', $question, $language),
+        ];
+    }
+
+    if (preg_match('/\b(reverse|backwards|backward)\b/', $q)) {
+        return [
+            'api_id' => 'text_reverse',
+            'params' => infer_params_from_question('text_reverse', $question, $language),
+        ];
+    }
+
+    if (preg_match('/\bpalindrome\b/', $q)) {
+        return [
+            'api_id' => 'analysis_is_palindrome',
+            'params' => infer_params_from_question('analysis_is_palindrome', $question, $language),
+        ];
+    }
+
+    if (preg_match('/\banagram\b/', $q)) {
+        return [
+            'api_id' => 'analysis_is_anagram',
+            'params' => infer_params_from_question('analysis_is_anagram', $question, $language),
+        ];
+    }
+
+    if (preg_match('/\bstarts with\b/', $q)) {
+        return [
+            'api_id' => 'comparison_starts_with',
+            'params' => infer_params_from_question('comparison_starts_with', $question, $language),
+        ];
+    }
+
+    if (preg_match('/\bends with\b/', $q)) {
+        return [
+            'api_id' => 'comparison_ends_with',
+            'params' => infer_params_from_question('comparison_ends_with', $question, $language),
+        ];
+    }
+
+    if (preg_match('/\bcontains\b/', $q)) {
+        return [
+            'api_id' => 'validation_contains_string',
+            'params' => infer_params_from_question('validation_contains_string', $question, $language),
+        ];
+    }
+
+    return null;
+}
+
 $raw = file_get_contents('php://input');
 $data = [];
 if($raw) {
@@ -125,18 +249,50 @@ if(!$question) {
     exit;
 }
 
+// ── Intent router (no LLM) ───────────────────────────────────────
+$intent = detect_intent($question, $language);
+if ($intent) {
+    $api_name = $intent['api_id'] ?? null;
+    $params = $intent['params'] ?? [];
+    $api_doc_label = resolve_doc_label($api_name);
+
+    $api_result = call_detected_api($api_name, $params);
+    $resp = format_api_result($api_name, $params, $api_result, $language);
+
+    if ($api_doc_label && strpos($resp, 'API used:') === false) {
+        $resp .= "\n\nAPI used: $api_doc_label";
+    }
+    if (stripos($resp, 'LLM consulted') === false) {
+        $resp .= "\n\nLLM consulted - No";
+    }
+
+    echo json_encode([
+        'question' => $question,
+        'language' => $language,
+        'answer' => $resp,
+        'api_doc_name' => $api_doc_label,
+        'source' => 'intent-router',
+        'llm_consulted' => false,
+    ]);
+    exit;
+}
+
 // ── Try MCP Server first ───────────────────────────────────────────
 $mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT);
 
 if($mcp_result !== null) {
     // MCP server responded successfully
+    if (is_array($mcp_result)) {
+        $mcp_result['llm_consulted'] = true;
+        if (!empty($mcp_result['answer']) && stripos($mcp_result['answer'], 'LLM consulted') === false) {
+            $mcp_result['answer'] .= "\n\nLLM consulted - Yes";
+        }
+    }
     echo json_encode($mcp_result);
     exit;
 }
 
 // ── Fallback: direct LLM call (no tool execution) ─────────────────
-require_once __DIR__ . '/includes/api_reference.php';
-require_once __DIR__ . '/includes/llm_handler.php';
 
 $context = generate_api_context($API_REFERENCE);
 
@@ -149,12 +305,11 @@ foreach ($API_REFERENCE as $api) {
 }
 
 $prompt = "You are a smart assistant that answers user questions by calling available APIs.\n";
-$prompt .= "When the user asks something that can be answered by an API:\n";
-$prompt .= "1. Identify which API to call\n";
-$prompt .= "2. Format it as:\n";
+$prompt .= "When the user asks something that can be answered by an API, output ONLY:\n";
 $prompt .= "API_CALL: api_id\n";
 $prompt .= "PARAMS: param1=value1&param2=value2\n";
-$prompt .= "3. Then provide your response based on the result.\n\n";
+$prompt .= "Do NOT include instructions, URLs, examples, or any extra text.\n";
+$prompt .= "If no API applies, answer normally in one short paragraph.\n\n";
 $prompt .= $param_reference . "\n";
 $prompt .= "Available APIs:\n" . $context . "\n";
 $prompt .= "User question (language: $language):\n" . $question . "\n";
@@ -165,6 +320,25 @@ $resp = llm_ask($prompt, [
 ]);
 
 error_log("LLM Raw Response:\n" . $resp . "\n---END---");
+
+// Retry once with a stricter format if the model didn't follow instructions
+if (!preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp)) {
+    $strict_prompt = "You MUST respond with ONLY the two lines below and nothing else:\n";
+    $strict_prompt .= "API_CALL: api_id\n";
+    $strict_prompt .= "PARAMS: param1=value1&param2=value2\n";
+    $strict_prompt .= "Use the exact parameter names from the reference.\n";
+    $strict_prompt .= "If no API applies, respond with: API_CALL: none and PARAMS: none\n\n";
+    $strict_prompt .= $param_reference . "\n";
+    $strict_prompt .= "Available APIs:\n" . $context . "\n";
+    $strict_prompt .= "User question (language: $language):\n" . $question . "\n";
+
+    $resp = llm_ask($strict_prompt, [
+        'model' => 'mistral',
+        'temperature' => 0.0,
+    ]);
+
+    error_log("LLM Strict Response:\n" . $resp . "\n---END---");
+}
 
 // Parse API_CALL from response
 $api_name = null;
@@ -179,6 +353,25 @@ if ($api_name && preg_match('/PARAMS:\s*([^\n]+)/i', $resp, $m2)) {
     parse_str($m2[1], $params);
     error_log("Found PARAMS: " . $m2[1]);
     error_log("Parsed params: " . json_encode($params));
+}
+
+// If still no API_CALL, attempt to extract API name and params from freeform text
+if (!$api_name) {
+    foreach ($API_REFERENCE as $api) {
+        if (!empty($api['id']) && preg_match('/\b' . preg_quote($api['id'], '/') . '\b/i', $resp)) {
+            $api_name = $api['id'];
+            $api_doc_label = resolve_doc_label($api_name);
+            error_log("Extracted API id from freeform: $api_name");
+            break;
+        }
+    }
+
+    if ($api_name && preg_match('/(string|language|input2|input3)\s*=\s*[^\s&]+/i', $resp)) {
+        if (preg_match('/(string=[^\s&]+(?:&language=[^\s&]+)?(?:&input2=[^\s&]+)?(?:&input3=[^\s&]+)?)/i', $resp, $m3)) {
+            parse_str($m3[1], $params);
+            error_log("Extracted params from freeform: " . json_encode($params));
+        }
+    }
 }
 
 // Heuristic: infer missing parameters or fill missing keys
@@ -197,34 +390,27 @@ if ($api_name) {
     error_log("Final params: " . json_encode($params));
 }
 
+
 // If an API call was detected, execute it
 if ($api_name) {
     $api_result = call_detected_api($api_name, $params);
     if ($api_result) {
-        $decoded = json_decode($api_result, true);
-        if (is_array($decoded) && ($decoded['success'] ?? false)) {
-            $result_value = $decoded['result'] ?? $decoded['data'] ?? null;
-            if ($api_name === 'text_length' && is_numeric($result_value)) {
-                $word = $params['string'] ?? '';
-                $resp = "The length of the word \"$word\" in $language is $result_value characters.";
-            } else {
-                $resp = "Result: " . json_encode($result_value, JSON_UNESCAPED_UNICODE);
-            }
-        } else {
-            // On error, return a concise message without dumping the raw API error
-            $error_message = is_array($decoded) ? ($decoded['message'] ?? 'API error') : 'API error';
-            $resp = "I could not complete that request: $error_message.";
-        }
+        $resp = format_api_result($api_name, $params, $api_result, $language);
     }
 }
 
 // Append doc label for UI display
-if ($api_doc_label && strpos($resp, '(API:') === false) {
-    $resp .= "\n\n(API: $api_doc_label)";
+if ($api_doc_label && strpos($resp, 'API used:') === false) {
+    $resp .= "\n\nAPI used: $api_doc_label";
 }
 
 // Debug: log the response
 error_log("chat_api.php | Question: " . $question . " | API: " . ($api_name ?: 'none') . " | Doc: " . ($api_doc_label ?: 'none') . " | Response: " . substr($resp, 0, 100));
+
+// Append LLM consulted status for fallback responses
+if (stripos($resp, 'LLM consulted') === false) {
+    $resp .= "\n\nLLM consulted - Yes";
+}
 
 echo json_encode([
     'question' => $question,
@@ -232,6 +418,7 @@ echo json_encode([
     'answer' => $resp,
     'api_doc_name' => $api_doc_label,
     'source' => 'fallback',
+    'llm_consulted' => true,
 ]);
 
 // ── Helper: call the Python MCP server ─────────────────────────────

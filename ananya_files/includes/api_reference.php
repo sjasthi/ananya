@@ -1,19 +1,25 @@
 <?php
-// Auto-generate a minimal API reference by scanning the api/ directory.
+// Auto-generate a minimal API reference by scanning the api/ directory recursively.
 // The generator looks for PHP files in api/ and extracts basic metadata
-// (filename, detected $_POST/$_GET params, and first comment block as description).
+// (path, detected $_POST/$_GET params, and first comment block as description).
 
 function build_api_reference() {
     $api_dir = realpath(__DIR__ . '/../api');
     $out = [];
     if(!$api_dir || !is_dir($api_dir)) return $out;
 
-    $files = scandir($api_dir);
-    foreach($files as $f) {
-        if(in_array($f, ['.', '..'])) continue;
-        $path = $api_dir . DIRECTORY_SEPARATOR . $f;
-        if(!is_file($path)) continue;
+    $iterator = new RecursiveIteratorIterator(
+        new RecursiveDirectoryIterator($api_dir, FilesystemIterator::SKIP_DOTS)
+    );
+
+    foreach($iterator as $fileInfo) {
+        if(!$fileInfo->isFile()) continue;
+        $f = $fileInfo->getFilename();
         if(!preg_match('/\.php$/i', $f)) continue;
+
+        $path = $fileInfo->getPathname();
+        $relativePath = str_replace($api_dir . DIRECTORY_SEPARATOR, '', $path);
+        $relativePath = str_replace('\\', '/', $relativePath);
 
         $content = file_get_contents($path);
 
@@ -45,9 +51,11 @@ function build_api_reference() {
             $example = "Example params: " . implode(', ', array_keys($params));
         }
 
+        $id = str_replace('/', '_', preg_replace('/\.php$/i', '', $relativePath));
+
         $out[] = [
-            'id' => pathinfo($f, PATHINFO_FILENAME),
-            'path' => 'api/' . $f,
+            'id' => $id,
+            'path' => 'api/' . $relativePath,
             'method' => empty($params) ? 'GET' : 'POST',
             'params' => $params,
             'param_keys' => array_keys($params), // Add this for easy access
