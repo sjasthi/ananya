@@ -22,6 +22,61 @@ cp -r ananya/ /path/to/htdocs/
 http://localhost/ananya/
 ```
 
+### Ollama (Local LLM for Chat)
+
+This project can use Ollama for local, free LLM responses (no API key needed).
+
+1. **Download Ollama**
+  - https://ollama.ai (Windows, macOS, Linux)
+
+2. **Start Ollama**
+  - Windows (PowerShell):
+    ```powershell
+    ollama serve
+    ```
+  - macOS/Linux (Terminal):
+    ```bash
+    ollama serve
+    ```
+
+3. **Download a model** (recommended: mistral)
+  ```bash
+  ollama pull mistral
+  ```
+
+4. **Configure the app**
+  - Copy the example environment file:
+    ```bash
+    cp .env.example .env
+    ```
+  - Ensure it contains:
+    ```
+    OLLAMA_URL=http://localhost:11434
+    ```
+
+5. **Open the chat UI**
+  - http://localhost/ananya/ananya_files/chat.php
+
+**Troubleshooting**
+
+- **Port already in use (11434)**
+  - Ollama is probably already running. Check:
+    ```powershell
+    Get-Process ollama
+    ```
+
+- **Model not found**
+  - Pull it first:
+    ```bash
+    ollama pull mistral
+    ```
+
+- **No response from model**
+  - Make sure Ollama is running:
+    ```bash
+    ollama serve
+    ```
+
 ### API Usage
 ```bash
 # Basic text length example

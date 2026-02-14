@@ -85,6 +85,12 @@
                 transform: translateY(-2px);
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             }
+
+            .language-select {
+                display: block;
+                width: auto;
+                max-width: 100%;
+            }
             
         </style>
         
@@ -123,20 +129,25 @@
                 </div>
                 
                 <div class="input-section">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="input-group mt-2">
-                                <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
-                                <button id="chat-send" class="btn btn-primary process-btn">
-                                    <i class="fas fa-paper-plane me-2"></i>Send
-                                </button>
-                            <small class="form-text text-muted mt-2">
-                            <i class="fas fa-info-circle me-1"></i>
-                            You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Process Text" to see the response.
-                            </small>
-                            </div>
-                        </div>
+                    <div class="mb-3">
+                        <label for="language-select" class="form-label">
+                            <i class="fas fa-language me-2"></i>Language
+                        </label>
+                        <select id="language-select" class="form-select language-select">
+                            <option value="english" selected>English</option>
+                            <option value="telugu">Telugu (తెలుగు)</option>
+                        </select>
                     </div>
+                    <div class="input-group mt-2">
+                        <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
+                        <button id="chat-send" class="btn btn-primary process-btn">
+                            <i class="fas fa-paper-plane me-2"></i>Send
+                        </button>
+                    </div>
+                    <small class="form-text text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Process Text" to see the response.
+                    </small>
                         <div class="mt-3">
                             <div id="chat-window" style="height:320px; overflow:auto; padding:12px; background:#fff; border:1px solid #e9ecef; border-radius:8px;"></div>
                             <div class="input-group mt-2">

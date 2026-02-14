@@ -1,49 +1,48 @@
 <?php
-// Simple LLM handler - uses OpenAI-compatible chat completions
-// Reads API key from environment variable OPENAI_API_KEY or from $_ENV
+// LLM handler using Ollama (local, free, no API key needed)
+// Make sure Ollama is running: ollama serve
+// Available models: ollama list
 
 function llm_ask($prompt, $opts = []) {
-    $apiKey = getenv('OPENAI_API_KEY') ?: ($_ENV['OPENAI_API_KEY'] ?? null);
-    if(!$apiKey) return 'LLM API key not configured. Set OPENAI_API_KEY environment variable.';
-
-    $model = $opts['model'] ?? 'gpt-4o-mini';
-    $max_tokens = $opts['max_tokens'] ?? 800;
+    $ollamaUrl = getenv('OLLAMA_URL') ?: 'http://localhost:11434';
+    $model = $opts['model'] ?? 'mistral'; // Change to 'llama2', 'neural-chat', etc.
     $temperature = $opts['temperature'] ?? 0.2;
 
     $payload = [
         'model' => $model,
-        'messages' => [
-            ['role' => 'system', 'content' => 'You are a helpful assistant. Provide concise, accurate answers and sample API calls when relevant.'],
-            ['role' => 'user', 'content' => $prompt]
-        ],
-        'max_tokens' => $max_tokens,
-        'temperature' => $temperature,
+        'prompt' => 'You are a helpful assistant. Provide concise, accurate answers and sample API calls when relevant.\n\n' . $prompt,
+        'stream' => false,
+        'options' => [
+            'temperature' => $temperature,
+            'top_k' => 40,
+            'top_p' => 0.9,
+        ]
     ];
 
-    $ch = curl_init('https://api.openai.com/v1/chat/completions');
+    $ch = curl_init($ollamaUrl . '/api/generate');
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
     curl_setopt($ch, CURLOPT_POST, true);
     curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Authorization: Bearer ' . $apiKey
+        'Content-Type: application/json'
     ]);
     curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($payload));
+    curl_setopt($ch, CURLOPT_TIMEOUT, 300); // Long timeout for first run
 
     $result = curl_exec($ch);
     if($result === false) {
         $err = curl_error($ch);
         curl_close($ch);
-        return 'LLM request failed: ' . $err;
+        return 'Ollama request failed: ' . $err . '. Make sure Ollama is running (ollama serve)';
     }
     curl_close($ch);
 
     $decoded = json_decode($result, true);
-    if(!$decoded) return 'Invalid response from LLM service.';
+    if(!$decoded) return 'Invalid response from Ollama.';
 
-    // Extract message content
-    if(isset($decoded['choices'][0]['message']['content'])) {
-        return trim($decoded['choices'][0]['message']['content']);
+    // Extract response content
+    if(isset($decoded['response'])) {
+        return trim($decoded['response']);
     }
 
-    return $result;
+    return 'No response from model. Check Ollama is running.';
 }

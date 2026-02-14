@@ -39,12 +39,19 @@ function build_api_reference() {
             }
         }
 
+        // Build example call
+        $example = '';
+        if (!empty($params)) {
+            $example = "Example params: " . implode(', ', array_keys($params));
+        }
+
         $out[] = [
             'id' => pathinfo($f, PATHINFO_FILENAME),
             'path' => 'api/' . $f,
             'method' => empty($params) ? 'GET' : 'POST',
             'params' => $params,
-            'description' => $description,
+            'param_keys' => array_keys($params), // Add this for easy access
+            'description' => $description . ($example ? " [$example]" : ""),
         ];
     }
 
