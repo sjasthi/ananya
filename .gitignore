@@ -1,0 +1,28 @@
+# Environment variables
+.env
+.env.local
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+vendor/
+__pycache__/
+
+# Build outputs
+dist/
+build/
+*.log
+
+# Local test files
+ananya_files/test_ollama.php
+ananya_files/test_llm.php

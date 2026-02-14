@@ -6,6 +6,28 @@ document.addEventListener('DOMContentLoaded', function () {
     const windowEl = document.getElementById('chat-window');
     const langSelect = document.getElementById('language-select');
 
+    function setSelectWidth(selectEl) {
+        if (!selectEl) return;
+        const options = Array.from(selectEl.options || []);
+        if (!options.length) return;
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const style = window.getComputedStyle(selectEl);
+        ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+        let maxWidth = 0;
+        options.forEach(opt => {
+            const w = ctx.measureText(opt.text).width;
+            if (w > maxWidth) maxWidth = w;
+        });
+
+        // 1.5x longest option + padding for arrow and inner spacing
+        const padding = 48;
+        const targetWidth = Math.ceil(maxWidth * 1.5 + padding);
+        selectEl.style.width = `${targetWidth}px`;
+    }
+
     // Configure marked for safe rendering
     if (typeof marked !== 'undefined') {
         marked.setOptions({ breaks: true, gfm: true });
@@ -139,6 +161,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Focus input on load
+    setSelectWidth(langSelect);
     input.focus();
 });

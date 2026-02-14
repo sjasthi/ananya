@@ -90,81 +90,81 @@
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             }
 
-            /* Chat-specific styles */
+            .language-select {
+                display: block;
+                width: auto;
+                max-width: 100%;
+            }
+
             #chat-window {
-                height: 420px;
-                overflow-y: auto;
-                padding: 16px;
-                background: #fff;
+                height: 320px;
+                overflow: auto;
+                padding: 12px;
+                background: #ffffff;
                 border: 1px solid #e9ecef;
                 border-radius: 8px;
             }
 
             .chat-bubble {
-                max-width: 80%;
-                padding: 10px 14px;
+                padding: 10px 12px;
                 border-radius: 12px;
-                word-wrap: break-word;
-                font-size: 0.95rem;
-                line-height: 1.5;
+                max-width: 75%;
+                line-height: 1.4;
+                word-break: break-word;
             }
 
             .chat-bubble.user {
-                background: linear-gradient(135deg, #2563eb, #7c3aed);
-                color: white;
+                background: #2563eb;
+                color: #ffffff;
                 border-bottom-right-radius: 4px;
             }
 
             .chat-bubble.assistant {
                 background: #f1f3f5;
-                color: #212529;
+                color: #111827;
                 border-bottom-left-radius: 4px;
             }
 
-            .chat-bubble.assistant p { margin-bottom: 0.4rem; }
-            .chat-bubble.assistant p:last-child { margin-bottom: 0; }
-            .chat-bubble.assistant code {
-                background: #e2e6ea;
-                padding: 1px 4px;
-                border-radius: 3px;
-                font-size: 0.88em;
-            }
-            .chat-bubble.assistant pre {
-                background: #1e1e2e;
-                color: #cdd6f4;
-                padding: 10px;
-                border-radius: 6px;
-                overflow-x: auto;
-                font-size: 0.85em;
-            }
-
-            .chat-typing {
-                display: inline-flex;
-                gap: 4px;
-                padding: 8px 14px;
-            }
-            .chat-typing span {
-                width: 8px; height: 8px;
-                background: #adb5bd;
-                border-radius: 50%;
-                animation: chatBounce 1.4s infinite both;
-            }
-            .chat-typing span:nth-child(2) { animation-delay: 0.2s; }
-            .chat-typing span:nth-child(3) { animation-delay: 0.4s; }
-            @keyframes chatBounce {
-                0%, 80%, 100% { transform: scale(0); }
-                40% { transform: scale(1); }
-            }
-
             .source-badge {
-                font-size: 0.7rem;
-                padding: 2px 6px;
-                border-radius: 4px;
-                margin-top: 4px;
+                font-size: 0.75rem;
+                margin-top: 6px;
+                padding: 2px 8px;
+                border-radius: 999px;
                 display: inline-block;
             }
-            .source-badge.mcp { background: #d3f9d8; color: #2b8a3e; }
-            .source-badge.fallback { background: #fff3bf; color: #e67700; }
+
+            .source-badge.mcp {
+                background: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .source-badge.fallback {
+                background: #fff3e0;
+                color: #ef6c00;
+            }
+
+            .chat-typing span {
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                margin-right: 4px;
+                border-radius: 50%;
+                background: #9aa0a6;
+                animation: typing-bounce 1.2s infinite ease-in-out;
+            }
+
+            .chat-typing span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .chat-typing span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            @keyframes typing-bounce {
+                0%, 80%, 100% { transform: scale(0.6); opacity: 0.6; }
+                40% { transform: scale(1); opacity: 1; }
+            }
             
         </style>
         
@@ -203,27 +203,28 @@
                 </div>
                 
                 <div class="input-section">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="input-group mt-2">
-                                <select id="language-select" class="form-select" style="max-width: 130px;">
-                                    <option value="english" selected>English</option>
-                                    <option value="telugu">Telugu</option>
-                                    <option value="hindi">Hindi</option>
-                                    <option value="gujarati">Gujarati</option>
-                                    <option value="malayalam">Malayalam</option>
-                                </select>
-                                <input id="chat-input" class="form-control" placeholder="Ask me about words, text analysis, palindromes, anagrams..." />
-                                <button id="chat-send" class="btn btn-primary process-btn">
-                                    <i class="fas fa-paper-plane me-2"></i>Send
-                                </button>
-                            </div>
-                            <small class="form-text text-muted mt-2">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Try: "Reverse the word abracadabra", "Is racecar a palindrome?", "Can you make the word 'mine' from 'minneapolis'?"
-                            </small>
-                        </div>
+                    <div class="mb-3">
+                        <label for="language-select" class="form-label">
+                            <i class="fas fa-language me-2"></i>Language
+                        </label>
+                        <select id="language-select" class="form-select language-select">
+                            <option value="english" selected>English</option>
+                            <option value="telugu">Telugu (తెలుగు)</option>
+                        </select>
                     </div>
+
+                    <div class="input-group mt-2">
+                        <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
+                        <button id="chat-send" class="btn btn-primary process-btn">
+                            <i class="fas fa-paper-plane me-2"></i>Send
+                        </button>
+                    </div>
+
+                    <small class="form-text text-muted mt-2">
+                        <i class="fas fa-info-circle me-1"></i>
+                        You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Send" to see the response.
+                    </small>
+
                     <div class="mt-3">
                         <div id="chat-window"></div>
                     </div>
