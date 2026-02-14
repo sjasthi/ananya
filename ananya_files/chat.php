@@ -16,6 +16,10 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap5.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         
+        <!-- Markdown rendering for chat responses -->
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.6/dist/purify.min.js"></script>
+        
         <style>
             .parser-container {
                 max-width: 1200px;
@@ -91,6 +95,76 @@
                 width: auto;
                 max-width: 100%;
             }
+
+            #chat-window {
+                height: 320px;
+                overflow: auto;
+                padding: 12px;
+                background: #ffffff;
+                border: 1px solid #e9ecef;
+                border-radius: 8px;
+            }
+
+            .chat-bubble {
+                padding: 10px 12px;
+                border-radius: 12px;
+                max-width: 75%;
+                line-height: 1.4;
+                word-break: break-word;
+            }
+
+            .chat-bubble.user {
+                background: #2563eb;
+                color: #ffffff;
+                border-bottom-right-radius: 4px;
+            }
+
+            .chat-bubble.assistant {
+                background: #f1f3f5;
+                color: #111827;
+                border-bottom-left-radius: 4px;
+            }
+
+            .source-badge {
+                font-size: 0.75rem;
+                margin-top: 6px;
+                padding: 2px 8px;
+                border-radius: 999px;
+                display: inline-block;
+            }
+
+            .source-badge.mcp {
+                background: #e8f5e9;
+                color: #2e7d32;
+            }
+
+            .source-badge.fallback {
+                background: #fff3e0;
+                color: #ef6c00;
+            }
+
+            .chat-typing span {
+                display: inline-block;
+                width: 6px;
+                height: 6px;
+                margin-right: 4px;
+                border-radius: 50%;
+                background: #9aa0a6;
+                animation: typing-bounce 1.2s infinite ease-in-out;
+            }
+
+            .chat-typing span:nth-child(2) {
+                animation-delay: 0.2s;
+            }
+
+            .chat-typing span:nth-child(3) {
+                animation-delay: 0.4s;
+            }
+
+            @keyframes typing-bounce {
+                0%, 80%, 100% { transform: scale(0.6); opacity: 0.6; }
+                40% { transform: scale(1); opacity: 1; }
+            }
             
         </style>
         
@@ -138,23 +212,21 @@
                             <option value="telugu">Telugu (తెలుగు)</option>
                         </select>
                     </div>
+
                     <div class="input-group mt-2">
                         <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
                         <button id="chat-send" class="btn btn-primary process-btn">
                             <i class="fas fa-paper-plane me-2"></i>Send
                         </button>
                     </div>
+
                     <small class="form-text text-muted mt-2">
                         <i class="fas fa-info-circle me-1"></i>
-                        You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Process Text" to see the response.
+                        You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Send" to see the response.
                     </small>
-                        <div class="mt-3">
-                            <div id="chat-window" style="height:320px; overflow:auto; padding:12px; background:#fff; border:1px solid #e9ecef; border-radius:8px;"></div>
-                            <div class="input-group mt-2">
-                
-                            </div>
 
-                        </div>
+                    <div class="mt-3">
+                        <div id="chat-window"></div>
                     </div>
                 </div>
             </div>

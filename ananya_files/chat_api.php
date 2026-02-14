@@ -11,10 +11,12 @@ if (file_exists(__DIR__ . '/../.env')) {
 }
 
 header('Content-Type: application/json; charset=utf-8');
-// chat_api.php - receives question, queries LLM with API context, returns JSON
+// chat_api.php - receives question, proxies to MCP server for LLM + tool orchestration
+// Falls back to direct LLM call if MCP server is unreachable
 
-require_once __DIR__ . '/includes/api_reference.php';
-require_once __DIR__ . '/includes/llm_handler.php';
+// MCP Server settings
+$MCP_SERVER_URL = 'http://localhost:8000/chat';
+$MCP_TIMEOUT = 60; // seconds — tool-calling loops can take a while
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {
@@ -123,18 +125,30 @@ if(!$question) {
     exit;
 }
 
-// Build a concise API context for the model
+// ── Try MCP Server first ───────────────────────────────────────────
+$mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT);
+
+if($mcp_result !== null) {
+    // MCP server responded successfully
+    echo json_encode($mcp_result);
+    exit;
+}
+
+// ── Fallback: direct LLM call (no tool execution) ─────────────────
+require_once __DIR__ . '/includes/api_reference.php';
+require_once __DIR__ . '/includes/llm_handler.php';
+
 $context = generate_api_context($API_REFERENCE);
 
 // Build detailed API param reference for the LLM
 $param_reference = "API Parameter Reference (use these EXACT names):\n";
 foreach ($API_REFERENCE as $api) {
     if (!empty($api['params'])) {
-        $param_reference .= "- " . $api['id'] . " (endpoint: " . $api['endpoint'] . "): " . implode(", ", array_keys($api['params'])) . "\n";
+        $param_reference .= "- " . $api['id'] . " (path: " . $api['path'] . "): " . implode(", ", array_keys($api['params'])) . "\n";
     }
 }
 
-$prompt = "You are a smart assistant that answers user questions by calling available REST APIs.\n";
+$prompt = "You are a smart assistant that answers user questions by calling available APIs.\n";
 $prompt .= "When the user asks something that can be answered by an API:\n";
 $prompt .= "1. Identify which API to call\n";
 $prompt .= "2. Format it as:\n";
@@ -145,7 +159,6 @@ $prompt .= $param_reference . "\n";
 $prompt .= "Available APIs:\n" . $context . "\n";
 $prompt .= "User question (language: $language):\n" . $question . "\n";
 
-// Query the LLM
 $resp = llm_ask($prompt, [
     'model' => 'mistral',
     'temperature' => 0.2,
@@ -213,12 +226,50 @@ if ($api_doc_label && strpos($resp, '(API:') === false) {
 // Debug: log the response
 error_log("chat_api.php | Question: " . $question . " | API: " . ($api_name ?: 'none') . " | Doc: " . ($api_doc_label ?: 'none') . " | Response: " . substr($resp, 0, 100));
 
-// Return structured JSON
 echo json_encode([
     'question' => $question,
     'language' => $language,
     'answer' => $resp,
     'api_doc_name' => $api_doc_label,
+    'source' => 'fallback',
 ]);
+
+// ── Helper: call the Python MCP server ─────────────────────────────
+function call_mcp_server($url, $question, $language, $timeout) {
+    $payload = json_encode([
+        'question' => $question,
+        'language' => $language,
+    ]);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Accept: application/json',
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+    $result = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+    curl_close($ch);
+
+    if($result === false || $httpCode < 200 || $httpCode >= 500) {
+        // MCP server is down or errored — trigger fallback
+        error_log("MCP server unreachable ($url): $err (HTTP $httpCode)");
+        return null;
+    }
+
+    $decoded = json_decode($result, true);
+    if(!is_array($decoded)) {
+        error_log("MCP server returned invalid JSON");
+        return null;
+    }
+
+    return $decoded;
+}
 
 // End of file
