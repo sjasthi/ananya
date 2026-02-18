@@ -1,21 +1,20 @@
 <?php
-
 require_once("../../word_processor.php");
 
-if (isset($_GET['string']) && isset($_GET['language'])) {
+if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['string2'])) {
     $string = $_GET['string'];
     $language = $_GET['language'];
-} else if (isset($_GET['input1']) && isset($_GET['input2'])) {
+    $string2 = $_GET['string2'];
+} else if (isset($_GET['input1']) && isset($_GET['input2']) && isset($_GET['input3'])) {
     $string = $_GET['input1'];
     $language = $_GET['input2'];
+    $string2 = $_GET['input3'];
 }
 
 if (!empty($string) && !empty($language)) {
     $processor = new wordProcessor($string, $language);
-    //convert string to an array (randomize() only takes arrays).
-    $stringArray = str_split($string);
-    $randomizedString = $processor->randomize($stringArray);
-    response(200, "String Randomized", $string, $language, $randomizedString);
+    $anagrams = $processor->isAnagram($string2);
+    response(200, "Anagram Assessed", $string, $language, $anagrams);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {

@@ -12,10 +12,8 @@ if (isset($_GET['string']) && isset($_GET['language'])) {
 
 if (!empty($string) && !empty($language)) {
     $processor = new wordProcessor($string, $language);
-    //convert string to an array (randomize() only takes arrays).
-    $stringArray = str_split($string);
-    $randomizedString = $processor->randomize($stringArray);
-    response(200, "String Randomized", $string, $language, $randomizedString);
+    $codePoints = $processor->getCodePointLength();
+    response(200, "Code Point Length Calculated", $string, $language, $codePoints);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {

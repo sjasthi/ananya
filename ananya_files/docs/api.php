@@ -94,62 +94,70 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <a class="nav-link" href="#text-replace">Text Replace</a>
                         
                         <div class="category-header">Character Operations</div>
+                        <a class="nav-link" href="#characters-add-at">Add at Position</a>
+                        <a class="nav-link" href="#characters-add-end">Add at End</a>
                         <a class="nav-link" href="#characters-base">Base Characters</a>
-                        <a class="nav-link" href="#characters-logical">Logical Characters</a>
+                        <a class="nav-link" href="#characters-base-consonants">Base Consonants</a>
                         <a class="nav-link" href="#characters-codepoints">Code Points</a>
                         <a class="nav-link" href="#characters-codepoint-length">Code Point Length</a>
-                        <a class="nav-link" href="#characters-random-logical">Random Logical</a>
-                        <a class="nav-link" href="#characters-add-end">Add at End</a>
+                        <a class="nav-link" href="#characters-filler-characters">Filler Characters</a>
+                        <a class="nav-link" href="#characters-logical">Logical Characters</a>
                         <a class="nav-link" href="#characters-logical-at">Logical Char At</a>
-                        <a class="nav-link" href="#characters-base-consonants">Base Consonants</a>
-                        <a class="nav-link" href="#characters-add-at">Add at Position</a>
-                        <a class="nav-link" href="#characters-filler">Filler Characters</a>
+                        <a class="nav-link" href="#characters-random-logical-chars">Random Logical</a>
                         
                         <div class="category-header">Analysis Operations</div>
-                        <a class="nav-link" href="#analysis-is-palindrome">Is Palindrome</a>
-                        <a class="nav-link" href="#analysis-word-strength">Word Strength</a>
-                        <a class="nav-link" href="#analysis-word-weight">Word Weight</a>
-                        <a class="nav-link" href="#analysis-word-level">Word Level</a>
-                        <a class="nav-link" href="#analysis-is-anagram">Is Anagram</a>
-                        <a class="nav-link" href="#analysis-parse-logical-chars">Parse to Logical Chars</a>
-                        <a class="nav-link" href="#analysis-parse-logical-characters">Parse to Logical Characters</a>
-                        <a class="nav-link" href="#analysis-split-chunks">Split into Chunks</a>
                         <a class="nav-link" href="#analysis-can-make-word">Can Make Word</a>
                         <a class="nav-link" href="#analysis-can-make-all-words">Can Make All Words</a>
-                        <a class="nav-link" href="#analysis-is-intersecting">Is Intersecting</a>
-                        <a class="nav-link" href="#analysis-intersecting-rank">Intersecting Rank</a>
-                        <a class="nav-link" href="#analysis-unique-intersecting-rank">Unique Intersecting Rank</a>
-                        <a class="nav-link" href="#analysis-unique-intersecting-chars">Unique Intersecting Chars</a>
-                        <a class="nav-link" href="#analysis-ladder-words">Ladder Words</a>
-                        <a class="nav-link" href="#analysis-head-tail-words">Head Tail Words</a>
                         <a class="nav-link" href="#analysis-get-match-id-string">Get Match ID String</a>
+                        <a class="nav-link" href="#analysis-head-tail-words">Head Tail Words</a>
+                        <a class="nav-link" href="#analysis-intersecting-rank">Intersecting Rank</a>
+                        <a class="nav-link" href="#analysis-is-anagram">Is Anagram</a>
+                        <a class="nav-link" href="#analysis-is-consonant">Is Consonant</a>
+                        <a class="nav-link" href="#analysis-is-palindrome">Is Palindrome</a>
+                        <a class="nav-link" href="#analysis-is-vowel">Is Vowel</a>
+                        <a class="nav-link" href="#analysis-ladder-words">Ladder Words</a>
+                        <a class="nav-link" href="#analysis-word-level">Word Level</a>
+                        <a class="nav-link" href="#analysis-word-strength">Word Strength</a>
+                        <a class="nav-link" href="#analysis-word-weight">Word Weight</a>
+                <!-- <a class="nav-link" href="#analysis-parse-logical-chars">Parse to Logical Chars</a> -->
+                        <a class="nav-link" href="#analysis-parse-logical-characters">Parse to Logical Characters</a>
+                        <a class="nav-link" href="#analysis-role">Character Role</a>
+                        <a class="nav-link" href="#analysis-split-chunks">Split into Chunks</a>
+                        <a class="nav-link" href="#analysis-unique-intersecting-chars">Unique Intersecting Chars</a>
+                        <a class="nav-link" href="#analysis-unique-intersecting-rank">Unique Intersecting Rank</a>
                         
                         <div class="category-header">Comparison Operations</div>
-                        <a class="nav-link" href="#comparison-equals">Equals</a>
-                        <a class="nav-link" href="#comparison-starts-with">Starts With</a>
-                        <a class="nav-link" href="#comparison-ends-with">Ends With</a>
-                        <a class="nav-link" href="#comparison-compare">Compare</a>
+                        <a class="nav-link" href="#comparison-compare-to">Compare To</a>
                         <a class="nav-link" href="#comparison-compare-ignore-case">Compare Ignore Case</a>
+                        <a class="nav-link" href="#comparison-equals">Equals</a>
+                        <a class="nav-link" href="#comparison-is-intersecting">Is Intersecting</a>
                         <a class="nav-link" href="#comparison-reverse-equals">Reverse Equals</a>
-                        <a class="nav-link" href="#comparison-index-of">Index Of</a>
                         
                         <div class="category-header">Validation Operations</div>
-                        <a class="nav-link" href="#validation-contains-space">Contains Space</a>
                         <a class="nav-link" href="#validation-contains-char">Contains Character</a>
                         <a class="nav-link" href="#validation-contains-logical-chars">Contains Logical Chars</a>
                         <a class="nav-link" href="#validation-contains-all-logical-chars">Contains All Logical Chars</a>
                         <a class="nav-link" href="#validation-contains-logical-sequence">Contains Logical Sequence</a>
+                        <a class="nav-link" href="#validation-contains-space">Contains Space</a>
                         <a class="nav-link" href="#validation-contains-string">Contains String</a>
-                        <a class="nav-link" href="#validation-is-consonant">Is Consonant</a>
-                        <a class="nav-link" href="#validation-is-vowel">Is Vowel</a>
+                        <a class="nav-link" href="#validation-starts-with">Starts With</a>
+                        <a class="nav-link" href="#validation-ends-with">Ends With</a>
                         
                         <div class="category-header">Utility Operations</div>
+                        <a class="nav-link" href="#utility-index-of">Index Of</a>
+                        <a class="nav-link" href="#utility-language">Language</a>
                         <a class="nav-link" href="#utility-length-no-spaces">Length No Spaces</a>
                         <a class="nav-link" href="#utility-length-no-spaces-commas">Length No Spaces/Commas</a>
-                        <a class="nav-link" href="#utility-length-alternative">Length Alternative</a>
+                        <a class="nav-link" href="#utility-match-id">Match ID</a>
+                        
                         
                         <div class="category-header">Authentication</div>
+                        <a class="nav-link" href="#auth-login">Login</a>
                         <a class="nav-link" href="#auth-user-exists">User Exists</a>
+                        
+                        <div class="category-header">User Management</div>
+                        <a class="nav-link" href="#userExists">User Exists</a>
+                        
                     </nav>
                 </div>
             </div>
@@ -441,6 +449,79 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                     <!-- Character Operations -->
                     <h2 class="category-header">Character Operations</h2>
 
+                    <div id="characters-add-at" class="api-section">
+                        <h3>Add Character at Position</h3>
+                        <p>Adds a character or string at a specific position in the input string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/add-at
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Position (0-based index)</li>
+                                    <li><code>input3</code> (required) - Character/string to add</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/add-at?string=hello&input2=2&input3=X&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Character added at position",
+  "string": "hello",
+  "language": "English",
+  "data": "heXllo"
+}</code></pre>
+                    </div>
+
+                    <div id="characters-add-end" class="api-section">
+                        <h3>Add Character at End</h3>
+                        <p>Adds a character or string at the end of the input string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/add-end
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Character/string to add</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/add-end?string=hello&input2=!&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Character added at end",
+  "string": "hello",
+  "language": "English",
+  "data": "hello!"
+}</code></pre>
+                    </div>
+
                     <div id="characters-base" class="api-section">
                         <h3>Base Characters</h3>
                         <p>Returns the base characters from the input string, useful for anagram analysis.</p>
@@ -476,15 +557,15 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <div id="characters-logical" class="api-section">
-                        <h3>Logical Characters</h3>
-                        <p>Returns an array of logical characters from the input string, properly handling complex scripts.</p>
+                    <div id="characters-base-consonants" class="api-section">
+                        <h3>Base Consonants</h3>
+                        <p>Returns the base consonants from a string compared against a second string.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/characters/logical
+                                    GET /api.php/characters/base-consonants
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -492,22 +573,24 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>secondString</code> (required) - Second string to compare</li>
                                 </ul>
                             </div>
                         </div>
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/logical?string=అమెరికా&language=Telugu
+                            <?= $apiBase ?>characters/base-consonants?string=hello&language=English&secondString=world
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Logical characters processed",
-  "string": "అమెరికా",
-  "language": "Telugu",
-  "data": ["అ", "మె", "రి", "కా"]
+  "message": "baseConsonants Processed",
+  "string": "hello",
+  "language": "English",
+  "secondString": "world",
+  "data": ["l"]
 }</code></pre>
                     </div>
 
@@ -581,6 +664,78 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
+                    <div id="characters-filler-characters" class="api-section">
+                        <h3>Filler Characters</h3>
+                        <p>Generates random filler characters of the specified type and count for the given language.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/filler-characters
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>count</code> (required) - Number of characters to generate (must be > 0)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>type</code> (required) - Type of filler characters</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/filler-characters?count=5&language=Telugu&type=consonant
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Filler Characters Generated",
+  "count": "5",
+  "type": "consonant",
+  "language": "Telugu",
+  "data": ["క", "ట", "ప", "మ", "న"]
+}</code></pre>
+                    </div>
+
+                    <div id="characters-logical" class="api-section">
+                        <h3>Logical Characters</h3>
+                        <p>Returns an array of logical characters from the input string, properly handling complex scripts.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/logical
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/logical?string=అమెరికా&language=Telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Logical characters processed",
+  "string": "అమెరికా",
+  "language": "Telugu",
+  "data": ["అ", "మె", "రి", "కా"]
+}</code></pre>
+                    </div>
+
                     <div id="characters-logical-at" class="api-section">
                         <h3>Logical Character At Position</h3>
                         <p>Returns the logical character at a specific position in the string.</p>
@@ -617,22 +772,22 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <div id="characters-add-end" class="api-section">
-                        <h3>Add Character at End</h3>
-                        <p>Adds a character or string at the end of the input string.</p>
+                    <div id="characters-random-logical-chars" class="api-section">
+                        <h3>Random Logical Characters</h3>
+                        <p>Generates random logical characters from the input string.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/characters/add-end
+                                    GET /api.php/characters/random-logical-chars
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Character/string to add</li>
+                                    <li><code>input2</code> (required) - Number of characters to generate</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
@@ -640,109 +795,39 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/add-end?string=hello&input2=!&language=English
+                            <?= $apiBase ?>characters/random-logical-chars?string=hello&input2=3&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Character added at end",
+  "message": "Random logical characters generated",
   "string": "hello",
   "language": "English",
-  "data": "hello!"
-}</code></pre>
-                    </div>
-
-                    <div id="characters-add-at" class="api-section">
-                        <h3>Add Character at Position</h3>
-                        <p>Adds a character or string at a specific position in the input string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/add-at
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Position (0-based index)</li>
-                                    <li><code>input3</code> (required) - Character/string to add</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/add-at?string=hello&input2=2&input3=X&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Character added at position",
-  "string": "hello",
-  "language": "English",
-  "data": "heXllo"
+  "data": ["h", "e", "l"]
 }</code></pre>
                     </div>
 
                     <!-- Analysis Operations -->
                     <h2 class="category-header">Analysis Operations</h2>
-
-                    <div id="analysis-strength" class="api-section">
-                        <h3>Word Strength</h3>
-                        <p>Calculates a strength score for the word based on its complexity and characteristics.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/strength
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/strength?string=America&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Word strength calculated",
-  "string": "America",
-  "language": "English",
-  "data": 42
-}</code></pre>
                     </div>
 
-                    <div id="analysis-weight" class="api-section">
-                        <h3>Word Weight</h3>
-                        <p>Calculates the weight of a word based on various linguistic factors.</p>
+                    <div id="analysis-can-make-word" class="api-section">
+                        <h3>Can Make Word</h3>
+                        <p>Checks if one string can be formed using characters from another string.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/analysis/weight
+                                    GET /api.php/analysis/can-make-word
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
-                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>string</code> (required) - Source string</li>
+                                    <li><code>input2</code> (required) - Target word to make</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
@@ -750,299 +835,16 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/weight?string=computer&language=English
+                            <?= $apiBase ?>analysis/can-make-word?string=hello&input2=he&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Word weight calculated",
-  "string": "computer",
-  "language": "English",
-  "data": 98
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-level" class="api-section">
-                        <h3>Word Level</h3>
-                        <p>Determines the complexity level of a word based on linguistic analysis.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/level
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/level?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Word level analyzed",
+  "message": "Word formation check completed",
   "string": "hello",
-  "language": "English",
-  "data": 2
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-role" class="api-section">
-                        <h3>Character Role</h3>
-                        <p>Determines the linguistic role of a character (consonant, vowel, etc.).</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/role
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/role?string=a&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Character role analyzed",
-  "string": "a",
-  "language": "English",
-  "data": "vowel"
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-is-consonant" class="api-section">
-                        <h3>Is Consonant</h3>
-                        <p>Checks if a character is a consonant in the specified language.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/is-consonant
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/is-consonant?string=b&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Consonant check completed",
-  "string": "b",
   "language": "English",
   "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-is-vowel" class="api-section">
-                        <h3>Is Vowel</h3>
-                        <p>Checks if a character is a vowel in the specified language.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/is-vowel
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/is-vowel?string=e&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Vowel check completed",
-  "string": "e",
-  "language": "English",
-  "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-intersecting-rank" class="api-section">
-                        <h3>Intersecting Rank</h3>
-                        <p>Calculates the intersecting rank between two strings based on common characters.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/intersecting-rank
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - First string</li>
-                                    <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/intersecting-rank?string=hello&input2=world&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Intersecting rank calculated",
-  "string": "hello",
-  "language": "English",
-  "data": 3
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-unique-intersecting-rank" class="api-section">
-                        <h3>Unique Intersecting Rank</h3>
-                        <p>Calculates the unique intersecting rank between two strings.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/unique-intersecting-rank
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - First string</li>
-                                    <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/unique-intersecting-rank?string=hello&input2=world&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Unique intersecting rank calculated",
-  "string": "hello",
-  "language": "English",
-  "data": 2
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-unique-intersecting-chars" class="api-section">
-                        <h3>Unique Intersecting Characters</h3>
-                        <p>Returns the unique characters that intersect between two strings.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/unique-intersecting-chars
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - First string</li>
-                                    <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/unique-intersecting-chars?string=hello&input2=world&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Unique intersecting characters found",
-  "string": "hello",
-  "language": "English",
-  "data": ["l", "o"]
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-parse-logical-characters" class="api-section">
-                        <h3>Parse to Logical Characters (Alternative)</h3>
-                        <p>Alternative method to parse text into logical characters array.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/parse-to-logical-characters
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input text</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/parse-to-logical-characters?string=అమెరికా&language=telugu
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Text parsed to logical characters (alternative)",
-  "string": "అమెరికా",
-  "language": "telugu",
-  "data": ["అ", "మె", "రి", "కా"]
 }</code></pre>
                     </div>
 
@@ -1079,42 +881,6 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "string": "అమెరికాఆస్ట్రేలియా",
   "language": "telugu",
   "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="analysis-unique-intersecting-rank" class="api-section">
-                        <h3>Unique Intersecting Rank</h3>
-                        <p>Calculates the count of unique characters that intersect between two strings.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/analysis/unique-intersecting-rank
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - First string</li>
-                                    <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/unique-intersecting-rank?string=అమెరికా&input2=కాలేజీ&language=telugu
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Unique intersecting rank calculated",
-  "string": "అమెరికా",
-  "language": "telugu",
-  "data": 2
 }</code></pre>
                     </div>
 
@@ -1162,18 +928,52 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         </div>
                     </div>
 
-                    <!-- String Comparison -->
-                    <h2 class="category-header">String Comparison</h2>
-
-                    <div id="comparison-is-anagram" class="api-section">
-                        <h3>Is Anagram</h3>
-                        <p>Checks if two strings are anagrams of each other (contain the same characters in different order).</p>
+                    <div id="analysis-head-tail-words" class="api-section">
+                        <h3>Head Tail Words</h3>
+                        <p>Checks if two words are head-and-tail words (the last logical character of the first word matches the first logical character of the second word).</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/comparison/is-anagram
+                                    GET /api.php/analysis/heads-tails-words
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - First word</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>string2</code> (required) - Second word</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/heads-tails-words?string=hello&language=English&string2=orange
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "areHeadAndTailWords() executed",
+  "string": "hello",
+  "string2": "orange",
+  "language": "English",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-intersecting-rank" class="api-section">
+                        <h3>Intersecting Rank</h3>
+                        <p>Calculates the intersecting rank between two strings based on common characters.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/intersecting-rank
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -1188,7 +988,43 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>comparison/is-anagram?string=listen&input2=silent&language=English
+                            <?= $apiBase ?>analysis/intersecting-rank?string=hello&input2=world&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Intersecting rank calculated",
+  "string": "hello",
+  "language": "English",
+  "data": 3
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-is-anagram" class="api-section">
+                        <h3>Is Anagram</h3>
+                        <p>Checks if two strings are anagrams of each other (contain the same characters in different order).</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/is-anagram
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - First string</li>
+                                    <li><code>input2</code> (required) - Second string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/is-anagram?string=listen&input2=silent&language=English
                         </div>
 
                         <h6>Example Response</h6>
@@ -1201,7 +1037,42 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <div id="comparison-is-palindrome" class="api-section">
+                    <div id="analysis-is-consonant" class="api-section">
+                        <h3>Is Consonant</h3>
+                        <p>Checks if a character is a consonant in the specified language.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/is-consonant
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input character</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/is-consonant?string=b&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Consonant check completed",
+  "string": "b",
+  "language": "English",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-is-palindrome" class="api-section">
                         <h3>Is Palindrome</h3>
                         <p>Checks if a string reads the same forwards and backwards (palindrome).</p>
                         
@@ -1209,7 +1080,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/comparison/is-palindrome
+                                    GET /api.php/analysis/is-palindrome
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -1223,7 +1094,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>comparison/is-palindrome?string=racecar&language=English
+                            <?= $apiBase ?>analysis/is-palindrome?string=racecar&language=English
                         </div>
 
                         <h6>Example Response</h6>
@@ -1236,15 +1107,297 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <div id="comparison-equals" class="api-section">
-                        <h3>Equals</h3>
-                        <p>Compares two strings for exact equality.</p>
+                    <div id="analysis-is-vowel" class="api-section">
+                        <h3>Is Vowel</h3>
+                        <p>Checks if a character is a vowel in the specified language.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/comparison/equals
+                                    GET /api.php/analysis/is-vowel
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input character</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/is-vowel?string=e&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Vowel check completed",
+  "string": "e",
+  "language": "English",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-ladder-words" class="api-section">
+                        <h3>Ladder Words</h3>
+                        <p>Checks if two words are ladder words (they differ by exactly one logical character).</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/ladder-words
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - First word</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>string2</code> (required) - Second word</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/ladder-words?string=cat&language=English&string2=bat
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "areLadderWords() executed",
+  "string": "cat",
+  "string2": "bat",
+  "language": "English",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-word-level" class="api-section">
+                        <h3>Word Level</h3>
+                        <p>Determines the complexity level of a word based on linguistic analysis.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/word-level
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/word-level?string=hello&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Word level analyzed",
+  "string": "hello",
+  "language": "English",
+  "data": 2
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-word-strength" class="api-section">
+                        <h3>Word Strength</h3>
+                        <p>Calculates a strength score for the word based on its complexity and characteristics.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/word-strength
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/word-strength?string=America&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Word strength calculated",
+  "string": "America",
+  "language": "English",
+  "data": 42
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-word-weight" class="api-section">
+                        <h3>Word Weight</h3>
+                        <p>Calculates the weight of a word based on various linguistic factors.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/word-weight
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/word-weight?string=computer&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Word weight calculated",
+  "string": "computer",
+  "language": "English",
+  "data": 98
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-parse-logical-characters" class="api-section">
+                        <h3>Parse to Logical Characters (Alternative)</h3>
+                        <p>Alternative method to parse text into logical characters array.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/parse-to-logical-characters
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input text</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/parse-to-logical-characters?string=అమెరికా&language=telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Text parsed to logical characters (alternative)",
+  "string": "అమెరికా",
+  "language": "telugu",
+  "data": ["అ", "మె", "రి", "కా"]
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-role" class="api-section">
+                        <h3>Character Role</h3>
+                        <p>Determines the linguistic role of a character (consonant, vowel, etc.).</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/role
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input character</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/role?string=a&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Character role analyzed",
+  "string": "a",
+  "language": "English",
+  "data": "vowel"
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-split-chunks" class="api-section">
+                        <h3>Split into Chunks</h3>
+                        <p>Splits the input string into 15 equal chunks of logical characters.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/split-into-chunks
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/split-into-chunks?string=అమెరికా&language=Telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Split into 15 chunks calculated",
+  "string": "అమెరికా",
+  "language": "Telugu",
+  "data": [["అ"], ["మె"], ["రి"], ["కా"]]
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-unique-intersecting-chars" class="api-section">
+                        <h3>Unique Intersecting Characters</h3>
+                        <p>Returns the unique characters that intersect between two strings.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/unique-intersecting-chars
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -1259,18 +1412,57 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>comparison/equals?string=hello&input2=hello&language=English
+                            <?= $apiBase ?>analysis/unique-intersecting-chars?string=hello&input2=world&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "String comparison completed",
+  "message": "Unique intersecting characters found",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": ["l", "o"]
 }</code></pre>
                     </div>
+
+                    <div id="analysis-unique-intersecting-rank" class="api-section">
+                        <h3>Unique Intersecting Rank</h3>
+                        <p>Calculates the unique intersecting rank between two strings.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/unique-intersecting-rank
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - First string</li>
+                                    <li><code>input2</code> (required) - Second string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/unique-intersecting-rank?string=hello&input2=world&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Unique intersecting rank calculated",
+  "string": "hello",
+  "language": "English",
+  "data": 2
+}</code></pre>
+                    </div>
+
+                    <!-- String Comparison -->
+                    <h2 class="category-header">String Comparison</h2>
 
                     <div id="comparison-compare-to" class="api-section">
                         <h3>Compare To</h3>
@@ -1344,15 +1536,15 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <div id="comparison-reverse-equals" class="api-section">
-                        <h3>Reverse Equals</h3>
-                        <p>Checks if the reverse of the first string equals the second string.</p>
+                    <div id="comparison-equals" class="api-section">
+                        <h3>Equals</h3>
+                        <p>Compares two strings for exact equality.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/comparison/reverse-equals
+                                    GET /api.php/comparison/equals
                                 </div>
                             </div>
                             <div class="col-md-6">
@@ -1367,13 +1559,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>comparison/reverse-equals?string=hello&input2=olleh&language=English
+                            <?= $apiBase ?>comparison/equals?string=hello&input2=hello&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Reverse equality check completed",
+  "message": "String comparison completed",
   "string": "hello",
   "language": "English",
   "data": true
@@ -1416,6 +1608,42 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
+                    <div id="comparison-reverse-equals" class="api-section">
+                        <h3>Reverse Equals</h3>
+                        <p>Checks if the reverse of the first string equals the second string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/comparison/reverse-equals
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - First string</li>
+                                    <li><code>input2</code> (required) - Second string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>comparison/reverse-equals?string=hello&input2=olleh&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Reverse equality check completed",
+  "string": "hello",
+  "language": "English",
+  "data": true
+}</code></pre>
+                    </div>
+
                     <!-- Validation Operations -->
                     <h2 class="category-header">Validation Operations</h2>
 
@@ -1450,6 +1678,150 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
   "message": "Character containment check completed",
   "string": "hello",
+  "language": "English",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="validation-contains-logical-chars" class="api-section">
+                        <h3>Contains Logical Characters</h3>
+                        <p>Checks if the string contains any of the specified logical characters (comma-separated).</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/validation/contains-logical-chars
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>contains</code> (required) - Comma-separated logical characters to check</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>validation/contains-logical-chars?string=అమెరికా&language=Telugu&contains=అ,క
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "containsLogicalChars() Processed",
+  "string": "అమెరికా",
+  "language": "Telugu",
+  "contains": "అ,క",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="validation-contains-all-logical-chars" class="api-section">
+                        <h3>Contains All Logical Characters</h3>
+                        <p>Checks if the string contains all the specified logical characters.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/validation/contains-all-logical-chars
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Logical characters to check</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>validation/contains-all-logical-chars?string=అమెరికాఆస్ట్రేలియా&input2=అ,మె&language=telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "All logical characters check completed",
+  "string": "అమెరికాఆస్ట్రేలియా",
+  "language": "telugu",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="validation-contains-logical-sequence" class="api-section">
+                        <h3>Contains Logical Sequence</h3>
+                        <p>Checks if the string contains a specific sequence of logical characters.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/validation/contains-logical-sequence
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Logical character sequence</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>validation/contains-logical-sequence?string=అమెరికా&input2=మె,రి&language=telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Logical character sequence check completed",
+  "string": "అమెరికా",
+  "language": "telugu",
+  "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="validation-contains-space" class="api-section">
+                        <h3>Contains Space</h3>
+                        <p>Checks if a string contains any whitespace characters.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/validation/contains-space
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>validation/contains-space?string=hello world&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Space check completed",
+  "string": "hello world",
   "language": "English",
   "data": true
 }</code></pre>
@@ -1561,222 +1933,9 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "language": "English",
   "data": true
 }</code></pre>
-                    </div>
-
-                    <div id="validation-contains-space" class="api-section">
-                        <h3>Contains Space</h3>
-                        <p>Checks if a string contains any whitespace characters.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/validation/contains-space
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>validation/contains-space?string=hello world&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Space check completed",
-  "string": "hello world",
-  "language": "English",
-  "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="validation-can-make-word" class="api-section">
-                        <h3>Can Make Word</h3>
-                        <p>Checks if one string can be formed using characters from another string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/validation/can-make-word
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Source string</li>
-                                    <li><code>input2</code> (required) - Target word to make</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>validation/can-make-word?string=hello&input2=he&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Word formation check completed",
-  "string": "hello",
-  "language": "English",
-  "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="validation-can-make-all-words" class="api-section">
-                        <h3>Can Make All Words</h3>
-                        <p>Checks if all words in a list can be formed using characters from a source string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/validation/can-make-all-words
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Source string</li>
-                                    <li><code>input2</code> (required) - Comma-separated list of words</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>validation/can-make-all-words?string=hello&input2=he,lo&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "All words formation check completed",
-  "string": "hello",
-  "language": "English",
-  "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="validation-contains-all-logical-chars" class="api-section">
-                        <h3>Contains All Logical Characters</h3>
-                        <p>Checks if the string contains all the specified logical characters.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/validation/contains-all-logical-chars
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Logical characters to check</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>validation/contains-all-logical-chars?string=అమెరికాఆస్ట్రేలియా&input2=అ,మె&language=telugu
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "All logical characters check completed",
-  "string": "అమెరికాఆస్ట్రేలియా",
-  "language": "telugu",
-  "data": true
-}</code></pre>
-                    </div>
-
-                    <div id="validation-contains-logical-sequence" class="api-section">
-                        <h3>Contains Logical Sequence</h3>
-                        <p>Checks if the string contains a specific sequence of logical characters.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/validation/contains-logical-sequence
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Logical character sequence</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>validation/contains-logical-sequence?string=అమెరికా&input2=మె,రి&language=telugu
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Logical character sequence check completed",
-  "string": "అమెరికా",
-  "language": "telugu",
-  "data": true
-}</code></pre>
-                    </div>
 
                     <!-- Utility Operations -->
                     <h2 class="category-header">Utility Operations</h2>
-
-                    <div id="utility-language" class="api-section">
-                        <h3>Detect Language</h3>
-                        <p>Automatically detects whether a string is primarily English, Telugu, or mixed/other.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/utility/language
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>utility/language?string=hello
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Language detected",
-  "string": "hello",
-  "data": "English"
-}</code></pre>
-                    </div>
 
                     <div id="utility-index-of" class="api-section">
                         <h3>Index Of</h3>
@@ -1814,22 +1973,54 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <div id="utility-random-logical-chars" class="api-section">
-                        <h3>Random Logical Characters</h3>
-                        <p>Generates random logical characters from the input string.</p>
+                    <div id="utility-language" class="api-section">
+                        <h3>Detect Language</h3>
+                        <p>Automatically detects whether a string is primarily English, Telugu, or mixed/other.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
                                 <h6>Endpoint</h6>
                                 <div class="api-endpoint">
-                                    GET /api.php/utility/random-logical-chars
+                                    GET /api.php/utility/language
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Number of characters to generate</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>utility/language?string=hello
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Language detected",
+  "string": "hello",
+  "data": "English"
+}</code></pre>
+                    </div>
+
+                    <div id="utility-length-no-spaces" class="api-section">
+                        <h3>Length No Spaces</h3>
+                        <p>Returns the length of the string excluding spaces.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/utility/length-no-spaces
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
@@ -1837,16 +2028,51 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>utility/random-logical-chars?string=hello&input2=3&language=English
+                            <?= $apiBase ?>utility/length-no-spaces?string=hello world&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Random logical characters generated",
-  "string": "hello",
+  "message": "Length Calculated with spaces",
+  "string": "hello world",
   "language": "English",
-  "data": ["h", "e", "l"]
+  "data": 10
+}</code></pre>
+                    </div>
+
+                    <div id="utility-length-no-spaces-commas" class="api-section">
+                        <h3>Length No Spaces/Commas</h3>
+                        <p>Returns the length of the string excluding both spaces and commas.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/utility/length-no-spaces-commas
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>utility/length-no-spaces-commas?string=hello, world&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Length Calculated with No Commas and No Spaces",
+  "string": "hello, world",
+  "language": "English",
+  "data": 10
 }</code></pre>
                     </div>
 
@@ -1888,39 +2114,6 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                     <!-- Authentication -->
                     <h2 class="category-header">Authentication</h2>
 
-                    <div id="auth-user-exists" class="api-section">
-                        <h3>User Exists</h3>
-                        <p>Checks if a user exists in the system.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/auth/user-exists
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Username</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>auth/user-exists?string=testuser
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "User existence check completed",
-  "string": "testuser",
-  "data": false
-}</code></pre>
-                    </div>
-
                     <div id="auth-login" class="api-section">
                         <h3>Login</h3>
                         <p>Authenticates a user with username and password.</p>
@@ -1954,6 +2147,39 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
     "token": "auth_token_here",
     "user_id": 123
   }
+}</code></pre>
+                    </div>
+
+                    <div id="auth-user-exists" class="api-section">
+                        <h3>User Exists</h3>
+                        <p>Checks if a user exists in the system.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/auth/user-exists
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Username</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>auth/user-exists?string=testuser
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "User existence check completed",
+  "string": "testuser",
+  "data": false
 }</code></pre>
                     </div>
 
@@ -2054,15 +2280,17 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
             }
         }
 
-        // Smooth scrolling for navigation links
+        // Smooth scrolling for navigation links (offset for fixed navbar)
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
+                    const navbarHeight = document.querySelector('.navbar-ananya')?.offsetHeight || 76;
+                    const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 15;
+                    window.scrollTo({
+                        top: targetPosition,
+                        behavior: 'smooth'
                     });
                 }
             });

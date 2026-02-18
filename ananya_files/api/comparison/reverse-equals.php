@@ -14,14 +14,14 @@ if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['secondStr
 
 if (!empty($string) && !empty($language) && !empty($secondString)) {
     $processor = new wordProcessor($string, $language);
-    $equals = $processor->equals($secondString);
-    response(200, "String Equals", $string, $secondString, $language, $equals);
+    $reversedEquals = $processor->reverseEquals($secondString);
+    response(200, "Reverse Equals", $string, $secondString, $language, $reversedEquals);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
     invalidResponse("Invalid or Empty Language");
 } else if (isset($language) && isset($string) && empty($secondString)) {
-    invalidResponse("Invalid Column Number");
+    invalidResponse("Invalid or Empty Second Word");
 } else {
     invalidResponse("Invalid Request");
 }

@@ -14,13 +14,13 @@ if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['secondStr
 
 if (!empty($string) && !empty($language) && !empty($secondString)) {
     $processor = new wordProcessor($string, $language);
-    $equals = $processor->equals($secondString);
-    response(200, "String Equals", $string, $secondString, $language, $equals);
+    $compareToResult = $processor->compareTo($secondString);
+    response(200, "Words Compared", $string, $secondString, $language, $compareToResult);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
     invalidResponse("Invalid or Empty Language");
-} else if (isset($language) && isset($string) && empty($secondString)) {
+} else if (isset($language) && isset($language) && empty($secondString)) {
     invalidResponse("Invalid Column Number");
 } else {
     invalidResponse("Invalid Request");
@@ -40,7 +40,7 @@ function response($responseCode, $message, $string, $secondString, $language, $d
     header('Content-type:application/json;charset=utf-8');
 
     http_response_code($responseCode);
-    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "second string" => $secondString, "language" => $language, "data" => $data);
+    $response = array("response_code" => $responseCode, "message" => $message, "string" => $string, "Second Word" => $secondString, "language" => $language, "data" => $data);
     $json = json_encode($response);
     echo $json;
 }

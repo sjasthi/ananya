@@ -11,11 +11,9 @@ if (isset($_GET['string']) && isset($_GET['language'])) {
 }
 
 if (!empty($string) && !empty($language)) {
-    $processor = new wordProcessor($string, $language);
-    //convert string to an array (randomize() only takes arrays).
-    $stringArray = str_split($string);
-    $randomizedString = $processor->randomize($stringArray);
-    response(200, "String Randomized", $string, $language, $randomizedString);
+    $processor = new wordProcessor(strtolower($string), $language);
+    $palindromeBool = $processor->isPalindrome();
+    response(200, "Palindrome Assessed", $string, $language, $palindromeBool);
 } else if (isset($string) && empty($string)) {
     invalidResponse("Invalid or Empty Word");
 } else if (isset($language) && empty($language)) {
