@@ -43,29 +43,137 @@ components:
     ApiResponse:
       type: object
       properties:
+        response_code:
+          type: integer
+          description: HTTP response code
+        message:
+          type: string
+          description: Descriptive message about the operation
+        string:
+          type: string
+          description: The input string that was processed
+        language:
+          type: string
+          description: The language used for processing
+        data:
+          description: The result data of the operation
         success:
           type: boolean
           description: Whether the operation was successful
         result:
-          type: string
-          description: The result of the operation
+          description: The result of the operation (same as data)
         error:
           type: string
+          nullable: true
           description: Error message if operation failed
-      example:
-        success: true
-        result: "5"
-        
+
     ErrorResponse:
       type: object
       properties:
+        response_code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "Missing required parameters: string and language"
         success:
           type: boolean
           example: false
         error:
           type: string
-          example: "Invalid input parameters"
-
+          example: "Missing required parameters: string and language"
+  parameters:
+    stringRequired:
+      name: string
+      in: query
+      required: true
+      description: Input string
+      schema:
+        type: string
+        example: "అనన్య"
+    languageRequired:
+      name: language
+      in: query
+      required: true
+      description: "Language of the input string (e.g., telugu, hindi, gujarati, malayalam)"
+      schema:
+        type: string
+        enum: [english, telugu]
+        example: "english"
+    input2Required:
+      name: input2
+      in: query
+      required: true
+      description: Secondary input string for comparison or manipulation
+      schema:
+        type: string
+        example: "అన్న"
+    input3Required:
+      name: input3
+      in: query
+      required: true
+      description: Tertiary input string for comparison or manipulation
+      schema:
+        type: string
+        example: "ఆన్న"
+    secondStringRequired:
+      name: second_string
+      in: query
+      required: true
+      description: "Second input string for comparison or manipulation"
+      schema:
+        type: string
+        enum: [english, telugu]
+        example: "english"
+    countRequired:
+      name: count
+      in: query
+      required: true
+      description: Number of characters to generate (must be > 0)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 10
+        example: 5
+    typeRequired:
+      name: type
+      in: query
+      required: true
+      description: Type of characters (consonant or vowel)
+      schema:
+        type: string
+        enum: [consonant, vowel]
+        example: "consonant"
+    containsRequired:
+      name: contains
+      in: query
+      required: true
+      description: Comma-separated logical characters to check
+      schema:
+        type: string
+        example: "అ,న్య"
+    usernameRequired:
+      name: username
+      in: query
+      required: true
+      description: Username for authentication
+      schema:
+        type: string
+    passwordRequired:
+      name: password
+      in: query
+      required: true
+      description: Password for authentication
+      schema:
+        type: string
+    emailRequired:
+      name: email
+      in: query
+      required: true
+      description: Email address for authentication
+      schema:
+        type: string
+        format: email
 paths:
   # Text Operations (5 endpoints)
   /text/length:
@@ -75,13 +183,8 @@ paths:
       summary: Get text length
       description: Calculate the length of the input string
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string to measure
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -90,8 +193,14 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
               example:
+                response_code: 200
+                message: "Length calculated"
+                string: "అనన్య"
+                language: "telugu"
+                data: "3"
                 success: true
                 result: "3"
+                error: null
 
   /text/reverse:
     get:
@@ -100,13 +209,8 @@ paths:
       summary: Reverse text
       description: Reverse the characters in the input string
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: String to reverse
-          schema:
-            type: string
-            example: "hello"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -114,9 +218,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-              example:
-                success: true
-                result: "olleh"
 
   /text/replace:
     get:
@@ -125,27 +226,10 @@ paths:
       summary: Replace text
       description: Replace occurrences of a substring with another string
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "hello world"
-        - name: search
-          in: query
-          required: true
-          description: String to search for
-          schema:
-            type: string
-            example: "world"
-        - name: replace
-          in: query
-          required: true
-          description: Replacement string
-          schema:
-            type: string
-            example: "universe"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/input2Required'
+        - $ref: '#/components/parameters/input3Required'
       responses:
         '200':
           description: Successful operation
@@ -161,13 +245,8 @@ paths:
       summary: Randomize text
       description: Randomly shuffle the characters in the input string
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: String to randomize
-          schema:
-            type: string
-            example: "hello"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -183,20 +262,9 @@ paths:
       summary: Split text
       description: Split text into parts
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: String to split
-          schema:
-            type: string
-            example: "hello-world"
-        - name: delimiter
-          in: query
-          required: false
-          description: Delimiter to split on
-          schema:
-            type: string
-            example: "-"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/input2Required'
       responses:
         '200':
           description: Successful operation
@@ -211,15 +279,10 @@ paths:
       tags:
         - Character Analysis
       summary: Get codepoint length
-      description: Get the number of Unicode code points in the string
+      description: Returns an array of Unicode code points for each logical character in the string.
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -235,13 +298,8 @@ paths:
       summary: Get Unicode codepoints
       description: Get the Unicode code points for each character in the string
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అ"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -255,15 +313,10 @@ paths:
       tags:
         - Character Analysis
       summary: Get logical characters
-      description: Extract logical characters from the input string
+      description: Returns an array of logical characters from the input string, properly handling complex scripts.
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -277,22 +330,11 @@ paths:
       tags:
         - Character Analysis
       summary: Get logical character at position
-      description: Get the logical character at a specific index
+      description: Returns the logical character at a specific position in the string.
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
-        - name: index
-          in: query
-          required: true
-          description: Zero-based index position
-          schema:
-            type: integer
-            example: 0
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/input2Required'
       responses:
         '200':
           description: Successful operation
@@ -301,6 +343,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
 
+  /characters/random-logical-chars:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get random logical characters
+      description: Generates random logical characters from the input string.
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/input2Required'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /characters/base:
     get:
       tags:
@@ -308,13 +373,8 @@ paths:
       summary: Get base characters
       description: Extract base characters from the input
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -330,13 +390,8 @@ paths:
       summary: Parse to logical characters
       description: Parse string into logical character components
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string to parse
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -352,13 +407,8 @@ paths:
       summary: Parse to logical characters (variant 2)
       description: Alternative parsing method for logical characters
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string to parse
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -374,13 +424,8 @@ paths:
       summary: Get random logical characters
       description: Generate random logical characters
       parameters:
-        - name: count
-          in: query
-          required: false
-          description: Number of characters to generate
-          schema:
-            type: integer
-            example: 5
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -394,15 +439,11 @@ paths:
       tags:
         - Character Analysis
       summary: Get filler characters
-      description: Extract filler characters from the input
+      description: Generates random filler characters of the specified type and count for the given language.
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/countRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/typeRequired'
       responses:
         '200':
           description: Successful operation
@@ -418,27 +459,10 @@ paths:
       summary: Add character at position
       description: Add a character at a specific position
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Original string
-          schema:
-            type: string
-            example: "hello"
-        - name: char
-          in: query
-          required: true
-          description: Character to add
-          schema:
-            type: string
-            example: "x"
-        - name: position
-          in: query
-          required: true
-          description: Position to add at
-          schema:
-            type: integer
-            example: 2
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/input2Required'
+        - $ref: '#/components/parameters/input3Required'
       responses:
         '200':
           description: Successful operation
@@ -688,27 +712,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
 
-  /validation/add-character-at-end:
+  /characters/add-end:
     get:
       tags:
         - Character Validation
       summary: Add character at end
-      description: Add a character at the end of the string
+      description: Adds a character or string at the end of the input string.
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Original string
-          schema:
-            type: string
-            example: "hello"
-        - name: char
-          in: query
-          required: true
-          description: Character to add
-          schema:
-            type: string
-            example: "!"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/input2Required'
       responses:
         '200':
           description: Successful operation
@@ -1420,20 +1433,16 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
 
-  /advanced/base-consonants:
+  /characters/base-consonants:
     get:
       tags:
-        - Advanced Operations
+        - Character Analysis
       summary: Get base consonants
-      description: Extract base consonants from the input
+      description: Returns the base consonants from a string compared against a second string.
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/secondStringRequired'
       responses:
         '200':
           description: Successful operation
@@ -1486,20 +1495,15 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
 
-  /advanced/get-logical-chars:
+  /characters/logical:
     get:
       tags:
-        - Advanced Operations
-      summary: Get logical characters (advanced)
-      description: Advanced logical character extraction
+        - Character Analysis
+      summary: Get logical characters
+      description: Extract logical characters from the input string
       parameters:
-        - name: string
-          in: query
-          required: true
-          description: Input string
-          schema:
-            type: string
-            example: "అనన్య"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation

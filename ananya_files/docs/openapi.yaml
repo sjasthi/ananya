@@ -64,15 +64,6 @@ components:
           type: string
           nullable: true
           description: Error message if operation failed
-      example:
-        response_code: 200
-        message: "Length calculated"
-        string: "అనన్య"
-        language: "telugu"
-        data: "3"
-        success: true
-        result: "3"
-        error: null
 
     ErrorResponse:
       type: object
@@ -95,7 +86,7 @@ components:
       name: string
       in: query
       required: true
-      description: Input string to process
+      description: Input string
       schema:
         type: string
         example: "అనన్య"
@@ -106,24 +97,83 @@ components:
       description: "Language of the input string (e.g., telugu, hindi, gujarati, malayalam)"
       schema:
         type: string
-        example: "telugu"
-    languageOptional:
-      name: language
-      in: query
-      required: false
-      description: "Language of the input string (defaults to telugu)"
-      schema:
-        type: string
-        default: "telugu"
-        example: "telugu"
-    input2:
+        enum: [english, telugu]
+        example: "english"
+    input2Required:
       name: input2
       in: query
-      required: false
+      required: true
       description: Secondary input string for comparison or manipulation
       schema:
         type: string
         example: "అన్న"
+    input3Required:
+      name: input3
+      in: query
+      required: true
+      description: Tertiary input string for comparison or manipulation
+      schema:
+        type: string
+        example: "ఆన్న"
+    secondStringRequired:
+      name: second_string
+      in: query
+      required: true
+      description: "Second input string for comparison or manipulation"
+      schema:
+        type: string
+        enum: [english, telugu]
+        example: "english"
+
+    countRequired:
+      name: count
+      in: query
+      required: true
+      description: Number of characters to generate (must be > 0)
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 10
+        example: 5
+    typeRequired:
+      name: type
+      in: query
+      required: true
+      description: Type of characters (consonant or vowel)
+      schema:
+        type: string
+        enum: [consonant, vowel]
+        example: "consonant"
+    containsRequired:
+      name: contains
+      in: query
+      required: true
+      description: Comma-separated logical characters to check
+      schema:
+        type: string
+        example: "అ,న్య"
+    usernameRequired:
+      name: username
+      in: query
+      required: true
+      description: Username for authentication
+      schema:
+        type: string
+    passwordRequired:
+      name: password
+      in: query
+      required: true
+      description: Password for authentication
+      schema:
+        type: string
+    emailRequired:
+      name: email
+      in: query
+      required: true
+      description: Email address for authentication
+      schema:
+        type: string
+        format: email
 
 paths:
   # ============================================================
@@ -460,7 +510,7 @@ paths:
       description: Reverse the input string while preserving logical character boundaries
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -468,6 +518,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+
 
   /text/randomize:
     get:
@@ -477,7 +528,7 @@ paths:
       description: Randomly shuffle the logical characters in the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -485,6 +536,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+                
 
   /text/split:
     get:
