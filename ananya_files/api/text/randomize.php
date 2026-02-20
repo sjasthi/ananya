@@ -1,4 +1,7 @@
 <?php
+/**
+ * Randomizes the logical characters within the input string
+ */
 
 require("../word_processor.php");
 

@@ -105,6 +105,57 @@ function infer_params_from_question($api_name, $question, $language) {
     return $params;
 }
 
+function extract_quoted_strings($question) {
+    $strings = [];
+    if (preg_match_all('/"([^"]+)"|\'([^\']+)\'/', $question, $matches)) {
+        foreach ($matches[1] as $idx => $val) {
+            $s = $val ?: $matches[2][$idx];
+            if (!empty($s)) $strings[] = $s;
+        }
+    }
+    return $strings;
+}
+
+function normalize_candidate_text($text) {
+    $text = trim($text, " \t\n\r\0\x0B\"'");
+    $text = preg_replace('/^(does|do|is|are|can|could|would|should|please)\b\s*/i', '', $text);
+    $text = preg_replace('/\b(the|a|an|word|string)\b\s*/i', '', $text);
+    return trim($text, " \t\n\r\0\x0B\"'.,?!");
+}
+
+function extract_two_strings_from_question($question) {
+    $strings = extract_quoted_strings($question);
+    if (count($strings) >= 2) return [$strings[0], $strings[1]];
+
+    if (preg_match('/\b(.+?)\s+and\s+(.+)\b/i', $question, $m)) {
+        return [normalize_candidate_text($m[1]), normalize_candidate_text($m[2])];
+    }
+
+    if (count($strings) === 1) return [$strings[0], null];
+
+    return [null, null];
+}
+
+function extract_string_and_input2($question, $phrase) {
+    $strings = extract_quoted_strings($question);
+    if (count($strings) >= 2) return [$strings[0], $strings[1]];
+
+    $phrasePattern = '/\b' . preg_quote($phrase, '/') . '\b/i';
+    if (!preg_match($phrasePattern, $question)) return [null, null];
+
+    if (count($strings) === 1) {
+        $parts = preg_split($phrasePattern, $question, 2);
+        $input2 = isset($parts[1]) ? normalize_candidate_text($parts[1]) : null;
+        return [$strings[0], $input2];
+    }
+
+    if (preg_match('/^(.*?)\b' . preg_quote($phrase, '/') . '\b\s*(.+)$/i', $question, $m)) {
+        return [normalize_candidate_text($m[1]), normalize_candidate_text($m[2])];
+    }
+
+    return [null, null];
+}
+
 // Load Quick Navigation labels from docs/api.php
 function get_doc_nav_map() {
     static $cache = null;
@@ -196,6 +247,13 @@ function detect_intent($question, $language) {
         ];
     }
 
+    if (preg_match('/\b(randomize|scramble|shuffle)\b/', $q)) {
+        return [
+            'api_id' => 'text_randomize',
+            'params' => infer_params_from_question('text_randomize', $question, $language),
+        ];
+    }
+
     if (preg_match('/\bpalindrome\b/', $q)) {
         return [
             'api_id' => 'analysis_is_palindrome',
@@ -204,30 +262,49 @@ function detect_intent($question, $language) {
     }
 
     if (preg_match('/\banagram\b/', $q)) {
+        [$s1, $s2] = extract_two_strings_from_question($question);
+        $params = infer_params_from_question('analysis_is_anagram', $question, $language);
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'analysis_is_anagram',
-            'params' => infer_params_from_question('analysis_is_anagram', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bstarts with\b/', $q)) {
+    if (preg_match('/\b(starts with|begins with)\b/', $q)) {
+        [$s1, $s2] = extract_string_and_input2($question, 'starts with');
+        if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'begins with');
+        $params = infer_params_from_question('comparison_starts_with', $question, $language);
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'comparison_starts_with',
-            'params' => infer_params_from_question('comparison_starts_with', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bends with\b/', $q)) {
+    if (preg_match('/\b(ends with|finishes with)\b/', $q)) {
+        [$s1, $s2] = extract_string_and_input2($question, 'ends with');
+        if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'finishes with');
+        $params = infer_params_from_question('comparison_ends_with', $question, $language);
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'comparison_ends_with',
-            'params' => infer_params_from_question('comparison_ends_with', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bcontains\b/', $q)) {
+    if (preg_match('/\b(contains|includes)\b/', $q)) {
+        [$s1, $s2] = extract_string_and_input2($question, 'contains');
+        if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'includes');
+        $params = infer_params_from_question('validation_contains_string', $question, $language);
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'validation_contains_string',
-            'params' => infer_params_from_question('validation_contains_string', $question, $language),
+            'params' => $params,
         ];
     }
 
@@ -304,72 +381,78 @@ foreach ($API_REFERENCE as $api) {
     }
 }
 
-$prompt = "You are a smart assistant that answers user questions by calling available APIs.\n";
-$prompt .= "When the user asks something that can be answered by an API, output ONLY:\n";
-$prompt .= "API_CALL: api_id\n";
-$prompt .= "PARAMS: param1=value1&param2=value2\n";
-$prompt .= "Do NOT include instructions, URLs, examples, or any extra text.\n";
-$prompt .= "If no API applies, answer normally in one short paragraph.\n\n";
+$prompt = "You must respond with ONLY valid JSON in this exact structure:\n";
+$prompt .= '{"api": "api_id", "params": {"param1": "value1", "param2": "value2"}}' . "\n\n";
+$prompt .= "EXAMPLES:\n\n";
+$prompt .= "User: 'How long is hello?'\n";
+$prompt .= '{"api": "text_length", "params": {"string": "hello", "language": "english"}}' . "\n\n";
+$prompt .= "User: 'Reverse the word test'\n";
+$prompt .= '{"api": "text_reverse", "params": {"string": "test", "language": "english"}}' . "\n\n";
+$prompt .= "User: 'Scramble xyz' or 'Randomize xyz'\n";
+$prompt .= '{"api": "text_randomize", "params": {"string": "xyz", "language": "english"}}' . "\n\n";
 $prompt .= $param_reference . "\n";
-$prompt .= "Available APIs:\n" . $context . "\n";
-$prompt .= "User question (language: $language):\n" . $question . "\n";
+$prompt .= "Available APIs:\n" . $context . "\n\n";
+$prompt .= "User: '" . $question . "' (language: $language)\n";
+$prompt .= "JSON response: ";
 
 $resp = llm_ask($prompt, [
     'model' => 'mistral',
-    'temperature' => 0.2,
+    'temperature' => 0.0,
+    'system_prompt' => 'You output ONLY valid JSON. No explanations.',
 ]);
 
 error_log("LLM Raw Response:\n" . $resp . "\n---END---");
 
+// Initialize variables
+$api_name = null;
+$api_doc_label = null;
+$params = [];
+
+// Try to parse JSON response
+$json_match = null;
+if (preg_match('/\{[^}]+\}/', $resp, $json_match)) {
+    $decoded = json_decode($json_match[0], true);
+    if ($decoded && isset($decoded['api'])) {
+        $api_name = $decoded['api'];
+        $params = $decoded['params'] ?? [];
+        $api_doc_label = resolve_doc_label($api_name);
+        error_log("Parsed JSON - API: $api_name, Params: " . json_encode($params));
+    }
+}
+
+// Fallback: try old API_CALL format
+if (!$api_name && preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp, $m1)) {
+    $api_name = $m1[1];
+    $api_doc_label = resolve_doc_label($api_name);
+    if (preg_match('/PARAMS:\s*([^\n]+)/i', $resp, $m2)) {
+        parse_str($m2[1], $params);
+    }
+    error_log("Parsed old format - API: $api_name");
+}
+
 // Retry once with a stricter format if the model didn't follow instructions
-if (!preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp)) {
-    $strict_prompt = "You MUST respond with ONLY the two lines below and nothing else:\n";
-    $strict_prompt .= "API_CALL: api_id\n";
-    $strict_prompt .= "PARAMS: param1=value1&param2=value2\n";
-    $strict_prompt .= "Use the exact parameter names from the reference.\n";
-    $strict_prompt .= "If no API applies, respond with: API_CALL: none and PARAMS: none\n\n";
+if (!$api_name) {
+    $strict_prompt = "Output ONLY this JSON structure with no extra text:\n";
+    $strict_prompt .= '{"api": "api_id_here", "params": {"key": "value"}}' . "\n\n";
     $strict_prompt .= $param_reference . "\n";
-    $strict_prompt .= "Available APIs:\n" . $context . "\n";
-    $strict_prompt .= "User question (language: $language):\n" . $question . "\n";
+    $strict_prompt .= "Available APIs:\n" . $context . "\n\n";
+    $strict_prompt .= "User: '" . $question . "' (language: $language)\n";
 
     $resp = llm_ask($strict_prompt, [
         'model' => 'mistral',
         'temperature' => 0.0,
+        'system_prompt' => 'Output ONLY valid JSON.',
     ]);
 
     error_log("LLM Strict Response:\n" . $resp . "\n---END---");
-}
-
-// Parse API_CALL from response
-$api_name = null;
-$api_doc_label = null;
-$params = [];
-if (preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp, $m1)) {
-    $api_name = $m1[1];
-    $api_doc_label = resolve_doc_label($api_name);
-    error_log("Found API_CALL: $api_name");
-}
-if ($api_name && preg_match('/PARAMS:\s*([^\n]+)/i', $resp, $m2)) {
-    parse_str($m2[1], $params);
-    error_log("Found PARAMS: " . $m2[1]);
-    error_log("Parsed params: " . json_encode($params));
-}
-
-// If still no API_CALL, attempt to extract API name and params from freeform text
-if (!$api_name) {
-    foreach ($API_REFERENCE as $api) {
-        if (!empty($api['id']) && preg_match('/\b' . preg_quote($api['id'], '/') . '\b/i', $resp)) {
-            $api_name = $api['id'];
+    
+    // Parse JSON from strict response
+    if (preg_match('/\{[^}]+\}/', $resp, $json_match)) {
+        $decoded = json_decode($json_match[0], true);
+        if ($decoded && isset($decoded['api'])) {
+            $api_name = $decoded['api'];
+            $params = $decoded['params'] ?? [];
             $api_doc_label = resolve_doc_label($api_name);
-            error_log("Extracted API id from freeform: $api_name");
-            break;
-        }
-    }
-
-    if ($api_name && preg_match('/(string|language|input2|input3)\s*=\s*[^\s&]+/i', $resp)) {
-        if (preg_match('/(string=[^\s&]+(?:&language=[^\s&]+)?(?:&input2=[^\s&]+)?(?:&input3=[^\s&]+)?)/i', $resp, $m3)) {
-            parse_str($m3[1], $params);
-            error_log("Extracted params from freeform: " . json_encode($params));
         }
     }
 }
@@ -389,7 +472,6 @@ if ($api_name) {
     }
     error_log("Final params: " . json_encode($params));
 }
-
 
 // If an API call was detected, execute it
 if ($api_name) {
