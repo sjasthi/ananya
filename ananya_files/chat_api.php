@@ -118,16 +118,48 @@ function extract_quoted_strings($question) {
 
 function normalize_candidate_text($text) {
     $text = trim($text, " \t\n\r\0\x0B\"'");
-    $text = preg_replace('/^(does|do|is|are|can|could|would|should|please)\b\s*/i', '', $text);
-    $text = preg_replace('/\b(the|a|an|word|string)\b\s*/i', '', $text);
+    // Remove leading English stop words (Unicode-aware, space-based)
+    $text = preg_replace('/^(does|do|is|are|can|could|would|should|please)\s+/iu', '', $text);
+    // Remove enclosed stop words (Unicode-aware)
+    $text = preg_replace('/\s+(the|a|an|word|string)\s+/iu', ' ', $text);
     return trim($text, " \t\n\r\0\x0B\"'.,?!");
+}
+
+function extract_single_quoted_string($question) {
+    $strings = extract_quoted_strings($question);
+    return count($strings) > 0 ? $strings[0] : null;
+}
+
+function extract_first_noun_from_question($question, $intent_keywords = []) {
+    // Extract quoted text first
+    $quoted = extract_single_quoted_string($question);
+    if ($quoted) return $quoted;
+
+    // Remove intent keywords and common stop words, keep first remaining word
+    $words = preg_split('/\s+/u', trim($question));
+    $filtered = [];
+    
+    $stop_words = array_merge(
+        $intent_keywords,
+        ['the', 'a', 'an', 'is', 'are', 'does', 'do', 'spell', 'word', 'string', 'how', 'long', 'many', 'character', 'characters']
+    );
+    
+    foreach ($words as $word) {
+        $normalized = strtolower(trim($word, '?,!.;:'));
+        if (!in_array($normalized, $stop_words) && !empty($normalized)) {
+            $filtered[] = trim($word, '?,!.;:');
+        }
+    }
+    
+    return count($filtered) > 0 ? $filtered[0] : null;
 }
 
 function extract_two_strings_from_question($question) {
     $strings = extract_quoted_strings($question);
     if (count($strings) >= 2) return [$strings[0], $strings[1]];
 
-    if (preg_match('/\b(.+?)\s+and\s+(.+)\b/i', $question, $m)) {
+    // Unicode-aware "X and Y" matching (space-based, no word boundaries)
+    if (preg_match('/(.+?)\s+and\s+(.+)/iu', $question, $m)) {
         return [normalize_candidate_text($m[1]), normalize_candidate_text($m[2])];
     }
 
@@ -140,16 +172,18 @@ function extract_string_and_input2($question, $phrase) {
     $strings = extract_quoted_strings($question);
     if (count($strings) >= 2) return [$strings[0], $strings[1]];
 
-    $phrasePattern = '/\b' . preg_quote($phrase, '/') . '\b/i';
-    if (!preg_match($phrasePattern, $question)) return [null, null];
+    // Unicode-aware phrase matching (space-based, no word boundaries)
+    $phrasePattern = '/\s' . preg_quote($phrase, '/') . '(?:\s|$)/iu';
+    if (!preg_match($phrasePattern, ' ' . $question)) return [null, null];
 
     if (count($strings) === 1) {
-        $parts = preg_split($phrasePattern, $question, 2);
+        $parts = preg_split($phrasePattern, ' ' . $question, 2);
         $input2 = isset($parts[1]) ? normalize_candidate_text($parts[1]) : null;
         return [$strings[0], $input2];
     }
 
-    if (preg_match('/^(.*?)\b' . preg_quote($phrase, '/') . '\b\s*(.+)$/i', $question, $m)) {
+    // Unicode-aware "X phrase Y" matching
+    if (preg_match('/(.*?)\s' . preg_quote($phrase, '/') . '\s(.+)$/iu', $question, $m)) {
         return [normalize_candidate_text($m[1]), normalize_candidate_text($m[2])];
     }
 
@@ -233,37 +267,49 @@ function format_api_result($api_name, $params, $api_result, $language) {
 function detect_intent($question, $language) {
     $q = strtolower($question);
 
-    if (preg_match('/\b(length|how long|how many characters)\b/', $q)) {
+    if (preg_match('/\b(length|how long|how many characters)\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['length', 'how', 'long', 'many', 'characters']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'text_length',
-            'params' => infer_params_from_question('text_length', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\b(reverse|backwards|backward)\b/', $q)) {
+    if (preg_match('/\b(reverse|backwards|backward)\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['reverse', 'backwards', 'backward']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'text_reverse',
-            'params' => infer_params_from_question('text_reverse', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\b(randomize|scramble|shuffle)\b/', $q)) {
+    if (preg_match('/\b(randomize|scramble|shuffle)\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['randomize', 'scramble', 'shuffle']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'text_randomize',
-            'params' => infer_params_from_question('text_randomize', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bpalindrome\b/', $q)) {
+    if (preg_match('/\bpalindrome\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['palindrome', 'is', 'are']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'analysis_is_palindrome',
-            'params' => infer_params_from_question('analysis_is_palindrome', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\banagram\b/', $q)) {
+    if (preg_match('/\banagram\b/u', $q)) {
         [$s1, $s2] = extract_two_strings_from_question($question);
-        $params = infer_params_from_question('analysis_is_anagram', $question, $language);
+        $params = ['language' => $language ?: 'english'];
         if ($s1) $params['string'] = $s1;
         if ($s2) $params['input2'] = $s2;
         return [
@@ -272,10 +318,10 @@ function detect_intent($question, $language) {
         ];
     }
 
-    if (preg_match('/\b(starts with|begins with)\b/', $q)) {
+    if (preg_match('/\b(starts with|begins with)\b/u', $q)) {
         [$s1, $s2] = extract_string_and_input2($question, 'starts with');
         if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'begins with');
-        $params = infer_params_from_question('comparison_starts_with', $question, $language);
+        $params = ['language' => $language ?: 'english'];
         if ($s1) $params['string'] = $s1;
         if ($s2) $params['input2'] = $s2;
         return [
@@ -284,10 +330,10 @@ function detect_intent($question, $language) {
         ];
     }
 
-    if (preg_match('/\b(ends with|finishes with)\b/', $q)) {
+    if (preg_match('/\b(ends with|finishes with)\b/u', $q)) {
         [$s1, $s2] = extract_string_and_input2($question, 'ends with');
         if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'finishes with');
-        $params = infer_params_from_question('comparison_ends_with', $question, $language);
+        $params = ['language' => $language ?: 'english'];
         if ($s1) $params['string'] = $s1;
         if ($s2) $params['input2'] = $s2;
         return [
@@ -296,10 +342,10 @@ function detect_intent($question, $language) {
         ];
     }
 
-    if (preg_match('/\b(contains|includes)\b/', $q)) {
+    if (preg_match('/\b(contains|includes)\b/u', $q)) {
         [$s1, $s2] = extract_string_and_input2($question, 'contains');
         if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'includes');
-        $params = infer_params_from_question('validation_contains_string', $question, $language);
+        $params = ['language' => $language ?: 'english'];
         if ($s1) $params['string'] = $s1;
         if ($s2) $params['input2'] = $s2;
         return [
@@ -457,19 +503,9 @@ if (!$api_name) {
     }
 }
 
-// Heuristic: infer missing parameters or fill missing keys
-if ($api_name) {
-    $inferred = infer_params_from_question($api_name, $question, $language);
-    if (empty($params)) {
-        $params = $inferred;
-    } else {
-        if (empty($params['string']) && !empty($inferred['string'])) {
-            $params['string'] = $inferred['string'];
-        }
-        if (empty($params['language']) && !empty($inferred['language'])) {
-            $params['language'] = $inferred['language'];
-        }
-    }
+// Ensure language is set
+if ($api_name && !isset($params['language'])) {
+    $params['language'] = $language ?: 'english';
     error_log("Final params: " . json_encode($params));
 }
 
