@@ -7,10 +7,12 @@ function llm_ask($prompt, $opts = []) {
     $ollamaUrl = getenv('OLLAMA_URL') ?: 'http://localhost:11434';
     $model = $opts['model'] ?? 'mistral'; // Change to 'llama2', 'neural-chat', etc.
     $temperature = $opts['temperature'] ?? 0.2;
+    $systemPrompt = $opts['system_prompt'] ?? 'You are a helpful assistant. Provide concise, accurate answers.';
 
     $payload = [
         'model' => $model,
-        'prompt' => 'You are a helpful assistant. Provide concise, accurate answers and sample API calls when relevant.\n\n' . $prompt,
+        'prompt' => $prompt,
+        'system' => $systemPrompt,
         'stream' => false,
         'options' => [
             'temperature' => $temperature,

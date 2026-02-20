@@ -6,7 +6,7 @@ word-processing PHP APIs as LLM-callable tools.
 
 Also provides a /chat HTTP endpoint for the PHP frontend to call,
 which handles the full LLM orchestration loop:
-    user question → OpenAI (with tools) → tool calls → PHP API → final answer
+    user question → LLM provider (with tools) → tool calls → PHP API → final answer
 
 Usage:
     python server.py            # starts MCP (SSE) + /chat on port 8000
@@ -15,6 +15,7 @@ Usage:
 import json
 import asyncio
 import logging
+import re
 from typing import Any
 
 from mcp.server.fastmcp import FastMCP
@@ -27,7 +28,7 @@ import uvicorn
 import openai
 
 from config import (
-    OPENAI_API_KEY, LLM_MODEL, LLM_MAX_TOKENS, LLM_TEMPERATURE,
+    OPENAI_API_KEY, OLLAMA_URL, LLM_PROVIDER, LLM_MODEL, LLM_MAX_TOKENS, LLM_TEMPERATURE,
     API_BASE_URL, MCP_HOST, MCP_PORT,
 )
 from api_client import AnanyaAPIClient
@@ -547,6 +548,47 @@ async def _execute_tool(name: str, arguments: dict) -> str:
         return json.dumps({"error": str(e)})
 
 
+def _create_llm_client() -> openai.AsyncOpenAI:
+    """Create an OpenAI-compatible client for either OpenAI or Ollama."""
+    provider = LLM_PROVIDER.lower()
+    if provider == "ollama":
+        base_url = OLLAMA_URL.rstrip("/") + "/v1"
+        return openai.AsyncOpenAI(api_key="ollama", base_url=base_url)
+    return openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+
+def _infer_string_from_question(question: str) -> str:
+    match = re.search(r"\"([^\"]+)\"|'([^']+)'", question)
+    if match:
+        return match.group(1) or match.group(2) or ""
+    parts = re.split(r"\s+", question.strip())
+    return parts[-1] if parts else ""
+
+
+def _detect_intent(question: str, language: str) -> tuple[str, dict] | None:
+    q = question.lower()
+    if re.search(r"\b(scramble|randomize|shuffle)\b", q):
+        word = _infer_string_from_question(question)
+        if not word:
+            return None
+        return ("randomize_text", {"word": word, "language": language})
+    return None
+
+
+def _format_tool_answer(tool_name: str, word: str, tool_result: str) -> str:
+    result_text = tool_result
+    try:
+        parsed = json.loads(tool_result)
+        if isinstance(parsed, dict):
+            result_text = parsed.get("result") or parsed.get("data") or tool_result
+    except Exception:
+        pass
+
+    if tool_name == "randomize_text":
+        return f"Scrambled version of \"{word}\" is \"{result_text}\"."
+    return str(result_text)
+
+
 SYSTEM_PROMPT = """You are Ananya, a helpful AI assistant specialized in word processing and text analysis.
 You have access to a set of tools that can analyze, compare, validate, and transform words and text
 in English and Indic languages (Telugu, Hindi, Gujarati, Malayalam).
@@ -574,7 +616,7 @@ async def chat_endpoint(request: Request) -> JSONResponse:
     Returns: {"question": "...", "language": "...", "answer": "..."}
 
     This endpoint orchestrates the full LLM + tool-calling loop:
-    1. Send user question + tools to OpenAI
+    1. Send user question + tools to the configured LLM provider
     2. If LLM responds with tool_calls, execute them against the MCP tools
     3. Send tool results back to LLM
     4. Repeat until LLM produces a final text answer
@@ -590,14 +632,27 @@ async def chat_endpoint(request: Request) -> JSONResponse:
     if not question:
         return JSONResponse({"error": "Missing question parameter"}, status_code=400)
 
-    if not OPENAI_API_KEY:
+    # Fast-path: obvious intent without LLM
+    intent = _detect_intent(question, language)
+    if intent:
+        tool_name, tool_args = intent
+        tool_result = await _execute_tool(tool_name, tool_args)
+        word = tool_args.get("word", "")
+        answer = _format_tool_answer(tool_name, word, tool_result)
+        return JSONResponse({
+            "question": question,
+            "language": language,
+            "answer": answer,
+        })
+
+    if LLM_PROVIDER.lower() == "openai" and not OPENAI_API_KEY:
         return JSONResponse({
             "question": question,
             "language": language,
             "answer": "Error: OPENAI_API_KEY is not configured. Please set it in mcp_server/.env"
         })
 
-    client = openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+    client = _create_llm_client()
     openai_tools = _build_openai_tools()
 
     messages = [
@@ -672,6 +727,7 @@ async def health_endpoint(request: Request) -> JSONResponse:
         "server": "ananya-mcp",
         "tools_available": tool_count,
         "model": LLM_MODEL,
+        "provider": LLM_PROVIDER,
     })
 
 
