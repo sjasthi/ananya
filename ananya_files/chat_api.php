@@ -1,3 +1,49 @@
+/*
+I'm continuing work on the Ananya MCP server project. Here's the current state:
+
+Project location: C:\xampp\htdocs\ananya
+
+Architecture (3-tier):
+
+chat.php → JS frontend sends questions to chat_api.php
+chat_api.php → PHP middleware with 3 tiers:
+Tier 1: Regex intent router (no LLM, instant) for obvious queries like "length of hello"
+Tier 2: Forwards to Python MCP server at localhost:8000/chat
+Tier 3: Fallback direct Ollama call from PHP if MCP server is down
+server.py → Python MCP server using FastMCP + Starlette + OpenAI SDK, talks to Ollama (Mistral) with tool-calling, executes tools against the PHP API
+What's been done:
+
+MCP server starts, health check works (34 tools registered)
+Ollama runs with Mistral 7B, tool-calling works (tested with 1 tool = 44s response)
+Two-stage tool filtering was implemented in server.py to reduce tools sent per request: Stage 1 classifies intent (no tools, 2s), Stage 2 sends only relevant category tools (5-15 tools instead of 34)
+Timeout in chat_api.php set to 120s, OpenAI client timeout set to 120s
+PHP API works: http://localhost/ananya/ananya_files/api.php/text/length?string=hello&language=english
+The main problem:
+
+Ollama Mistral 7B runs entirely on CPU (size_vram: 0), making tool-calling very slow (~60-90s with many tools)
+Even with two-stage filtering reducing to ~13 tools, Stage 2 still takes too long on CPU
+Need to either: switch to a smaller model (qwen2.5:3b), fix GPU acceleration, or further reduce tools per request
+Key files:
+
+server.py — MCP server with two-stage chat endpoint
+config.py — Config loader (has project timeline notes, leave them)
+api_client.py — Async HTTP client for PHP API
+.env — Environment config (LLM_PROVIDER=ollama, LLM_MODEL=mistral)
+chat_api.php — PHP middleware (intent router + MCP proxy + fallback)
+chat.php — Frontend UI
+chat.js — Frontend JS
+llm_handler.php — Direct Ollama caller for PHP fallback
+Next steps:
+
+Test if GPU acceleration works on this Windows PC (ollama ps should show size_vram > 0)
+If still CPU-only, switch to qwen2.5:3b model (ollama pull qwen2.5:3b, update .env)
+Test the full pipeline: chat.php → chat_api.php → MCP server → Ollama → tool call → PHP API → response
+Verify the two-stage filtering in server.py is working (check server logs for "Stage 1" and "Stage 2" entries)
+Please start by checking if the MCP server starts correctly and test the full chat pipeline end-to-end.
+
+Note: On Windows, venv\Scripts\activate replaces Mac's source venv/bin/activate. Everything else in the code is cross-platform.
+*/
+
 <?php
 // Load .env file if it exists
 if (file_exists(__DIR__ . '/../.env')) {
