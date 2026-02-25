@@ -19,7 +19,7 @@ require_once __DIR__ . '/includes/llm_handler.php';
 
 // MCP Server settings
 $MCP_SERVER_URL = 'http://localhost:8000/chat';
-$MCP_TIMEOUT = 60; // seconds — tool-calling loops can take a while
+$MCP_TIMEOUT = 120; // seconds — two-stage filtering keeps it fast, but allow headroom for cold starts
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {

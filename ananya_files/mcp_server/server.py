@@ -508,6 +508,58 @@ async def get_length_no_spaces(word: str, language: str = "english") -> str:
 # CHAT ORCHESTRATION ENDPOINT (non-MCP, for PHP frontend)
 # ═══════════════════════════════════════════════════════════════════════
 
+# ── Tool categories for two-stage filtering ────────────────────────────
+TOOL_CATEGORIES = {
+    "text": {
+        "keywords": ["reverse", "length", "long", "characters", "randomize",
+                     "scramble", "shuffle", "split", "replace", "swap"],
+        "tools": ["reverse_text", "get_text_length", "randomize_text",
+                  "split_text", "replace_in_text"],
+    },
+    "characters": {
+        "keywords": ["logical", "grapheme", "base char", "codepoint", "unicode",
+                     "character at", "position", "parse"],
+        "tools": ["get_logical_characters", "get_base_characters",
+                  "get_code_points", "get_character_at_position",
+                  "get_codepoint_length", "get_random_logical_chars"],
+    },
+    "analysis": {
+        "keywords": ["palindrome", "anagram", "can make", "form", "spell",
+                     "strength", "weight", "level", "difficulty", "detect",
+                     "language", "intersect", "ladder", "head tail",
+                     "chunk", "match"],
+        "tools": ["check_palindrome", "check_anagram", "can_make_word",
+                  "can_make_all_words", "get_word_strength", "get_word_weight",
+                  "get_word_level", "detect_language", "check_intersecting",
+                  "get_intersecting_rank", "check_ladder_words",
+                  "check_head_tail_words", "parse_to_logical_chars"],
+    },
+    "comparison": {
+        "keywords": ["starts with", "begins", "ends with", "compare",
+                     "equal", "same", "reverse equal", "index", "find",
+                     "position of", "where"],
+        "tools": ["check_starts_with", "check_ends_with", "compare_words",
+                  "check_equals", "check_reverse_equals", "find_index_of"],
+    },
+    "validation": {
+        "keywords": ["contains", "has", "consonant", "vowel", "space"],
+        "tools": ["check_contains_char", "check_contains_string",
+                  "check_is_consonant", "check_is_vowel",
+                  "check_contains_space"],
+    },
+    "utility": {
+        "keywords": ["length no space", "without space"],
+        "tools": ["get_length_no_spaces"],
+    },
+}
+
+# Maps every tool name to its category for quick lookup
+_TOOL_TO_CATEGORY: dict[str, str] = {}
+for _cat, _info in TOOL_CATEGORIES.items():
+    for _t in _info["tools"]:
+        _TOOL_TO_CATEGORY[_t] = _cat
+
+
 # Build the OpenAI tool definitions from MCP tools at startup
 def _build_openai_tools() -> list[dict]:
     """Convert MCP tool definitions into OpenAI function-calling tool format."""
@@ -524,6 +576,80 @@ def _build_openai_tools() -> list[dict]:
             }
         })
     return tools
+
+
+def _filter_tools_by_categories(all_tools: list[dict], categories: list[str]) -> list[dict]:
+    """Return only the tools belonging to the given categories."""
+    allowed = set()
+    for cat in categories:
+        if cat in TOOL_CATEGORIES:
+            allowed.update(TOOL_CATEGORIES[cat]["tools"])
+    return [t for t in all_tools if t["function"]["name"] in allowed]
+
+
+async def _classify_question(client: openai.AsyncOpenAI, question: str, language: str) -> list[str]:
+    """
+    Stage 1: Ask the LLM (with NO tools) to classify which tool categories
+    are relevant. Returns a list of category names. Fast (~2-5s).
+    """
+    category_descriptions = "\n".join(
+        f"- {cat}: {', '.join(info['keywords'][:5])}" for cat, info in TOOL_CATEGORIES.items()
+    )
+
+    classify_prompt = f"""You are a classifier. Given a user question about words/text, output ONLY the relevant category names from this list, separated by commas. Output "none" if no tool is needed.
+
+Categories:
+{category_descriptions}
+
+Rules:
+- Output ONLY category names separated by commas (e.g. "analysis,text")
+- No explanation, no extra text
+- If the question is general knowledge or chitchat, output "none"
+- Include "text" if the question involves word length, reversing, or scrambling
+- Include "analysis" if it involves palindromes, anagrams, or word properties
+- Include "comparison" if it involves comparing, prefixes, or suffixes
+- Include "validation" if it involves checking vowels, consonants, or containment
+- Include "characters" if it involves Unicode, codepoints, or logical characters
+
+Question: {question}
+Categories:"""
+
+    try:
+        response = await client.chat.completions.create(
+            model=LLM_MODEL,
+            messages=[
+                {"role": "system", "content": "Output only comma-separated category names. Nothing else."},
+                {"role": "user", "content": classify_prompt},
+            ],
+            max_tokens=50,
+            temperature=0.0,
+        )
+        raw = (response.choices[0].message.content or "").strip().lower()
+        logger.info(f"Stage 1 classification: '{raw}'")
+
+        if "none" in raw:
+            return []
+
+        # Parse comma-separated category names
+        valid = set(TOOL_CATEGORIES.keys())
+        categories = [c.strip() for c in raw.split(",") if c.strip() in valid]
+        return categories if categories else []
+    except Exception as e:
+        logger.error(f"Classification failed: {e}")
+        # Fallback: keyword-match categories
+        return _keyword_match_categories(question)
+
+
+def _keyword_match_categories(question: str) -> list[str]:
+    """Fast fallback: match categories by keywords without LLM."""
+    q = question.lower()
+    matched = []
+    for cat, info in TOOL_CATEGORIES.items():
+        for kw in info["keywords"]:
+            if kw in q:
+                matched.append(cat)
+                break
+    return matched
 
 
 async def _execute_tool(name: str, arguments: dict) -> str:
@@ -553,7 +679,11 @@ def _create_llm_client() -> openai.AsyncOpenAI:
     provider = LLM_PROVIDER.lower()
     if provider == "ollama":
         base_url = OLLAMA_URL.rstrip("/") + "/v1"
-        return openai.AsyncOpenAI(api_key="ollama", base_url=base_url)
+        return openai.AsyncOpenAI(
+            api_key="ollama",
+            base_url=base_url,
+            timeout=120.0,  # Local Ollama: generous for cold starts + tool calls
+        )
     return openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
@@ -653,21 +783,33 @@ async def chat_endpoint(request: Request) -> JSONResponse:
         })
 
     client = _create_llm_client()
-    openai_tools = _build_openai_tools()
+    all_tools = _build_openai_tools()
+
+    # ── Stage 1: Classify which tool categories are relevant (no tools, fast) ──
+    categories = await _classify_question(client, question, language)
+    logger.info(f"Matched categories: {categories}")
+
+    if categories:
+        filtered_tools = _filter_tools_by_categories(all_tools, categories)
+        logger.info(f"Stage 2: using {len(filtered_tools)} tools (from {len(all_tools)} total)")
+    else:
+        # No tools needed — just let the LLM answer directly
+        filtered_tools = []
+        logger.info("No tool categories matched — LLM-only response")
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": f"[Language: {language}]\n\n{question}"},
     ]
 
-    # Orchestration loop — max 10 iterations to prevent runaway
+    # ── Stage 2: Orchestration loop with only the relevant tools ──
     max_iterations = 10
     for iteration in range(max_iterations):
         try:
             response = await client.chat.completions.create(
                 model=LLM_MODEL,
                 messages=messages,
-                tools=openai_tools if openai_tools else None,
+                tools=filtered_tools if filtered_tools else None,
                 max_tokens=LLM_MAX_TOKENS,
                 temperature=LLM_TEMPERATURE,
             )

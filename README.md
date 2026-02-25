@@ -27,7 +27,7 @@ http://localhost/ananya/
 This project can use Ollama for local, free LLM responses (no API key needed).
 
 1. **Download Ollama**
-  - https://ollama.ai (Windows, macOS, Linux)
+  - https://ollamacurl -fsSL https://ollama.com/install.sh | sh.ai (Windows, macOS, Linux)
 
 2. **Start Ollama**
   - Windows (PowerShell):
