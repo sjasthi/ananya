@@ -524,7 +524,10 @@ TOOL_CATEGORIES = {
                   "get_codepoint_length", "get_random_logical_chars"],
     },
     "analysis": {
-        "keywords": ["palindrome", "anagram", "can make", "form", "spell",
+        "keywords": ["palindrome", "anagram",
+                     "can make", "can i make", "make word", "make the word",
+                     "make from", "form word", "form the word", "spell from",
+                     "form", "spell",
                      "strength", "weight", "level", "difficulty", "detect",
                      "language", "intersect", "ladder", "head tail",
                      "chunk", "match"],
@@ -542,7 +545,8 @@ TOOL_CATEGORIES = {
                   "check_equals", "check_reverse_equals", "find_index_of"],
     },
     "validation": {
-        "keywords": ["contains", "has", "consonant", "vowel", "space"],
+        "keywords": ["contains", "has", "have", "include", "letter",
+                     "consonant", "vowel", "space"],
         "tools": ["check_contains_char", "check_contains_string",
                   "check_is_consonant", "check_is_vowel",
                   "check_contains_space"],
@@ -587,61 +591,106 @@ def _filter_tools_by_categories(all_tools: list[dict], categories: list[str]) ->
     return [t for t in all_tools if t["function"]["name"] in allowed]
 
 
-async def _classify_question(client: openai.AsyncOpenAI, question: str, language: str) -> list[str]:
-    """
-    Stage 1: Ask the LLM (with NO tools) to classify which tool categories
-    are relevant. Returns a list of category names. Fast (~2-5s).
-    """
-    category_descriptions = "\n".join(
-        f"- {cat}: {', '.join(info['keywords'][:5])}" for cat, info in TOOL_CATEGORIES.items()
-    )
+def _build_compact_tool_list() -> str:
+    """Generate a compact one-line-per-tool description for Stage 1 prompts.
+    Auto-derived from registered MCP tools so it never goes out of sync."""
+    lines = []
+    for tool_name, tool_obj in mcp._tool_manager._tools.items():
+        desc = (tool_obj.description or "").split("\n")[0].strip().rstrip(".")
+        props = tool_obj.parameters.get("properties", {})
+        param_str = ", ".join(props.keys())
+        lines.append(f"  {tool_name}({param_str}): {desc}")
+    return "\n".join(lines)
 
-    classify_prompt = f"""You are a classifier. Given a user question about words/text, output ONLY the relevant category names from this list, separated by commas. Output "none" if no tool is needed.
 
-Categories:
-{category_descriptions}
+async def _identify_intent_and_tool(
+    client: openai.AsyncOpenAI, question: str, language: str
+) -> dict:
+    """
+    Stage 1: LLM reads the question and returns one of:
+      {"action": "tool",   "tool": "<name>", "params": {...}}  — single tool identified
+      {"action": "multi"}                                        — needs several tools
+      {"action": "direct"}                                       — no tool needed
+
+    Uses a compact prompt (~120 token budget for response) so it stays fast (~3-5s).
+    This replaces all regex-based intent routing — the LLM handles all languages.
+    """
+    tool_list = _build_compact_tool_list()
+
+    prompt = f"""You are a request router for a word-processing API.
+
+Available tools:
+{tool_list}
+
+Given the user question, respond with ONLY valid JSON (no markdown, no explanation).
+The "action" field MUST be exactly one of: "tool", "multi", or "direct" — never a tool name.
+
+If ONE tool answers it:
+{{"action": "tool", "tool": "<tool_name>", "params": {{"<param>": "<value>", "language": "{language}"}}}}
+
+If MULTIPLE tool calls are needed:
+{{"action": "multi"}}
+
+If no tool is needed (general knowledge, greetings, non-word-analysis):
+{{"action": "direct"}}
 
 Rules:
-- Output ONLY category names separated by commas (e.g. "analysis,text")
-- No explanation, no extra text
-- If the question is general knowledge or chitchat, output "none"
-- Include "text" if the question involves word length, reversing, or scrambling
-- Include "analysis" if it involves palindromes, anagrams, or word properties
-- Include "comparison" if it involves comparing, prefixes, or suffixes
-- Include "validation" if it involves checking vowels, consonants, or containment
-- Include "characters" if it involves Unicode, codepoints, or logical characters
+- "action" must be "tool", "multi", or "direct" — never the tool name itself
+- Extract EXACT word/string values from the question as param values
+- Language defaults to "{language}" unless question specifies another (telugu/hindi/gujarati/malayalam)
+- For Indic script text in the question, set language accordingly
+- Prefer "tool" over "multi" whenever a single tool clearly answers the question
+- Only use "direct" if the question clearly cannot be answered by any tool above
+- "has the letter X", "contains X", "have the letter X" → check_contains_char with char=X
 
-Question: {question}
-Categories:"""
+Question: {question}"""
 
     try:
         response = await client.chat.completions.create(
             model=LLM_MODEL,
             messages=[
-                {"role": "system", "content": "Output only comma-separated category names. Nothing else."},
-                {"role": "user", "content": classify_prompt},
+                {"role": "system", "content": "Output only valid JSON. No markdown, no explanation."},
+                {"role": "user", "content": prompt},
             ],
-            max_tokens=50,
+            max_tokens=120,
             temperature=0.0,
         )
-        raw = (response.choices[0].message.content or "").strip().lower()
-        logger.info(f"Stage 1 classification: '{raw}'")
+        raw = (response.choices[0].message.content or "").strip()
+        # Strip markdown fences if model adds them
+        raw = re.sub(r'^```(?:json)?\s*|\s*```$', '', raw, flags=re.MULTILINE).strip()
+        logger.info(f"Stage 1 raw: {raw}")
 
-        if "none" in raw:
-            return []
+        result = json.loads(raw)
+        action = result.get("action", "multi")
 
-        # Parse comma-separated category names
-        valid = set(TOOL_CATEGORIES.keys())
-        categories = [c.strip() for c in raw.split(",") if c.strip() in valid]
-        return categories if categories else []
+        # ── Recovery: Mistral sometimes uses the tool name as the action value ──
+        # e.g. {"action": "check_contains_char", "char": "e", "word": "fruit"}
+        # Detect this and normalise it into the proper format.
+        known_tools = mcp._tool_manager._tools
+        if action not in ("tool", "multi", "direct") and action in known_tools:
+            # The model flattened the structure — reconstruct it
+            params = {k: v for k, v in result.items() if k != "action"}
+            logger.info(f"Stage 1 recovery: flat format detected for tool '{action}', params={params}")
+            return {"action": "tool", "tool": action, "params": params}
+
+        if action == "tool" and result.get("tool"):
+            if result["tool"] in known_tools:
+                return result
+            logger.warning(f"Stage 1 picked unknown tool '{result['tool']}' — falling back to multi")
+            return {"action": "multi"}
+
+        if action == "direct":
+            return {"action": "direct"}
+
+        return {"action": "multi"}
+
     except Exception as e:
-        logger.error(f"Classification failed: {e}")
-        # Fallback: keyword-match categories
-        return _keyword_match_categories(question)
+        logger.error(f"Stage 1 failed: {e} — defaulting to multi")
+        return {"action": "multi"}
 
 
 def _keyword_match_categories(question: str) -> list[str]:
-    """Fast fallback: match categories by keywords without LLM."""
+    """Fast keyword scan to narrow tool categories for the Stage 2 multi-path."""
     q = question.lower()
     matched = []
     for cat, info in TOOL_CATEGORIES.items():
@@ -687,36 +736,74 @@ def _create_llm_client() -> openai.AsyncOpenAI:
     return openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
 
 
-def _infer_string_from_question(question: str) -> str:
-    match = re.search(r"\"([^\"]+)\"|'([^']+)'", question)
-    if match:
-        return match.group(1) or match.group(2) or ""
-    parts = re.split(r"\s+", question.strip())
-    return parts[-1] if parts else ""
-
-
-def _detect_intent(question: str, language: str) -> tuple[str, dict] | None:
-    q = question.lower()
-    if re.search(r"\b(scramble|randomize|shuffle)\b", q):
-        word = _infer_string_from_question(question)
-        if not word:
-            return None
-        return ("randomize_text", {"word": word, "language": language})
-    return None
-
-
-def _format_tool_answer(tool_name: str, word: str, tool_result: str) -> str:
-    result_text = tool_result
+def _format_direct_answer(tool_name: str, params: dict, tool_result: str, question: str) -> str:
+    """Convert a direct single-tool result into a human-readable answer."""
+    # Parse raw JSON result from the tool
+    value = tool_result
     try:
         parsed = json.loads(tool_result)
+        # API wraps answer in {success, result} — unwrap it
         if isinstance(parsed, dict):
-            result_text = parsed.get("result") or parsed.get("data") or tool_result
+            # Detect tool execution errors
+            if parsed.get("error"):
+                return f"Sorry, I couldn't complete that request: {parsed['error']}"
+            value = parsed.get("result", parsed.get("data", parsed))
+        else:
+            value = parsed
     except Exception:
-        pass
+        pass  # keep raw string
 
-    if tool_name == "randomize_text":
-        return f"Scrambled version of \"{word}\" is \"{result_text}\"."
-    return str(result_text)
+    if isinstance(value, str) and value.startswith("API Error:"):
+        return f"Sorry, I couldn't complete that: {value}"
+
+    word  = params.get("word",  params.get("source_word", params.get("text", "")))
+    word2 = params.get("word2", params.get("target_word", ""))
+    lang  = params.get("language", "english")
+    lang_note = f" ({lang})" if lang != "english" else ""
+
+    def yn(v): return "Yes" if v else "No"
+
+    answers = {
+        "get_text_length":          f'The length of "{word}"{lang_note} is {value} character(s).',
+        "reverse_text":             f'The reverse of "{word}" is "{value}".',
+        "randomize_text":           f'A scrambled version of "{word}": "{value}".',
+        "split_text":               f'Splitting "{word}": {value}',
+        "replace_in_text":          f'Result after replacement: "{value}".',
+        "get_logical_characters":   f'Logical characters of "{word}"{lang_note}: {value}',
+        "get_base_characters":      f'Base characters of "{word}"{lang_note}: {value}',
+        "get_code_points":          f'Code points of "{word}": {value}',
+        "get_character_at_position": f'Character at position {params.get("index", 0)} in "{word}": "{value}".',
+        "parse_to_logical_chars":   f'Logical character components of "{word}"{lang_note}: {value}',
+        "check_palindrome":         lambda: f'"{word}" is{" " if value else " not "}a palindrome.',
+        "check_anagram":            lambda: f'"{word}" and "{word2}" are{" " if value else " not "}anagrams.',
+        "can_make_word":            lambda: f'"{word2}" can{" " if value else "not "}be made from the letters of "{word}".',
+        "can_make_all_words":       lambda: f'All words can{" " if value else "not "}be made from "{word}".',
+        "get_word_strength":        f'Strength of "{word}": {value}.',
+        "get_word_weight":          f'Weight of "{word}": {value}.',
+        "get_word_level":           f'Difficulty level of "{word}": {value}.',
+        "detect_language":          f'Detected language: {value}.',
+        "check_intersecting":       lambda: f'"{word}" and "{word2}" do{" " if value else " not "}share common characters.',
+        "get_intersecting_rank":    f'Shared characters between "{word}" and "{word2}": {value}.',
+        "check_ladder_words":       lambda: f'"{word}" and "{word2}" are{" " if value else " not "}ladder words (differ by one character).',
+        "check_head_tail_words":    lambda: f'"{word}" and "{word2}" are{" " if value else " not "}head-tail words.',
+        "check_starts_with":        lambda: f'"{word}" does{" " if value else " not "}start with "{params.get("prefix", "")}".',
+        "check_ends_with":          lambda: f'"{word}" does{" " if value else " not "}end with "{params.get("suffix", "")}".',
+        "compare_words":            f'Comparison of "{word}" vs "{word2}": {value}.',
+        "check_equals":             lambda: f'"{word}" and "{word2}" are{" " if value else " not "}equal.',
+        "check_reverse_equals":     lambda: f'The reverse of "{word}" does{" " if value else " not "}equal "{word2}".',
+        "find_index_of":            f'"{params.get("search", "")}" found at index {value} in "{word}".',
+        "check_contains_char":      lambda: f'"{word}" does{" " if value else " not "}contain the character "{params.get("char", "")}".',
+        "check_contains_string":    lambda: f'"{word}" does{" " if value else " not "}contain "{params.get("substring", params.get("search", ""))}".',
+        "check_is_consonant":       lambda: f'"{params.get("character", word)}" is{" " if value else " not "}a consonant.',
+        "check_is_vowel":           lambda: f'"{params.get("character", word)}" is{" " if value else " not "}a vowel.',
+        "check_contains_space":     lambda: f'"{word}" does{" " if value else " not "}contain spaces.',
+        "get_length_no_spaces":     f'Length of "{word}" without spaces: {value}.',
+    }
+
+    template = answers.get(tool_name)
+    if template is None:
+        return f"Result: {value}"
+    return template() if callable(template) else template
 
 
 SYSTEM_PROMPT = """You are Ananya, a helpful AI assistant specialized in word processing and text analysis.
@@ -745,11 +832,11 @@ async def chat_endpoint(request: Request) -> JSONResponse:
     Body: {"question": "...", "language": "english"}
     Returns: {"question": "...", "language": "...", "answer": "..."}
 
-    This endpoint orchestrates the full LLM + tool-calling loop:
-    1. Send user question + tools to the configured LLM provider
-    2. If LLM responds with tool_calls, execute them against the MCP tools
-    3. Send tool results back to LLM
-    4. Repeat until LLM produces a final text answer
+    Three-path orchestration:
+      Stage 1 — LLM identifies intent + specific tool + params (compact prompt, ~3-5s)
+        → "tool"   : fast path — call tool directly, format answer, return (no loop)
+        → "direct" : LLM answers from knowledge with no tools
+        → "multi"  : keyword-filter tools, run orchestration loop (Stage 2)
     """
     try:
         body = await request.json()
@@ -762,47 +849,70 @@ async def chat_endpoint(request: Request) -> JSONResponse:
     if not question:
         return JSONResponse({"error": "Missing question parameter"}, status_code=400)
 
-    # Fast-path: obvious intent without LLM
-    intent = _detect_intent(question, language)
-    if intent:
-        tool_name, tool_args = intent
-        tool_result = await _execute_tool(tool_name, tool_args)
-        word = tool_args.get("word", "")
-        answer = _format_tool_answer(tool_name, word, tool_result)
-        return JSONResponse({
-            "question": question,
-            "language": language,
-            "answer": answer,
-        })
-
     if LLM_PROVIDER.lower() == "openai" and not OPENAI_API_KEY:
         return JSONResponse({
-            "question": question,
-            "language": language,
+            "question": question, "language": language,
             "answer": "Error: OPENAI_API_KEY is not configured. Please set it in mcp_server/.env"
         })
 
     client = _create_llm_client()
+
+    # ── Stage 1: LLM identifies intent + specific tool + extracts params ──────
+    intent = await _identify_intent_and_tool(client, question, language)
+    logger.info(f"Stage 1 → {intent}")
+
+    # ── Fast path: single tool identified ────────────────────────────────────
+    if intent["action"] == "tool":
+        tool_name = intent["tool"]
+        tool_args = intent.get("params", {})
+
+        # Verify all required params are present; if not, drop to multi-path
+        # (Stage 1 sometimes extracts only partial params for multi-arg tools)
+        tool_obj = mcp._tool_manager._tools.get(tool_name)
+        required = tool_obj.parameters.get("required", []) if tool_obj else []
+        missing = [p for p in required if p not in tool_args]
+        if missing:
+            logger.warning(f"Fast path: missing required params {missing} for {tool_name} — falling to multi")
+            intent = {"action": "multi"}
+        else:
+            logger.info(f"Fast path — {tool_name}({tool_args})")
+            tool_result = await _execute_tool(tool_name, tool_args)
+            logger.info(f"Tool result: {tool_result[:200]}")
+            answer = _format_direct_answer(tool_name, tool_args, tool_result, question)
+            return JSONResponse({"question": question, "language": language, "answer": answer})
+
+    # ── Direct path: LLM answers from knowledge, no tools ────────────────────
+    if intent["action"] == "direct":
+        logger.info("Direct LLM response (no tools)")
+        messages = [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": f"[Language: {language}]\n\n{question}"},
+        ]
+        try:
+            response = await client.chat.completions.create(
+                model=LLM_MODEL, messages=messages,
+                max_tokens=LLM_MAX_TOKENS, temperature=LLM_TEMPERATURE,
+            )
+            answer = (response.choices[0].message.content or "").strip()
+        except openai.APIError as e:
+            answer = f"LLM service error: {str(e)}"
+        return JSONResponse({"question": question, "language": language, "answer": answer})
+
+    # ── Multi path: keyword-filter tools, orchestration loop ─────────────────
     all_tools = _build_openai_tools()
-
-    # ── Stage 1: Classify which tool categories are relevant (no tools, fast) ──
-    categories = await _classify_question(client, question, language)
-    logger.info(f"Matched categories: {categories}")
-
+    categories = _keyword_match_categories(question)
     if categories:
         filtered_tools = _filter_tools_by_categories(all_tools, categories)
-        logger.info(f"Stage 2: using {len(filtered_tools)} tools (from {len(all_tools)} total)")
+        logger.info(f"Stage 2 multi — {len(filtered_tools)} tools for categories {categories}")
     else:
-        # No tools needed — just let the LLM answer directly
-        filtered_tools = []
-        logger.info("No tool categories matched — LLM-only response")
+        filtered_tools = all_tools
+        logger.info(f"Stage 2 multi — all {len(all_tools)} tools (no keyword match)")
 
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": f"[Language: {language}]\n\n{question}"},
     ]
 
-    # ── Stage 2: Orchestration loop with only the relevant tools ──
     max_iterations = 10
     for iteration in range(max_iterations):
         try:
@@ -823,18 +933,11 @@ async def chat_endpoint(request: Request) -> JSONResponse:
         choice = response.choices[0]
         message = choice.message
 
-        # If the LLM produced a final text answer (no tool calls), we're done
         if choice.finish_reason == "stop" or not message.tool_calls:
-            answer = message.content or ""
-            logger.info(f"Chat complete after {iteration + 1} iteration(s)")
-            return JSONResponse({
-                "question": question,
-                "language": language,
-                "answer": answer.strip(),
-            })
+            answer = (message.content or "").strip()
+            logger.info(f"Multi path complete after {iteration + 1} iteration(s)")
+            return JSONResponse({"question": question, "language": language, "answer": answer})
 
-        # Otherwise, execute each tool call and feed results back
-        # First, append the assistant message with tool_calls
         messages.append(message.model_dump())
 
         for tool_call in message.tool_calls:
@@ -843,18 +946,15 @@ async def chat_endpoint(request: Request) -> JSONResponse:
                 fn_args = json.loads(tool_call.function.arguments)
             except json.JSONDecodeError:
                 fn_args = {}
-
             logger.info(f"Executing tool: {fn_name}({fn_args})")
             tool_result = await _execute_tool(fn_name, fn_args)
             logger.info(f"Tool result: {tool_result[:200]}")
-
             messages.append({
                 "role": "tool",
                 "tool_call_id": tool_call.id,
                 "content": tool_result,
             })
 
-    # If we exhausted iterations, return what we have
     return JSONResponse({
         "question": question, "language": language,
         "answer": "I processed your request but it required too many steps. Please try a simpler question."
