@@ -27,3 +27,4 @@ build/
 ananya_files/test_ollama.php
 ananya_files/test_llm.php
 ananya_files/mcp_server/mcp_venv/
+ananya_files/__pycache__

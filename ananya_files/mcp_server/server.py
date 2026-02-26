@@ -28,7 +28,7 @@ import uvicorn
 import openai
 
 from config import (
-    OPENAI_API_KEY, OLLAMA_URL, LLM_PROVIDER, LLM_MODEL, LLM_MAX_TOKENS, LLM_TEMPERATURE,
+    OPENAI_API_KEY, GEMINI_API_KEY, OLLAMA_URL, LLM_PROVIDER, LLM_MODEL, LLM_MAX_TOKENS, LLM_TEMPERATURE,
     API_BASE_URL, MCP_HOST, MCP_PORT,
 )
 from api_client import AnanyaAPIClient
@@ -724,8 +724,14 @@ async def _execute_tool(name: str, arguments: dict) -> str:
 
 
 def _create_llm_client() -> openai.AsyncOpenAI:
-    """Create an OpenAI-compatible client for either OpenAI or Ollama."""
+    """Create an OpenAI-compatible client for Gemini, OpenAI, or Ollama."""
     provider = LLM_PROVIDER.lower()
+    if provider == "gemini":
+        return openai.AsyncOpenAI(
+            api_key=GEMINI_API_KEY,
+            base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+            timeout=60.0,
+        )
     if provider == "ollama":
         base_url = OLLAMA_URL.rstrip("/") + "/v1"
         return openai.AsyncOpenAI(
@@ -849,7 +855,13 @@ async def chat_endpoint(request: Request) -> JSONResponse:
     if not question:
         return JSONResponse({"error": "Missing question parameter"}, status_code=400)
 
-    if LLM_PROVIDER.lower() == "openai" and not OPENAI_API_KEY:
+    provider = LLM_PROVIDER.lower()
+    if provider == "gemini" and not GEMINI_API_KEY:
+        return JSONResponse({
+            "question": question, "language": language,
+            "answer": "Error: GEMINI_API_KEY is not configured. Please set it in mcp_server/.env"
+        })
+    if provider == "openai" and not OPENAI_API_KEY:
         return JSONResponse({
             "question": question, "language": language,
             "answer": "Error: OPENAI_API_KEY is not configured. Please set it in mcp_server/.env"

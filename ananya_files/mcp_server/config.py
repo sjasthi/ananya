@@ -11,7 +11,8 @@ _env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
 load_dotenv(_env_path)
 
 # LLM provider
-LLM_PROVIDER = os.getenv('LLM_PROVIDER', 'openai')
+LLM_PROVIDER = os.getenv('LLM_PROVIDER', 'gemini')
+GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 # Here’s the approach that best fits those goals and is stable across semesters:
 
@@ -45,9 +46,11 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 # Students can debug in clear stages (LLM → validate → build → render).
 # If you want, I can outline the exact pipeline functions and file layout for the puzzle module so it’s easy for next semester’s team to pick up.
 OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
-LLM_MODEL = os.getenv('LLM_MODEL', 'gpt-4o-mini')
+LLM_MODEL = os.getenv('LLM_MODEL', 'gemini-2.0-flash')
 if LLM_PROVIDER.lower() == 'ollama' and 'LLM_MODEL' not in os.environ:
-	LLM_MODEL = 'mistral'
+    LLM_MODEL = 'mistral'
+elif LLM_PROVIDER.lower() == 'gemini' and 'LLM_MODEL' not in os.environ:
+    LLM_MODEL = 'gemini-2.0-flash'
 LLM_MAX_TOKENS = int(os.getenv('LLM_MAX_TOKENS', '1200'))
 LLM_TEMPERATURE = float(os.getenv('LLM_TEMPERATURE', '0.2'))
 
