@@ -15,7 +15,7 @@ info:
   version: 2.0.0
 
 servers:
-  - url: http://localhost/ananya/ananya_files/api.php
+  - url: http://localhost/ananya/api.php
     description: Local Development Server
   - url: /api.php
     description: API Server

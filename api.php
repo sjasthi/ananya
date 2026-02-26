@@ -15,8 +15,8 @@ require_once("word_processor.php");
 // Get the request path
 $request = $_SERVER['REQUEST_URI'];
 $path = parse_url($request, PHP_URL_PATH);
-$path = str_replace('/ananya/ananya_files/api.php/', '', $path); // TODO:Remove /ananya_files/ from path when file system fixed.
-$path = str_replace('/ananya/ananya_files/api.php', '', $path);
+$path = str_replace('/ananya/api.php/', '', $path);
+$path = str_replace('/ananya/api.php', '', $path);
 
 // Remove leading slash if present
 $path = ltrim($path, '/');

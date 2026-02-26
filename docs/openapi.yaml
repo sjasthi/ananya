@@ -15,10 +15,10 @@ info:
   version: 2.0.0
 
 servers:
-  - url: http://localhost/ananya/ananya_files/api.php
+  - url: https://ananya.telugupuzzles.com/api.php
+    description: API Server
+  - url: http://localhost/ananya/api.php
     description: Local Development Server
-  - url: /api.php
-    description: API Server (Use when deployed to a production server)
 
 tags:
   - name: Character Analysis

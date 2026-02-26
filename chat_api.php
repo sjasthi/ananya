@@ -42,7 +42,7 @@ function call_detected_api($api_name, $params) {
     // Build REST API URL using the current script base path
     $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '/ananya/ananya_files/chat_api.php');
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '/ananya/chat_api.php');
     $basePath = rtrim(str_replace('\\', '/', $scriptDir), '/');
     $url = $protocol . '://' . $host . $basePath . '/' . $api['path'];
     
