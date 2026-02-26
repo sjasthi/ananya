@@ -15,7 +15,7 @@ info:
   version: 2.0.0
 
 servers:
-  - url: https://ananya.telugupuzzles.com/api.php
+  - url: https://jasthi.com/ananya/api.php
     description: API Server
   - url: http://localhost/ananya/api.php
     description: Local Development Server
