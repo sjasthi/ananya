@@ -27,7 +27,7 @@ http://localhost/ananya/
 This project can use Ollama for local, free LLM responses (no API key needed).
 
 1. **Download Ollama**
-  - https://ollama.ai (Windows, macOS, Linux)
+  - https://ollamacurl -fsSL https://ollama.com/install.sh | sh.ai (Windows, macOS, Linux)
 
 2. **Start Ollama**
   - Windows (PowerShell):
@@ -76,6 +76,96 @@ This project can use Ollama for local, free LLM responses (no API key needed).
     ```bash
     ollama serve
     ```
+
+### MCP Server (Tool-Orchestrated Chat)
+
+The MCP server runs a local orchestration service that calls Ananya APIs as tools.
+
+1. **Install Python 3.10+**
+  - https://www.python.org/downloads/
+  - On Windows, check **Add Python to PATH** during install.
+
+2. **Install MCP dependencies**
+  ```powershell
+  cd ananya/ananya_files/mcp_server
+  python -m pip install -r requirements.txt
+  ```
+
+3. **Configure MCP environment**
+  - Edit `ananya/ananya_files/mcp_server/.env` and set:
+  ```
+  LLM_PROVIDER=ollama
+  OLLAMA_URL=http://localhost:11434
+  LLM_MODEL=mistral
+  API_BASE_URL=http://localhost/ananya/ananya_files/api.php
+  MCP_HOST=localhost
+  MCP_PORT=8000
+  ```
+
+4. **Start the MCP server**
+  ```powershell
+  cd ananya/ananya_files/mcp_server
+  python server.py
+  ```
+
+5. **Verify it is running**
+  - Visit: http://localhost:8000/health
+  - Then open: http://localhost/ananya/ananya_files/chat.php
+
+### MCP Server (Remote Setup for Live Demos)
+
+Use this when hosting at http://ananya.telugupuzzle.com for weekly demos.
+
+1. **Deploy code to the server**
+  - Ensure `ananya_files/` and `mcp_server/` are present on the server.
+
+2. **Install Python 3.10+ on the server**
+  - Confirm `python` is available on PATH.
+
+3. **Install MCP dependencies**
+  ```bash
+  cd /path/to/ananya/ananya_files/mcp_server
+  python -m pip install -r requirements.txt
+  ```
+
+4. **Configure MCP environment**
+  - Edit `/path/to/ananya/ananya_files/mcp_server/.env`:
+  ```
+  LLM_PROVIDER=ollama
+  OLLAMA_URL=http://localhost:11434
+  LLM_MODEL=mistral
+  API_BASE_URL=http://ananya.telugupuzzle.com/ananya_files/api.php
+  MCP_HOST=0.0.0.0
+  MCP_PORT=8000
+  ```
+
+5. **Start MCP server (keep it running)**
+  ```bash
+  cd /path/to/ananya/ananya_files/mcp_server
+  python server.py
+  ```
+
+6. **Verify from the server**
+  - http://localhost:8000/health
+
+7. **If you need public access to MCP**
+  - Place it behind a reverse proxy (Nginx/Apache) or SSH tunnel.
+  - Example Nginx location:
+  ```nginx
+  location /mcp/ {
+      proxy_pass http://127.0.0.1:8000/;
+      proxy_set_header Host $host;
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+  }
+  ```
+  - Example Apache (enable `proxy` and `proxy_http`):
+  ```apache
+  ProxyPass /mcp/ http://127.0.0.1:8000/
+  ProxyPassReverse /mcp/ http://127.0.0.1:8000/
+  ProxyPreserveHost On
+  RequestHeader set X-Forwarded-Proto "https"
+  ```
 
 ### API Usage
 ```bash

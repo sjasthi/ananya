@@ -19,7 +19,7 @@ require_once __DIR__ . '/includes/llm_handler.php';
 
 // MCP Server settings
 $MCP_SERVER_URL = 'http://localhost:8000/chat';
-$MCP_TIMEOUT = 60; // seconds — tool-calling loops can take a while
+$MCP_TIMEOUT = 120; // seconds — two-stage filtering keeps it fast, but allow headroom for cold starts
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {
@@ -58,7 +58,7 @@ function call_detected_api($api_name, $params) {
     
     $result = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    // curl_close($ch);
 
     error_log("API Response ($http_code): " . substr($result, 0, 200));
 
@@ -77,7 +77,7 @@ function call_detected_api($api_name, $params) {
             curl_setopt($ch2, CURLOPT_HEADER, false);
             $retry = curl_exec($ch2);
             $retry_code = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
-            curl_close($ch2);
+            // curl_close($ch2);'curl_close' is deprecated.
 
             error_log("Router Response ($retry_code): " . substr($retry, 0, 200));
             return $retry ?: $result;
@@ -103,6 +103,95 @@ function infer_params_from_question($api_name, $question, $language) {
     $params['language'] = $language ?: 'english';
 
     return $params;
+}
+
+function extract_quoted_strings($question) {
+    $strings = [];
+    if (preg_match_all('/"([^"]+)"|\'([^\']+)\'/', $question, $matches)) {
+        foreach ($matches[1] as $idx => $val) {
+            $s = $val ?: $matches[2][$idx];
+            if (!empty($s)) $strings[] = $s;
+        }
+    }
+    return $strings;
+}
+
+function normalize_candidate_text($text) {
+    $text = trim($text, " \t\n\r\0\x0B\"'");
+    // Remove leading English stop words (Unicode-aware, space-based)
+    $text = preg_replace('/^(does|do|is|are|can|could|would|should|please)\s+/iu', '', $text);
+    // Remove enclosed stop words (Unicode-aware)
+    $text = preg_replace('/\s+(the|a|an|word|string)\s+/iu', ' ', $text);
+    return trim($text, " \t\n\r\0\x0B\"'.,?!");
+}
+
+function extract_single_quoted_string($question) {
+    $strings = extract_quoted_strings($question);
+    return count($strings) > 0 ? $strings[0] : null;
+}
+
+function extract_first_noun_from_question($question, $intent_keywords = []) {
+    // Extract quoted text first
+    $quoted = extract_single_quoted_string($question);
+    if ($quoted) return $quoted;
+
+    // Remove intent keywords and common stop words, keep first remaining word
+    $words = preg_split('/\s+/u', trim($question));
+    $filtered = [];
+    
+    $stop_words = array_merge(
+        $intent_keywords,
+        ['the', 'a', 'an', 'is', 'are', 'does', 'do', 'spell', 'word', 'string',
+         'how', 'long', 'many', 'character', 'characters',
+         'what', 'which', 'who', 'where', 'when', 'why',
+         'of', 'in', 'for', 'with', 'on', 'at', 'by', 'to',
+         'give', 'tell', 'me', 'please', 'find', 'get', 'show']
+    );
+    
+    foreach ($words as $word) {
+        $normalized = strtolower(trim($word, '?,!.;:'));
+        if (!in_array($normalized, $stop_words) && !empty($normalized)) {
+            $filtered[] = trim($word, '?,!.;:');
+        }
+    }
+    
+    return count($filtered) > 0 ? $filtered[0] : null;
+}
+
+function extract_two_strings_from_question($question) {
+    $strings = extract_quoted_strings($question);
+    if (count($strings) >= 2) return [$strings[0], $strings[1]];
+
+    // Unicode-aware "X and Y" matching (space-based, no word boundaries)
+    if (preg_match('/(.+?)\s+and\s+(.+)/iu', $question, $m)) {
+        return [normalize_candidate_text($m[1]), normalize_candidate_text($m[2])];
+    }
+
+    if (count($strings) === 1) return [$strings[0], null];
+
+    return [null, null];
+}
+
+function extract_string_and_input2($question, $phrase) {
+    $strings = extract_quoted_strings($question);
+    if (count($strings) >= 2) return [$strings[0], $strings[1]];
+
+    // Unicode-aware phrase matching (space-based, no word boundaries)
+    $phrasePattern = '/\s' . preg_quote($phrase, '/') . '(?:\s|$)/iu';
+    if (!preg_match($phrasePattern, ' ' . $question)) return [null, null];
+
+    if (count($strings) === 1) {
+        $parts = preg_split($phrasePattern, ' ' . $question, 2);
+        $input2 = isset($parts[1]) ? normalize_candidate_text($parts[1]) : null;
+        return [$strings[0], $input2];
+    }
+
+    // Unicode-aware "X phrase Y" matching
+    if (preg_match('/(.*?)\s' . preg_quote($phrase, '/') . '\s(.+)$/iu', $question, $m)) {
+        return [normalize_candidate_text($m[1]), normalize_candidate_text($m[2])];
+    }
+
+    return [null, null];
 }
 
 // Load Quick Navigation labels from docs/api.php
@@ -182,52 +271,90 @@ function format_api_result($api_name, $params, $api_result, $language) {
 function detect_intent($question, $language) {
     $q = strtolower($question);
 
-    if (preg_match('/\b(length|how long|how many characters)\b/', $q)) {
+    if (preg_match('/\b(length|how long|how many characters)\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['length', 'how', 'long', 'many', 'characters']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'text_length',
-            'params' => infer_params_from_question('text_length', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\b(reverse|backwards|backward)\b/', $q)) {
+    if (preg_match('/\b(reverse|backwards|backward)\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['reverse', 'backwards', 'backward']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'text_reverse',
-            'params' => infer_params_from_question('text_reverse', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bpalindrome\b/', $q)) {
+    if (preg_match('/\b(randomize|scramble|shuffle)\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['randomize', 'scramble', 'shuffle']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
+        return [
+            'api_id' => 'text_randomize',
+            'params' => $params,
+        ];
+    }
+
+    if (preg_match('/\bpalindrome\b/u', $q)) {
+        $string = extract_first_noun_from_question($question, ['palindrome', 'is', 'are']);
+        $params = ['language' => $language ?: 'english'];
+        if ($string) $params['string'] = $string;
         return [
             'api_id' => 'analysis_is_palindrome',
-            'params' => infer_params_from_question('analysis_is_palindrome', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\banagram\b/', $q)) {
+    if (preg_match('/\banagram\b/u', $q)) {
+        [$s1, $s2] = extract_two_strings_from_question($question);
+        $params = ['language' => $language ?: 'english'];
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'analysis_is_anagram',
-            'params' => infer_params_from_question('analysis_is_anagram', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bstarts with\b/', $q)) {
+    if (preg_match('/\b(starts with|begins with)\b/u', $q)) {
+        [$s1, $s2] = extract_string_and_input2($question, 'starts with');
+        if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'begins with');
+        $params = ['language' => $language ?: 'english'];
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'comparison_starts_with',
-            'params' => infer_params_from_question('comparison_starts_with', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bends with\b/', $q)) {
+    if (preg_match('/\b(ends with|finishes with)\b/u', $q)) {
+        [$s1, $s2] = extract_string_and_input2($question, 'ends with');
+        if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'finishes with');
+        $params = ['language' => $language ?: 'english'];
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'comparison_ends_with',
-            'params' => infer_params_from_question('comparison_ends_with', $question, $language),
+            'params' => $params,
         ];
     }
 
-    if (preg_match('/\bcontains\b/', $q)) {
+    if (preg_match('/\b(contains|includes)\b/u', $q)) {
+        [$s1, $s2] = extract_string_and_input2($question, 'contains');
+        if (!$s2) [$s1, $s2] = extract_string_and_input2($question, 'includes');
+        $params = ['language' => $language ?: 'english'];
+        if ($s1) $params['string'] = $s1;
+        if ($s2) $params['input2'] = $s2;
         return [
             'api_id' => 'validation_contains_string',
-            'params' => infer_params_from_question('validation_contains_string', $question, $language),
+            'params' => $params,
         ];
     }
 
@@ -249,35 +376,8 @@ if(!$question) {
     exit;
 }
 
-// ── Intent router (no LLM) ───────────────────────────────────────
-$intent = detect_intent($question, $language);
-if ($intent) {
-    $api_name = $intent['api_id'] ?? null;
-    $params = $intent['params'] ?? [];
-    $api_doc_label = resolve_doc_label($api_name);
+// ── Forward to MCP server (intent classification + tool calling handled there) ──
 
-    $api_result = call_detected_api($api_name, $params);
-    $resp = format_api_result($api_name, $params, $api_result, $language);
-
-    if ($api_doc_label && strpos($resp, 'API used:') === false) {
-        $resp .= "\n\nAPI used: $api_doc_label";
-    }
-    if (stripos($resp, 'LLM consulted') === false) {
-        $resp .= "\n\nLLM consulted - No";
-    }
-
-    echo json_encode([
-        'question' => $question,
-        'language' => $language,
-        'answer' => $resp,
-        'api_doc_name' => $api_doc_label,
-        'source' => 'intent-router',
-        'llm_consulted' => false,
-    ]);
-    exit;
-}
-
-// ── Try MCP Server first ───────────────────────────────────────────
 $mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT);
 
 if($mcp_result !== null) {
@@ -304,92 +404,87 @@ foreach ($API_REFERENCE as $api) {
     }
 }
 
-$prompt = "You are a smart assistant that answers user questions by calling available APIs.\n";
-$prompt .= "When the user asks something that can be answered by an API, output ONLY:\n";
-$prompt .= "API_CALL: api_id\n";
-$prompt .= "PARAMS: param1=value1&param2=value2\n";
-$prompt .= "Do NOT include instructions, URLs, examples, or any extra text.\n";
-$prompt .= "If no API applies, answer normally in one short paragraph.\n\n";
+$prompt = "You must respond with ONLY valid JSON in this exact structure:\n";
+$prompt .= '{"api": "api_id", "params": {"param1": "value1", "param2": "value2"}}' . "\n\n";
+$prompt .= "EXAMPLES:\n\n";
+$prompt .= "User: 'How long is hello?'\n";
+$prompt .= '{"api": "text_length", "params": {"string": "hello", "language": "english"}}' . "\n\n";
+$prompt .= "User: 'Reverse the word test'\n";
+$prompt .= '{"api": "text_reverse", "params": {"string": "test", "language": "english"}}' . "\n\n";
+$prompt .= "User: 'Scramble xyz' or 'Randomize xyz'\n";
+$prompt .= '{"api": "text_randomize", "params": {"string": "xyz", "language": "english"}}' . "\n\n";
 $prompt .= $param_reference . "\n";
-$prompt .= "Available APIs:\n" . $context . "\n";
-$prompt .= "User question (language: $language):\n" . $question . "\n";
+$prompt .= "Available APIs:\n" . $context . "\n\n";
+$prompt .= "User: '" . $question . "' (language: $language)\n";
+$prompt .= "JSON response: ";
 
 $resp = llm_ask($prompt, [
     'model' => 'mistral',
-    'temperature' => 0.2,
+    'temperature' => 0.0,
+    'system_prompt' => 'You output ONLY valid JSON. No explanations.',
 ]);
 
 error_log("LLM Raw Response:\n" . $resp . "\n---END---");
 
+// Initialize variables
+$api_name = null;
+$api_doc_label = null;
+$params = [];
+
+// Try to parse JSON response
+$json_match = null;
+if (preg_match('/\{[^}]+\}/', $resp, $json_match)) {
+    $decoded = json_decode($json_match[0], true);
+    if ($decoded && isset($decoded['api'])) {
+        $api_name = $decoded['api'];
+        $params = $decoded['params'] ?? [];
+        $api_doc_label = resolve_doc_label($api_name);
+        error_log("Parsed JSON - API: $api_name, Params: " . json_encode($params));
+    }
+}
+
+// Fallback: try old API_CALL format
+if (!$api_name && preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp, $m1)) {
+    $api_name = $m1[1];
+    $api_doc_label = resolve_doc_label($api_name);
+    if (preg_match('/PARAMS:\s*([^\n]+)/i', $resp, $m2)) {
+        parse_str($m2[1], $params);
+    }
+    error_log("Parsed old format - API: $api_name");
+}
+
 // Retry once with a stricter format if the model didn't follow instructions
-if (!preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp)) {
-    $strict_prompt = "You MUST respond with ONLY the two lines below and nothing else:\n";
-    $strict_prompt .= "API_CALL: api_id\n";
-    $strict_prompt .= "PARAMS: param1=value1&param2=value2\n";
-    $strict_prompt .= "Use the exact parameter names from the reference.\n";
-    $strict_prompt .= "If no API applies, respond with: API_CALL: none and PARAMS: none\n\n";
+if (!$api_name) {
+    $strict_prompt = "Output ONLY this JSON structure with no extra text:\n";
+    $strict_prompt .= '{"api": "api_id_here", "params": {"key": "value"}}' . "\n\n";
     $strict_prompt .= $param_reference . "\n";
-    $strict_prompt .= "Available APIs:\n" . $context . "\n";
-    $strict_prompt .= "User question (language: $language):\n" . $question . "\n";
+    $strict_prompt .= "Available APIs:\n" . $context . "\n\n";
+    $strict_prompt .= "User: '" . $question . "' (language: $language)\n";
 
     $resp = llm_ask($strict_prompt, [
         'model' => 'mistral',
         'temperature' => 0.0,
+        'system_prompt' => 'Output ONLY valid JSON.',
     ]);
 
     error_log("LLM Strict Response:\n" . $resp . "\n---END---");
-}
-
-// Parse API_CALL from response
-$api_name = null;
-$api_doc_label = null;
-$params = [];
-if (preg_match('/API_CALL:\s*([A-Za-z0-9_-]+)/i', $resp, $m1)) {
-    $api_name = $m1[1];
-    $api_doc_label = resolve_doc_label($api_name);
-    error_log("Found API_CALL: $api_name");
-}
-if ($api_name && preg_match('/PARAMS:\s*([^\n]+)/i', $resp, $m2)) {
-    parse_str($m2[1], $params);
-    error_log("Found PARAMS: " . $m2[1]);
-    error_log("Parsed params: " . json_encode($params));
-}
-
-// If still no API_CALL, attempt to extract API name and params from freeform text
-if (!$api_name) {
-    foreach ($API_REFERENCE as $api) {
-        if (!empty($api['id']) && preg_match('/\b' . preg_quote($api['id'], '/') . '\b/i', $resp)) {
-            $api_name = $api['id'];
+    
+    // Parse JSON from strict response
+    if (preg_match('/\{[^}]+\}/', $resp, $json_match)) {
+        $decoded = json_decode($json_match[0], true);
+        if ($decoded && isset($decoded['api'])) {
+            $api_name = $decoded['api'];
+            $params = $decoded['params'] ?? [];
             $api_doc_label = resolve_doc_label($api_name);
-            error_log("Extracted API id from freeform: $api_name");
-            break;
-        }
-    }
-
-    if ($api_name && preg_match('/(string|language|input2|input3)\s*=\s*[^\s&]+/i', $resp)) {
-        if (preg_match('/(string=[^\s&]+(?:&language=[^\s&]+)?(?:&input2=[^\s&]+)?(?:&input3=[^\s&]+)?)/i', $resp, $m3)) {
-            parse_str($m3[1], $params);
-            error_log("Extracted params from freeform: " . json_encode($params));
         }
     }
 }
 
-// Heuristic: infer missing parameters or fill missing keys
-if ($api_name) {
-    $inferred = infer_params_from_question($api_name, $question, $language);
-    if (empty($params)) {
-        $params = $inferred;
-    } else {
-        if (empty($params['string']) && !empty($inferred['string'])) {
-            $params['string'] = $inferred['string'];
-        }
-        if (empty($params['language']) && !empty($inferred['language'])) {
-            $params['language'] = $inferred['language'];
-        }
-    }
+// Ensure language is set
+if ($api_name && !isset($params['language'])) {
+    $params['language'] = $language ?: 'english';
     error_log("Final params: " . json_encode($params));
 }
-
 
 // If an API call was detected, execute it
 if ($api_name) {
@@ -442,7 +537,7 @@ function call_mcp_server($url, $question, $language, $timeout) {
     $result = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err = curl_error($ch);
-    curl_close($ch);
+    // curl_close($ch);
 
     if($result === false || $httpCode < 200 || $httpCode >= 500) {
         // MCP server is down or errored — trigger fallback
