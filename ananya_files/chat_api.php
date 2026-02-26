@@ -19,7 +19,7 @@ require_once __DIR__ . '/includes/llm_handler.php';
 
 // MCP Server settings
 $MCP_SERVER_URL = 'http://localhost:8000/chat';
-$MCP_TIMEOUT = 60; // seconds — tool-calling loops can take a while
+$MCP_TIMEOUT = 120; // seconds — two-stage filtering keeps it fast, but allow headroom for cold starts
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {
@@ -58,7 +58,7 @@ function call_detected_api($api_name, $params) {
     
     $result = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    // curl_close($ch);
 
     error_log("API Response ($http_code): " . substr($result, 0, 200));
 
@@ -77,7 +77,7 @@ function call_detected_api($api_name, $params) {
             curl_setopt($ch2, CURLOPT_HEADER, false);
             $retry = curl_exec($ch2);
             $retry_code = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
-            curl_close($ch2);
+            // curl_close($ch2);'curl_close' is deprecated.
 
             error_log("Router Response ($retry_code): " . substr($retry, 0, 200));
             return $retry ?: $result;
@@ -141,7 +141,11 @@ function extract_first_noun_from_question($question, $intent_keywords = []) {
     
     $stop_words = array_merge(
         $intent_keywords,
-        ['the', 'a', 'an', 'is', 'are', 'does', 'do', 'spell', 'word', 'string', 'how', 'long', 'many', 'character', 'characters']
+        ['the', 'a', 'an', 'is', 'are', 'does', 'do', 'spell', 'word', 'string',
+         'how', 'long', 'many', 'character', 'characters',
+         'what', 'which', 'who', 'where', 'when', 'why',
+         'of', 'in', 'for', 'with', 'on', 'at', 'by', 'to',
+         'give', 'tell', 'me', 'please', 'find', 'get', 'show']
     );
     
     foreach ($words as $word) {
@@ -372,35 +376,8 @@ if(!$question) {
     exit;
 }
 
-// ── Intent router (no LLM) ───────────────────────────────────────
-$intent = detect_intent($question, $language);
-if ($intent) {
-    $api_name = $intent['api_id'] ?? null;
-    $params = $intent['params'] ?? [];
-    $api_doc_label = resolve_doc_label($api_name);
+// ── Forward to MCP server (intent classification + tool calling handled there) ──
 
-    $api_result = call_detected_api($api_name, $params);
-    $resp = format_api_result($api_name, $params, $api_result, $language);
-
-    if ($api_doc_label && strpos($resp, 'API used:') === false) {
-        $resp .= "\n\nAPI used: $api_doc_label";
-    }
-    if (stripos($resp, 'LLM consulted') === false) {
-        $resp .= "\n\nLLM consulted - No";
-    }
-
-    echo json_encode([
-        'question' => $question,
-        'language' => $language,
-        'answer' => $resp,
-        'api_doc_name' => $api_doc_label,
-        'source' => 'intent-router',
-        'llm_consulted' => false,
-    ]);
-    exit;
-}
-
-// ── Try MCP Server first ───────────────────────────────────────────
 $mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT);
 
 if($mcp_result !== null) {
@@ -560,7 +537,7 @@ function call_mcp_server($url, $question, $language, $timeout) {
     $result = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err = curl_error($ch);
-    curl_close($ch);
+    // curl_close($ch);
 
     if($result === false || $httpCode < 200 || $httpCode >= 500) {
         // MCP server is down or errored — trigger fallback
