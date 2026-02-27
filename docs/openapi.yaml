@@ -32,7 +32,7 @@ tags:
   - name: Character Validation
     description: Character validation and content checking
   - name: Utility
-    description: Additional length and utility operations
+    description: Text length calculations with selective character filtering.
   - name: Authentication
     description: User authentication and management
 
@@ -1382,18 +1382,18 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
 
   # ============================================================
-  # UTILITY (requires string; language defaults to telugu)
+  # UTILITY (requires string; language defaults to English)
   # ============================================================
 
   /utility/length-no-spaces:
     get:
       tags:
         - Utility
-      summary: Length without spaces
-      description: Calculate the length of the string excluding spaces
+      summary: Length calculation without spaces
+      description: Calculate the length of a string excluding spaces
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1406,11 +1406,12 @@ paths:
     get:
       tags:
         - Utility
-      summary: Length without spaces and commas
-      description: Calculate the length of the string excluding spaces and commas
+      summary: Length calculation without spaces or commas
+      description: Calculate the length of a string excluding spaces and commas
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
+        - $ref: '#/components/parameters/languageRequired'
+        
       responses:
         '200':
           description: Successful operation
@@ -1423,11 +1424,18 @@ paths:
     get:
       tags:
         - Utility
-      summary: Alternative length calculation
-      description: Calculate the length using an alternative method
+      summary: Alternative length calculation (excluding special characters)
+      
+      description: |
+        Calculates the length of text excluding spaces and special characters (punctuation and symbols).
+        
+        **Filtered Characters:**
+        - Spaces
+        - Special symbols: `! @ # $ % ^ & * ( ) _ - + = { } [ ] : ; " ' < , > . ? / | \`
+                      
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1435,6 +1443,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Alternative length calculated"
+                string: "Hello, World!"
+                language: "telugu"
+                data: 10
+                success: true
+                result: 10
+                error: null
 
   # ============================================================
   # AUTHENTICATION
