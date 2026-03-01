@@ -117,7 +117,16 @@
                 tryItOutEnabled: true,
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete'],
                 requestInterceptor: function(request) {
-                    // Ensure all requests use clean URLs
+                    // Ensure requests bypass browser/proxy cache so Try It Out always hits live runtime
+                    try {
+                        const requestUrl = new URL(request.url, window.location.href);
+                        if (!requestUrl.searchParams.has('_t')) {
+                            requestUrl.searchParams.set('_t', Date.now().toString());
+                            request.url = requestUrl.toString();
+                        }
+                    } catch (e) {
+                        // If URL parsing fails, keep original request URL
+                    }
                     console.log('Making request to:', request.url);
                     return request;
                 },

@@ -215,7 +215,7 @@ function handleAnalysisAPIs($action) {
             break;
         case 'detect-language':
             $result = $processor->getLangForString();
-            sendResponse(200, "Language detected", $string, $language, $result);
+            sendResponse(200, "Language detected", $string, null, $result);
             break;
         case 'parse-to-logical-chars':
             $result = $processor->parseToLogicalChars($string);
@@ -393,31 +393,82 @@ function handleValidationAPIs($action) {
 
 function handleUtilityAPIs($action) {
     $string = $_GET['string'] ?? '';
-    $language = $_GET['language'] ?? 'telugu'; // Default to telugu for primary use case
+    $requestedLanguage = $_GET['language'] ?? '';
     
     if (empty($string)) {
         sendResponse(400, "Missing required parameter: string", null, null, null);
         return;
     }
     
-    $processor = new wordProcessor($string, $language);
-    
     switch ($action) {
-        case 'length-no-spaces':
-            $result = $processor->getLengthNoSpaces($string);
-            sendResponse(200, "Length without spaces calculated", $string, $language, $result);
-            break;
-        case 'length-no-spaces-commas':
-            $result = $processor->getLengthNoSpacesNoCommas($string);
-            sendResponse(200, "Length without spaces and commas calculated", $string, $language, $result);
+        case 'language':
+            $processor = new wordProcessor($string, '');
+            $result = $processor->getLangForString();
+            sendResponse(200, "Language detected", $string, null, $result);
             break;
         case 'length-alternative':
+        case 'length-no-spaces':
+        case 'length-no-spaces-commas':
+            $resolvedLanguage = resolveUtilityLanguage($string, $requestedLanguage);
+            if ($resolvedLanguage === null) {
+                sendResponse(400, "Unable to auto-detect a supported language (english/telugu). Provide language explicitly.", $string, null, null);
+                return;
+            }
+
+            $processor = new wordProcessor($string, $resolvedLanguage);
+
+            if ($action === 'length-no-spaces') {
+                $result = $processor->getLengthNoSpaces($string);
+                sendResponse(200, "Length without spaces calculated", $string, $resolvedLanguage, $result);
+                return;
+            }
+
+            if ($action === 'length-no-spaces-commas') {
+                $result = $processor->getLengthNoSpacesNoCommas($string);
+                sendResponse(200, "Length without spaces and commas calculated", $string, $resolvedLanguage, $result);
+                return;
+            }
+
             $result = $processor->getLength2();
-            sendResponse(200, "Alternative length calculated", $string, $language, $result);
-            break;
+            sendResponse(200, "Alternative length calculated", $string, $resolvedLanguage, $result);
+            return;
         default:
             sendResponse(404, "Utility API action not found: $action", null, null, null);
     }
+}
+
+function resolveUtilityLanguage($string, $requestedLanguage)
+{
+    $normalizedRequestedLanguage = normalizeSupportedUtilityLanguage($requestedLanguage);
+    if ($normalizedRequestedLanguage !== null) {
+        return $normalizedRequestedLanguage;
+    }
+
+    if (!empty($requestedLanguage)) {
+        sendResponse(400, "Unsupported language. Supported values: english, telugu", $string, null, null);
+    }
+
+    $detector = new wordProcessor($string, '');
+    $detectedLanguage = $detector->getLangForString();
+    return normalizeSupportedUtilityLanguage($detectedLanguage);
+}
+
+function normalizeSupportedUtilityLanguage($language)
+{
+    if (!is_string($language) || trim($language) === '') {
+        return null;
+    }
+
+    $lang = strtolower(trim($language));
+    if ($lang === 'english') {
+        return 'english';
+    }
+
+    if ($lang === 'telugu') {
+        return 'telugu';
+    }
+
+    return null;
 }
 
 function handleAuthAPIs($action) {

@@ -538,18 +538,6 @@ $root = 'http://' . $_SERVER['HTTP_HOST'] . '/wpapi/';
   </p>
 </div>
 
-<div class="APIDescription" id="indexOf">
-  <body>
-    <h4>Index Of:</h4>
-    <p>
-    The indx of API will takes a string and a character as input. The service returns an integer value for the index of the character. 
-    For example, if 'hello!' and 'l' are entered the service will return 2. This API uses zero based indexing. 
-    <br>
-    <a href="https://wpapi.telugupuzzles.com/api/indexof.php?input1=hello!&input2=English&input3=l">Link to API: https://wpapi.telugupuzzles.com/api/indexof.php?input1=hello!&input2=English&input3=l</a>
-
-  </p>
-</div>
-
 <div class="APIDescription" id="addCharacterAt">
   <body>
     <h4>Add Character At:</h4>
