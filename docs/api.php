@@ -111,6 +111,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <a class="nav-link" href="#analysis-get-match-id-string">Get Match ID String</a>
                         <a class="nav-link" href="#analysis-head-tail-words">Head Tail Words</a>
                         <a class="nav-link" href="#analysis-intersecting-rank">Intersecting Rank</a>
+                        <a class="nav-link" href="#analysis-detect-language">Detect Language</a>
                         <a class="nav-link" href="#analysis-is-anagram">Is Anagram</a>
                         <a class="nav-link" href="#analysis-is-consonant">Is Consonant</a>
                         <a class="nav-link" href="#analysis-is-palindrome">Is Palindrome</a>
@@ -144,11 +145,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <a class="nav-link" href="#validation-ends-with">Ends With</a>
                         
                         <div class="category-header">Utility Operations</div>
-                        <a class="nav-link" href="#utility-index-of">Index Of</a>
                         <a class="nav-link" href="#utility-language">Language</a>
+                        <a class="nav-link" href="#utility-length-alternative">Length Alternative</a>
                         <a class="nav-link" href="#utility-length-no-spaces">Length No Spaces</a>
                         <a class="nav-link" href="#utility-length-no-spaces-commas">Length No Spaces/Commas</a>
-                        <a class="nav-link" href="#utility-match-id">Match ID</a>
                         
                         
                         <div class="category-header">Authentication</div>
@@ -231,8 +231,11 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
   "message": "Operation completed successfully",
   "string": "input_string",
-  "language": "English",
-  "data": "result_data"
+    "language": "English",
+    "data": "result_data",
+    "success": true,
+    "result": "result_data",
+    "error": null
 }</code></pre>
 
                         <h5>Error Response (400)</h5>
@@ -241,7 +244,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Error description",
   "string": null,
   "language": null,
-  "data": null
+    "data": null,
+    "success": false,
+    "result": null,
+    "error": "Error description"
 }</code></pre>
 
                         <div class="row mt-3">
@@ -1034,6 +1040,40 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "string": "listen",
   "language": "English",
   "data": true
+}</code></pre>
+                    </div>
+
+                    <div id="analysis-detect-language" class="api-section">
+                        <h3>Detect Language (Legacy Alias)</h3>
+                        <p>Detects language for input text. This is a legacy alias for <code>/utility/language</code>.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/analysis/detect-language
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (optional) - Language hint (defaults internally)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>analysis/detect-language?string=hello
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Language detected",
+  "string": "hello",
+  "data": "English"
 }</code></pre>
                     </div>
 
@@ -1936,42 +1976,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                     <!-- Utility Operations -->
                     <h2 class="category-header">Utility Operations</h2>
-
-                    <div id="utility-index-of" class="api-section">
-                        <h3>Index Of</h3>
-                        <p>Returns the index of the first occurrence of a substring within a string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/utility/index-of
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Substring to find</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>utility/index-of?string=hello&input2=ll&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Index found",
-  "string": "hello",
-  "language": "English",
-  "data": 2
-}</code></pre>
-                    </div>
+                    <p>If <code>language</code> is omitted for utility length endpoints, the API auto-detects <code>english</code> or <code>telugu</code>. Use <code>language</code> to explicitly override detection.</p>
 
                     <div id="utility-language" class="api-section">
                         <h3>Detect Language</h3>
@@ -2002,8 +2007,51 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
   "message": "Language detected",
   "string": "hello",
-  "data": "English"
+    "language": null,
+    "data": "English",
+    "success": true,
+    "result": "English",
+    "error": null
 }</code></pre>
+                    </div>
+
+                    <div id="utility-length-alternative" class="api-section">
+                        <h3>Length Alternative</h3>
+                        <p>Calculates length excluding spaces and special symbols.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/utility/length-alternative
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (optional override) - Language (english/telugu). If omitted, auto-detected.</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>utility/length-alternative?string=Hello,%20World!&language=english
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Alternative length calculated",
+  "string": "Hello, World!",
+  "language": "english",
+  "data": 10,
+  "success": true,
+  "result": 10,
+  "error": null
+}</code></pre>
+                                                <p><strong>Note:</strong> If auto-detection returns mixed/unknown, provide <code>language=english</code> or <code>language=telugu</code>.</p>
                     </div>
 
                     <div id="utility-length-no-spaces" class="api-section">
@@ -2021,23 +2069,26 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional override) - Language (english/telugu). If omitted, auto-detected.</li>
                                 </ul>
                             </div>
                         </div>
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>utility/length-no-spaces?string=hello world&language=English
+                                                        <?= $apiBase ?>utility/length-no-spaces?string=hello%20world&language=english
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Length Calculated with spaces",
+    "message": "Length without spaces calculated",
   "string": "hello world",
-  "language": "English",
-  "data": 10
+    "language": "english",
+    "data": 10,
+    "success": true,
+    "result": 10,
+    "error": null
 }</code></pre>
                     </div>
 
@@ -2056,58 +2107,26 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional override) - Language (english/telugu). If omitted, auto-detected.</li>
                                 </ul>
                             </div>
                         </div>
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>utility/length-no-spaces-commas?string=hello, world&language=English
+                            <?= $apiBase ?>utility/length-no-spaces-commas?string=hello,%20world&language=english
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Length Calculated with No Commas and No Spaces",
+  "message": "Length without spaces and commas calculated",
   "string": "hello, world",
-  "language": "English",
-  "data": 10
-}</code></pre>
-                    </div>
-
-                    <div id="utility-match-id" class="api-section">
-                        <h3>Match ID String</h3>
-                        <p>Generates a match ID string for the input text.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/utility/match-id
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>utility/match-id?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Match ID generated",
-  "string": "hello",
-  "language": "English",
-  "data": "5h1e2l1o"
+  "language": "english",
+  "data": 10,
+  "success": true,
+  "result": 10,
+  "error": null
 }</code></pre>
                     </div>
 

@@ -1452,7 +1452,18 @@ class wordProcessor
         // Flatten the array and check each code point
         foreach ($codePointArrays as $codePointArray) {
             foreach ($codePointArray as $codePoint) {
-                $cp = hexdec($codePoint);
+				if (is_int($codePoint)) {
+					$cp = $codePoint;
+				} else {
+					$codePointStr = trim((string)$codePoint);
+					if (preg_match('/^0x/i', $codePointStr)) {
+						$cp = hexdec(substr($codePointStr, 2));
+					} elseif (ctype_digit($codePointStr)) {
+						$cp = (int)$codePointStr;
+					} else {
+						$cp = hexdec($codePointStr);
+					}
+				}
                 
                 // Skip spaces, punctuation, and common symbols (0x0020-0x007F)
                 if ($cp >= 0x0020 && $cp <= 0x007F) {

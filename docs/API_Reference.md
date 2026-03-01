@@ -272,9 +272,9 @@ Checks if the string contains any space characters.
 **Endpoint:** `GET /containsSpace.php`
 
 ### Find Character Index
-Returns the zero-based index of the first occurrence of a character.
+Use the clean endpoint for index lookup in current API versions.
 
-**Endpoint:** `GET /indexOf.php`
+**Endpoint:** `GET /comparison/index-of`
 
 ### Contains Logical Characters
 Checks if any of the specified characters are in the string.

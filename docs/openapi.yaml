@@ -15,10 +15,12 @@ info:
   version: 2.0.0
 
 servers:
-  - url: https://jasthi.com/ananya/api.php
-    description: API Server
+  - url: /ananya/api.php
+    description: Current Environment Server (auto-detect host)
   - url: http://localhost/ananya/api.php
     description: Local Development Server
+  - url: https://jasthi.com/ananya/api.php
+    description: Production Server
 
 tags:
   - name: Character Analysis
@@ -32,7 +34,7 @@ tags:
   - name: Character Validation
     description: Character validation and content checking
   - name: Utility
-    description: Text length calculations with selective character filtering.
+    description: General-purpose utility endpoints for language detection and length calculations with optional character filtering.
   - name: Authentication
     description: User authentication and management
 
@@ -52,6 +54,7 @@ components:
           description: The input string that was processed
         language:
           type: string
+          nullable: true
           description: The language used for processing
         data:
           description: The result data of the operation
@@ -99,6 +102,23 @@ components:
         type: string
         enum: [english, telugu]
         example: "english"
+    languageOptional:
+      name: language
+      in: query
+      required: false
+      description: Language of the input text
+      schema:
+        type: string
+        enum: [english, telugu]
+        default: telugu
+    utilityLanguageOverride:
+      name: language
+      in: query
+      required: false
+      description: Optional language override. If omitted, language is auto-detected (english/telugu only).
+      schema:
+        type: string
+        enum: [english, telugu]
     input2Required:
       name: input2
       in: query
@@ -696,12 +716,13 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
 
-  /utility/language:
+  /analysis/detect-language:
     get:
       tags:
         - Word Analysis
-      summary: Detect language
-      description: Detect the language of the input string based on Unicode character ranges
+      summary: Detect language (legacy alias)
+      deprecated: true
+      description: Legacy alias for language detection. Prefer `/utility/language` for new integrations.
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - $ref: '#/components/parameters/languageOptional'
@@ -712,6 +733,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Language detected"
+                string: "hello"
+                language: null
+                data: "English"
+                success: true
+                result: "English"
+                error: null
 
   /analysis/parse-to-logical-chars:
     get:
@@ -1382,36 +1412,25 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
 
   # ============================================================
-  # UTILITY (requires string; language defaults to English)
+  # UTILITY (requires string; language auto-detected unless overridden)
   # ============================================================
 
-  /utility/length-no-spaces:
+  /utility/language:
     get:
       tags:
         - Utility
-      summary: Length calculation without spaces
-      description: Calculate the length of a string excluding spaces
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
+      summary: Determine language
+      description: |
+        Detect the script/language profile of the input text using Unicode character ranges.
 
-  /utility/length-no-spaces-commas:
-    get:
-      tags:
-        - Utility
-      summary: Length calculation without spaces or commas
-      description: Calculate the length of a string excluding spaces and commas
+        **Return values (`data`):**
+        - `English`
+        - `Telugu`
+        - `Mixed languages`
+        - `Unknown`
+
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-        
       responses:
         '200':
           description: Successful operation
@@ -1419,6 +1438,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Language detected"
+                string: "అనన్య"
+                language: null
+                data: "Telugu"
+                success: true
+                result: "Telugu"
+                error: null
 
   /utility/length-alternative:
     get:
@@ -1428,6 +1456,7 @@ paths:
       
       description: |
         Calculates the length of text excluding spaces and special characters (punctuation and symbols).
+        If `language` is omitted, the API auto-detects language (`english` or `telugu`).
         
         **Filtered Characters:**
         - Spaces
@@ -1435,7 +1464,7 @@ paths:
                       
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/utilityLanguageOverride'
       responses:
         '200':
           description: Successful operation
@@ -1452,6 +1481,59 @@ paths:
                 success: true
                 result: 10
                 error: null
+        '400':
+          description: Unsupported override or unable to auto-detect english/telugu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /utility/length-no-spaces:
+    get:
+      tags:
+        - Utility
+      summary: Length calculation without spaces
+      description: Calculate the length of a string excluding spaces
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/utilityLanguageOverride'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Unsupported override or unable to auto-detect english/telugu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /utility/length-no-spaces-commas:
+    get:
+      tags:
+        - Utility
+      summary: Length calculation without spaces or commas
+      description: Calculate the length of a string excluding spaces and commas
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/utilityLanguageOverride'
+        
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Unsupported override or unable to auto-detect english/telugu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   # ============================================================
   # AUTHENTICATION
