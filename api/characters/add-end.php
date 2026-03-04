@@ -1,3 +1,4 @@
+<!-- Currently allows characters other than letters to be added to the end of the string. -->
 <?php
 require_once("../../word_processor.php");
 
