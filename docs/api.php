@@ -85,14 +85,32 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <a class="nav-link" href="#overview">Overview</a>
                         <a class="nav-link" href="#authentication">Authentication</a>
                         <a class="nav-link" href="#response-format">Response Format</a>
-                        
-                        <div class="category-header">Text Operations</div>
-                        <a class="nav-link" href="#text-length">Text Length</a>
-                        <a class="nav-link" href="#text-reverse">Text Reverse</a>
-                        <a class="nav-link" href="#text-randomize">Text Randomize</a>
-                        <a class="nav-link" href="#text-split">Text Split</a>
-                        <a class="nav-link" href="#text-replace">Text Replace</a>
-                        
+
+                        <div class="category-header">Analysis Operations</div>
+                        <a class="nav-link" href="#analysis-can-make-all-words">Can Make All Words</a>
+                        <a class="nav-link" href="#analysis-can-make-word">Can Make Word</a>
+                        <a class="nav-link" href="#analysis-detect-language">Detect Language</a>
+                        <a class="nav-link" href="#analysis-get-match-id-string">Get Match ID String</a>
+                        <a class="nav-link" href="#analysis-head-tail-words">Head Tail Words</a>
+                        <a class="nav-link" href="#analysis-intersecting-rank">Intersecting Rank</a>
+                        <a class="nav-link" href="#analysis-is-anagram">Is Anagram</a>
+                        <a class="nav-link" href="#analysis-is-consonant">Is Consonant</a>
+                        <a class="nav-link" href="#analysis-is-palindrome">Is Palindrome</a>
+                        <a class="nav-link" href="#analysis-is-vowel">Is Vowel</a>
+                        <a class="nav-link" href="#analysis-ladder-words">Ladder Words</a>
+                        <a class="nav-link" href="#analysis-word-level">Word Level</a>
+                        <a class="nav-link" href="#analysis-word-strength">Word Strength</a>
+                        <a class="nav-link" href="#analysis-word-weight">Word Weight</a>
+                        <a class="nav-link" href="#analysis-parse-logical-characters">Parse to Logical Characters</a>
+                        <a class="nav-link" href="#analysis-role">Character Role</a>
+                        <a class="nav-link" href="#analysis-split-chunks">Split into Chunks</a>
+                        <a class="nav-link" href="#analysis-unique-intersecting-chars">Unique Intersecting Chars</a>
+                        <a class="nav-link" href="#analysis-unique-intersecting-rank">Unique Intersecting Rank</a>
+
+                        <div class="category-header">Authentication</div>
+                        <a class="nav-link" href="#auth-login">Login</a>
+                        <a class="nav-link" href="#auth-user-exists">User Exists</a>
+
                         <div class="category-header">Character Operations</div>
                         <a class="nav-link" href="#characters-add-at">Add at Position</a>
                         <a class="nav-link" href="#characters-add-end">Add at End</a>
@@ -104,56 +122,37 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <a class="nav-link" href="#characters-logical">Logical Characters</a>
                         <a class="nav-link" href="#characters-logical-at">Logical Char At</a>
                         <a class="nav-link" href="#characters-random-logical-chars">Random Logical</a>
-                        
-                        <div class="category-header">Analysis Operations</div>
-                        <a class="nav-link" href="#analysis-can-make-word">Can Make Word</a>
-                        <a class="nav-link" href="#analysis-can-make-all-words">Can Make All Words</a>
-                        <a class="nav-link" href="#analysis-get-match-id-string">Get Match ID String</a>
-                        <a class="nav-link" href="#analysis-head-tail-words">Head Tail Words</a>
-                        <a class="nav-link" href="#analysis-intersecting-rank">Intersecting Rank</a>
-                        <a class="nav-link" href="#analysis-detect-language">Detect Language</a>
-                        <a class="nav-link" href="#analysis-is-anagram">Is Anagram</a>
-                        <a class="nav-link" href="#analysis-is-consonant">Is Consonant</a>
-                        <a class="nav-link" href="#analysis-is-palindrome">Is Palindrome</a>
-                        <a class="nav-link" href="#analysis-is-vowel">Is Vowel</a>
-                        <a class="nav-link" href="#analysis-ladder-words">Ladder Words</a>
-                        <a class="nav-link" href="#analysis-word-level">Word Level</a>
-                        <a class="nav-link" href="#analysis-word-strength">Word Strength</a>
-                        <a class="nav-link" href="#analysis-word-weight">Word Weight</a>
-                <!-- <a class="nav-link" href="#analysis-parse-logical-chars">Parse to Logical Chars</a> -->
-                        <a class="nav-link" href="#analysis-parse-logical-characters">Parse to Logical Characters</a>
-                        <a class="nav-link" href="#analysis-role">Character Role</a>
-                        <a class="nav-link" href="#analysis-split-chunks">Split into Chunks</a>
-                        <a class="nav-link" href="#analysis-unique-intersecting-chars">Unique Intersecting Chars</a>
-                        <a class="nav-link" href="#analysis-unique-intersecting-rank">Unique Intersecting Rank</a>
-                        
+
                         <div class="category-header">Comparison Operations</div>
-                        <a class="nav-link" href="#comparison-compare-to">Compare To</a>
                         <a class="nav-link" href="#comparison-compare-ignore-case">Compare Ignore Case</a>
+                        <a class="nav-link" href="#comparison-compare-to">Compare To</a>
                         <a class="nav-link" href="#comparison-equals">Equals</a>
                         <a class="nav-link" href="#comparison-is-intersecting">Is Intersecting</a>
                         <a class="nav-link" href="#comparison-reverse-equals">Reverse Equals</a>
-                        
+
+                        <div class="category-header">Text Operations</div>
+                        <a class="nav-link" href="#text-length">Text Length</a>
+                        <a class="nav-link" href="#text-randomize">Text Randomize</a>
+                        <a class="nav-link" href="#text-replace">Text Replace</a>
+                        <a class="nav-link" href="#text-reverse">Text Reverse</a>
+                        <a class="nav-link" href="#text-split">Text Split</a>
+
                         <div class="category-header">Validation Operations</div>
+                        <a class="nav-link" href="#validation-contains-all-logical-chars">Contains All Logical Chars</a>
                         <a class="nav-link" href="#validation-contains-char">Contains Character</a>
                         <a class="nav-link" href="#validation-contains-logical-chars">Contains Logical Chars</a>
-                        <a class="nav-link" href="#validation-contains-all-logical-chars">Contains All Logical Chars</a>
                         <a class="nav-link" href="#validation-contains-logical-sequence">Contains Logical Sequence</a>
                         <a class="nav-link" href="#validation-contains-space">Contains Space</a>
                         <a class="nav-link" href="#validation-contains-string">Contains String</a>
                         <a class="nav-link" href="#validation-starts-with">Starts With</a>
                         <a class="nav-link" href="#validation-ends-with">Ends With</a>
-                        
+
                         <div class="category-header">Utility Operations</div>
+
+                        <a class="nav-link" href="#utility-index-of">Index Of </a>
                         <a class="nav-link" href="#utility-language">Language</a>
-                        <a class="nav-link" href="#utility-length-alternative">Length Alternative</a>
-                        <a class="nav-link" href="#utility-length-no-spaces">Length No Spaces</a>
                         <a class="nav-link" href="#utility-length-no-spaces-commas">Length No Spaces/Commas</a>
-                        
-                        
-                        <div class="category-header">Authentication</div>
-                        <a class="nav-link" href="#auth-login">Login</a>
-                        <a class="nav-link" href="#auth-user-exists">User Exists</a>
+                        <a class="nav-link" href="#utility-length-no-spaces">Length No Spaces</a>
                         
                         <div class="category-header">User Management</div>
                         <a class="nav-link" href="#userExists">User Exists</a>
@@ -270,550 +269,6 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                     <!-- API Endpoints -->
                     <h1 class="mt-5 mb-4">API Reference</h1>
-
-                    <!-- Text Operations -->
-                    <h2 class="category-header">Text Operations</h2>
-
-                    <div id="text-length" class="api-section">
-                        <h3>Text Length</h3>
-                        <p>Returns the logical length of a string, which may differ from byte length for non-ASCII characters.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/text/length
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>text/length?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Length calculated",
-  "string": "hello",
-  "language": "English",
-  "data": 5
-}</code></pre>
-                    </div>
-
-                    <div id="text-reverse" class="api-section">
-                        <h3>Text Reverse</h3>
-                        <p>Returns the reverse of the input string, preserving logical character order.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/text/reverse
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>text/reverse?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Text reversed",
-  "string": "hello",
-  "language": "English",
-  "data": "olleh"
-}</code></pre>
-                    </div>
-
-                    <div id="text-randomize" class="api-section">
-                        <h3>Text Randomize</h3>
-                        <p>Randomizes the logical characters within the input string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/text/randomize
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>text/randomize?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Text randomized",
-  "string": "hello",
-  "language": "English",
-  "data": "loleh"
-}</code></pre>
-                    </div>
-
-                    <div id="text-split" class="api-section">
-                        <h3>Text Split</h3>
-                        <p>Splits text into specified number of columns for display purposes.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/text/split
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Number of columns</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>text/split?string=hello&input2=2&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Text split",
-  "string": "hello",
-  "language": "English",
-  "data": {"0":["h","e"],"2":["l","l"],"4":["o",null]}
-}</code></pre>
-                    </div>
-
-                    <div id="text-replace" class="api-section">
-                        <h3>Text Replace</h3>
-                        <p>Replaces all occurrences of a substring with another string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/text/replace
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Text to find</li>
-                                    <li><code>input3</code> (required) - Replacement text</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>text/replace?string=hello&input2=ell&input3=i&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Text replaced",
-  "string": "hello",
-  "language": "English",
-  "data": "hio"
-}</code></pre>
-                    </div>
-
-                    <!-- Character Operations -->
-                    <h2 class="category-header">Character Operations</h2>
-
-                    <div id="characters-add-at" class="api-section">
-                        <h3>Add Character at Position</h3>
-                        <p>Adds a character or string at a specific position in the input string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/add-at
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Position (0-based index)</li>
-                                    <li><code>input3</code> (required) - Character/string to add</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/add-at?string=hello&input2=2&input3=X&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Character added at position",
-  "string": "hello",
-  "language": "English",
-  "data": "heXllo"
-}</code></pre>
-                    </div>
-
-                    <div id="characters-add-end" class="api-section">
-                        <h3>Add Character at End</h3>
-                        <p>Adds a character or string at the end of the input string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/add-end
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Character/string to add</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/add-end?string=hello&input2=!&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Character added at end",
-  "string": "hello",
-  "language": "English",
-  "data": "hello!"
-}</code></pre>
-                    </div>
-
-                    <div id="characters-base" class="api-section">
-                        <h3>Base Characters</h3>
-                        <p>Returns the base characters from the input string, useful for anagram analysis.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/base
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/base?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Base characters processed",
-  "string": "hello",
-  "language": "English",
-  "data": ["h", "e", "l", "l", "o"]
-}</code></pre>
-                    </div>
-
-                    <div id="characters-base-consonants" class="api-section">
-                        <h3>Base Consonants</h3>
-                        <p>Returns the base consonants from a string compared against a second string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/base-consonants
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                    <li><code>secondString</code> (required) - Second string to compare</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/base-consonants?string=hello&language=English&secondString=world
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "baseConsonants Processed",
-  "string": "hello",
-  "language": "English",
-  "secondString": "world",
-  "data": ["l"]
-}</code></pre>
-                    </div>
-
-                    <div id="characters-codepoints" class="api-section">
-                        <h3>Code Points</h3>
-                        <p>Returns an array of Unicode code points for each logical character in the string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/codepoints
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/codepoints?string=hello&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Code points processed",
-  "string": "hello",
-  "language": "English",
-  "data": [[104], [101], [108], [108], [111]]
-}</code></pre>
-                    </div>
-
-                    <div id="characters-codepoint-length" class="api-section">
-                        <h3>Code Point Length</h3>
-                        <p>Returns the total number of Unicode code points in the string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/codepoint-length
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/codepoint-length?string=అమెరికా&language=Telugu
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Code point length calculated",
-  "string": "అమెరికా",
-  "language": "Telugu",
-  "data": 7
-}</code></pre>
-                    </div>
-
-                    <div id="characters-filler-characters" class="api-section">
-                        <h3>Filler Characters</h3>
-                        <p>Generates random filler characters of the specified type and count for the given language.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/filler-characters
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>count</code> (required) - Number of characters to generate (must be > 0)</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                    <li><code>type</code> (required) - Type of filler characters</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/filler-characters?count=5&language=Telugu&type=consonant
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Filler Characters Generated",
-  "count": "5",
-  "type": "consonant",
-  "language": "Telugu",
-  "data": ["క", "ట", "ప", "మ", "న"]
-}</code></pre>
-                    </div>
-
-                    <div id="characters-logical" class="api-section">
-                        <h3>Logical Characters</h3>
-                        <p>Returns an array of logical characters from the input string, properly handling complex scripts.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/logical
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/logical?string=అమెరికా&language=Telugu
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Logical characters processed",
-  "string": "అమెరికా",
-  "language": "Telugu",
-  "data": ["అ", "మె", "రి", "కా"]
-}</code></pre>
-                    </div>
-
-                    <div id="characters-logical-at" class="api-section">
-                        <h3>Logical Character At Position</h3>
-                        <p>Returns the logical character at a specific position in the string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/logical-at
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Position (0-based index)</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/logical-at?string=hello&input2=1&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Logical character at position retrieved",
-  "string": "hello",
-  "language": "English",
-  "data": "e"
-}</code></pre>
-                    </div>
-
-                    <div id="characters-random-logical-chars" class="api-section">
-                        <h3>Random Logical Characters</h3>
-                        <p>Generates random logical characters from the input string.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/characters/random-logical-chars
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Number of characters to generate</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>characters/random-logical-chars?string=hello&input2=3&language=English
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Random logical characters generated",
-  "string": "hello",
-  "language": "English",
-  "data": ["h", "e", "l"]
-}</code></pre>
-                    </div>
-
                     <!-- Analysis Operations -->
                     <h2 class="category-header">Analysis Operations</h2>
                     </div>
@@ -1501,7 +956,442 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <!-- String Comparison -->
+
+                    <!-- Authentication -->
+                    <h2 class="category-header">Authentication</h2>
+
+                    <div id="auth-login" class="api-section">
+                        <h3>Login</h3>
+                        <p>Authenticates a user with username and password.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    POST /api.php/auth/login
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>username</code> (required) - Username</li>
+                                    <li><code>password</code> (required) - Password</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            POST <?= $apiBase ?>auth/login
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Login successful",
+  "data": {
+    "token": "auth_token_here",
+    "user_id": 123
+  }
+}</code></pre>
+                    </div>
+
+                    <div id="auth-user-exists" class="api-section">
+                        <h3>User Exists</h3>
+                        <p>Checks if a user exists in the system.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/auth/user-exists
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Username</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>auth/user-exists?string=testuser
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "User existence check completed",
+  "string": "testuser",
+  "data": false
+}</code></pre>
+                    </div>
+
+                    <!-- Character Operations -->
+                    <h2 class="category-header">Character Operations</h2>
+
+                    <div id="characters-add-at" class="api-section">
+                        <h3>Add Character at Position</h3>
+                        <p>Adds a character or string at a specific position in the input string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/add-at
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Position (0-based index)</li>
+                                    <li><code>input3</code> (required) - Character/string to add</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/add-at?string=hello&input2=2&input3=X&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Character added at position",
+  "string": "hello",
+  "language": "English",
+  "data": "heXllo"
+}</code></pre>
+                    </div>
+
+                    <div id="characters-add-end" class="api-section">
+                        <h3>Add Character at End</h3>
+                        <p>Adds a character or string at the end of the input string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/add-end
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Character/string to add</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/add-end?string=hello&input2=!&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Character added at end",
+  "string": "hello",
+  "language": "English",
+  "data": "hello!"
+}</code></pre>
+                    </div>
+
+                    <div id="characters-base" class="api-section">
+                        <h3>Base Characters</h3>
+                        <p>Returns the base characters from the input string, useful for anagram analysis.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/base
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/base?string=hello&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Base characters processed",
+  "string": "hello",
+  "language": "English",
+  "data": ["h", "e", "l", "l", "o"]
+}</code></pre>
+                    </div>
+
+                    <div id="characters-base-consonants" class="api-section">
+                        <h3>Base Consonants</h3>
+                        <p>Returns the base consonants from a string compared against a second string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/base-consonants
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>secondString</code> (required) - Second string to compare</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/base-consonants?string=hello&language=English&secondString=world
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "baseConsonants Processed",
+  "string": "hello",
+  "language": "English",
+  "secondString": "world",
+  "data": ["l"]
+}</code></pre>
+                    </div>
+
+                    <div id="characters-codepoints" class="api-section">
+                        <h3>Code Points</h3>
+                        <p>Returns an array of Unicode code points for each logical character in the string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/codepoints
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/codepoints?string=hello&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Code points processed",
+  "string": "hello",
+  "language": "English",
+  "data": [[104], [101], [108], [108], [111]]
+}</code></pre>
+                    </div>
+
+                    <div id="characters-codepoint-length" class="api-section">
+                        <h3>Code Point Length</h3>
+                        <p>Returns the total number of Unicode code points in the string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/codepoint-length
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/codepoint-length?string=అమెరికా&language=Telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Code point length calculated",
+  "string": "అమెరికా",
+  "language": "Telugu",
+  "data": 7
+}</code></pre>
+                    </div>
+
+                    <div id="characters-filler-characters" class="api-section">
+                        <h3>Filler Characters</h3>
+                        <p>Generates random filler characters of the specified type and count for the given language.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/filler-characters
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>count</code> (required) - Number of characters to generate (must be > 0)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>type</code> (required) - Type of filler characters</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/filler-characters?count=5&language=Telugu&type=consonant
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Filler Characters Generated",
+  "count": "5",
+  "type": "consonant",
+  "language": "Telugu",
+  "data": ["క", "ట", "ప", "మ", "న"]
+}</code></pre>
+                    </div>
+
+                    <div id="characters-logical" class="api-section">
+                        <h3>Logical Characters</h3>
+                        <p>Returns an array of logical characters from the input string, properly handling complex scripts.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/logical
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/logical?string=అమెరికా&language=Telugu
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Logical characters processed",
+  "string": "అమెరికా",
+  "language": "Telugu",
+  "data": ["అ", "మె", "రి", "కా"]
+}</code></pre>
+                    </div>
+
+                    <div id="characters-logical-at" class="api-section">
+                        <h3>Logical Character At Position</h3>
+                        <p>Returns the logical character at a specific position in the string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/logical-at
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Position (0-based index)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/logical-at?string=hello&input2=1&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Logical character at position retrieved",
+  "string": "hello",
+  "language": "English",
+  "data": "e"
+}</code></pre>
+                    </div>
+
+                    <div id="characters-random-logical-chars" class="api-section">
+                        <h3>Random Logical Characters</h3>
+                        <p>Generates random logical characters from the input string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/characters/random-logical-chars
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Number of characters to generate</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>characters/random-logical-chars?string=hello&input2=3&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Random logical characters generated",
+  "string": "hello",
+  "language": "English",
+  "data": ["h", "e", "l"]
+}</code></pre>
+                    </div>
+
+                                        <!-- Comparison Operations-->
                     <h2 class="category-header">String Comparison</h2>
 
                     <div id="comparison-compare-to" class="api-section">
@@ -1681,6 +1571,187 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "string": "hello",
   "language": "English",
   "data": true
+}</code></pre>
+                    </div>
+
+                    <!-- Text Operations -->
+                    <h2 class="category-header">Text Operations</h2>
+
+                    <div id="text-length" class="api-section">
+                        <h3>Text Length</h3>
+                        <p>Returns the logical length of a string, which may differ from byte length for non-ASCII characters.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/text/length
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>text/length?string=hello&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Length calculated",
+  "string": "hello",
+  "language": "English",
+  "data": 5
+}</code></pre>
+                    </div>
+
+                    <div id="text-reverse" class="api-section">
+                        <h3>Text Reverse</h3>
+                        <p>Returns the reverse of the input string, preserving logical character order.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/text/reverse
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>text/reverse?string=hello&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Text reversed",
+  "string": "hello",
+  "language": "English",
+  "data": "olleh"
+}</code></pre>
+                    </div>
+
+                    <div id="text-randomize" class="api-section">
+                        <h3>Text Randomize</h3>
+                        <p>Randomizes the logical characters within the input string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/text/randomize
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>text/randomize?string=hello&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Text randomized",
+  "string": "hello",
+  "language": "English",
+  "data": "loleh"
+}</code></pre>
+                    </div>
+
+                    <div id="text-split" class="api-section">
+                        <h3>Text Split</h3>
+                        <p>Splits text into specified number of columns for display purposes.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/text/split
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Number of columns</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>text/split?string=hello&input2=2&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Text split",
+  "string": "hello",
+  "language": "English",
+  "data": {"0":["h","e"],"2":["l","l"],"4":["o",null]}
+}</code></pre>
+                    </div>
+
+                    <div id="text-replace" class="api-section">
+                        <h3>Text Replace</h3>
+                        <p>Replaces all occurrences of a substring with another string.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Endpoint</h6>
+                                <div class="api-endpoint">
+                                    GET /api.php/text/replace
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Parameters</h6>
+                                <ul>
+                                    <li><code>string</code> (required) - Input string</li>
+                                    <li><code>input2</code> (required) - Text to find</li>
+                                    <li><code>input3</code> (required) - Replacement text</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <h6>Example Request</h6>
+                        <div class="api-endpoint">
+                            <?= $apiBase ?>text/replace?string=hello&input2=ell&input3=i&language=English
+                        </div>
+
+                        <h6>Example Response</h6>
+                        <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Text replaced",
+  "string": "hello",
+  "language": "English",
+  "data": "hio"
 }</code></pre>
                     </div>
 
@@ -1973,6 +2044,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "language": "English",
   "data": true
 }</code></pre>
+                    </div>
 
                     <!-- Utility Operations -->
                     <h2 class="category-header">Utility Operations</h2>
@@ -2130,77 +2202,6 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 }</code></pre>
                     </div>
 
-                    <!-- Authentication -->
-                    <h2 class="category-header">Authentication</h2>
-
-                    <div id="auth-login" class="api-section">
-                        <h3>Login</h3>
-                        <p>Authenticates a user with username and password.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    POST /api.php/auth/login
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>username</code> (required) - Username</li>
-                                    <li><code>password</code> (required) - Password</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            POST <?= $apiBase ?>auth/login
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "Login successful",
-  "data": {
-    "token": "auth_token_here",
-    "user_id": 123
-  }
-}</code></pre>
-                    </div>
-
-                    <div id="auth-user-exists" class="api-section">
-                        <h3>User Exists</h3>
-                        <p>Checks if a user exists in the system.</p>
-                        
-                        <div class="row">
-                            <div class="col-md-6">
-                                <h6>Endpoint</h6>
-                                <div class="api-endpoint">
-                                    GET /api.php/auth/user-exists
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <h6>Parameters</h6>
-                                <ul>
-                                    <li><code>string</code> (required) - Username</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <h6>Example Request</h6>
-                        <div class="api-endpoint">
-                            <?= $apiBase ?>auth/user-exists?string=testuser
-                        </div>
-
-                        <h6>Example Response</h6>
-                        <pre><code class="language-json">{
-  "response_code": 200,
-  "message": "User existence check completed",
-  "string": "testuser",
-  "data": false
-}</code></pre>
-                    </div>
 
                     <!-- User Management -->
                     <h2 class="category-header">User Management</h2>

@@ -34,7 +34,7 @@ tags:
   - name: Character Validation
     description: Character validation and content checking
   - name: Utility
-    description: General-purpose utility endpoints for language detection and length calculations with optional character filtering.
+    description: General-purpose utility endpoints for language detection and length calculations with Required character filtering.
   - name: Authentication
     description: User authentication and management
 
@@ -115,7 +115,7 @@ components:
       name: language
       in: query
       required: false
-      description: Optional language override. If omitted, language is auto-detected (english/telugu only).
+      description: Required language override. If omitted, language is auto-detected (english/telugu only).
       schema:
         type: string
         enum: [english, telugu]
@@ -196,149 +196,27 @@ components:
         format: email
 
 paths:
+
   # ============================================================
-  # CHARACTER ANALYSIS (requires string AND language)
+  # WORD ANALYSIS (requires string; language defaults to telugu)
   # ============================================================
 
-  /characters/base:
+  /analysis/can-make-all-words:
     get:
       tags:
-        - Character Analysis
-      summary: Get base characters
-      description: Extract base characters from the input string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/logical:
-    get:
-      tags:
-        - Character Analysis
-      summary: Get logical characters
-      description: Split the input string into logical character components
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/codepoints:
-    get:
-      tags:
-        - Character Analysis
-      summary: Get Unicode code points
-      description: Get Unicode code points for each character in the input string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/codepoint-length:
-    get:
-      tags:
-        - Character Analysis
-      summary: Get code point length
-      description: Calculate the number of Unicode code points in the input string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/random-logical:
-    get:
-      tags:
-        - Character Analysis
-      summary: Get random logical characters
-      description: Get a random selection of logical characters from the input string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-        - name: count
-          in: query
-          required: false
-          description: Number of random characters to return (default 5)
-          schema:
-            type: integer
-            default: 5
-            example: 5
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/add-end:
-    get:
-      tags:
-        - Character Analysis
-      summary: Add character at end
-      description: Append a character to the end of the input string
+        - Word Analysis
+      summary: Check if all words can be formed
+      description: Check if all words in the second parameter can be formed from the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
-          description: Character to add at the end
+          description: Comma-separated words to check
           schema:
             type: string
-            example: "క"
+            example: "అన,న్య"
       responses:
         '200':
           description: Successful operation
@@ -346,30 +224,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/logical-at:
+  /analysis/can-make-word:
     get:
       tags:
-        - Character Analysis
-      summary: Get logical character at position
-      description: Retrieve the logical character at a specific position in the string
+        - Word Analysis
+      summary: Check if word can be formed
+      description: Check if the second word can be formed using characters from the first word
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
-          required: false
-          description: Zero-based position index (default 0)
+          required: true
+          description: Word to check if it can be formed from the input string
           schema:
-            type: integer
-            default: 0
-            example: 0
+            type: string
+            example: "అన"
       responses:
         '200':
           description: Successful operation
@@ -377,26 +247,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
+  /analysis/detect-language:
+    get:
+      tags:
+        - Word Analysis
+      summary: Detect language (legacy alias)
+      deprecated: true
+      description: Legacy alias for language detection. Prefer `/utility/language` for new integrations.
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageOptional'
+      responses:
+        '200':
+          description: Successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /characters/base-consonants:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Language detected"
+                string: "hello"
+                language: null
+                data: "English"
+                success: true
+                result: "English"
+                error: null
+  /analysis/get-match-id-string:
     get:
       tags:
-        - Character Analysis
-      summary: Get base consonants
-      description: Calculate base consonants for the input strings
+        - Word Analysis
+      summary: Get match ID string
+      description: Generate a match ID string between two words for comparison analysis
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
-          required: false
-          description: Secondary string for consonant comparison
+          required: true
+          description: Second string for match ID generation
           schema:
             type: string
             example: "అన్న"
@@ -407,12 +296,361 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+  /analysis/head-tail-words:
+    get:
+      tags:
+        - Word Analysis
+      summary: Check if head-tail words
+      description: Check if the last logical character of the first word matches the first logical character of the second word
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second word for head-tail check
+          schema:
+            type: string
+            example: "న్యాయం"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/intersecting-rank:
+    get:
+      tags:
+        - Word Analysis
+      summary: Get intersecting rank
+      description: Calculate the intersecting rank between two strings (number of shared characters)
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string for intersection ranking
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/is-anagram:
+    get:
+      tags:
+        - Word Analysis
+      summary: Check if anagram
+      description: Determine if the two input strings are anagrams of each other
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string to compare for anagram check
+          schema:
+            type: string
+            example: "న్యఅన"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/is-consonant:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if character is consonant
+      description: Determine if the given character is a consonant (uses the first logical character of the input)
+      parameters:
+        - name: string
+          in: query
+          required: true
+          description: Character to check (first logical character is used)
+          schema:
+            type: string
+            example: "క"
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/is-palindrome:
+    get:
+      tags:
+        - Word Analysis
+      summary: Check if palindrome
+      description: Determine if the input string is a palindrome using logical character comparison
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/is-vowel:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if character is vowel
+      description: Determine if the given character is a vowel (uses the first logical character of the input)
+      parameters:
+        - name: string
+          in: query
+          required: true
+          description: Character to check (first logical character is used)
+          schema:
+            type: string
+            example: "అ"
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/ladder-words:
+    get:
+      tags:
+        - Word Analysis
+      summary: Check if ladder words
+      description: Check if two words are ladder words (differ by one logical character)
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second word for ladder word check
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/word-level:
+    get:
+      tags:
+        - Word Analysis
+      summary: Calculate word level
+      description: Calculate the linguistic level metric of the input word
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/word-strength:
+    get:
+      tags:
+        - Word Analysis
+      summary: Calculate word strength
+      description: Calculate the linguistic strength metric of the input word
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/word-weight:
+    get:
+      tags:
+        - Word Analysis
+      summary: Calculate word weight
+      description: Calculate the linguistic weight metric of the input word
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/parse-to-logical-characters:
+    get:
+      tags:
+        - Word Analysis
+      summary: Parse to logical characters (alternative)
+      description: Alternative method to parse the input string into logical character components
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/role:
+    get:
+      tags:
+        - Word Analysis
+      summary: Determine character role
+      description: Determines the linguistic role of a character (consonant, vowel, etc.).
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/split-into-chunks:
+    get:
+      tags:
+        - Word Analysis
+      summary: Split into chunks
+      description: Split the input string into 15 chunks based on logical characters
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/unique-intersecting-chars:
+    get:
+      tags:
+        - Word Analysis
+      summary: Get unique intersecting logical characters
+      description: Get the unique intersecting logical characters between two strings
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string for unique intersection
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /analysis/unique-intersecting-rank:
+    get:
+      tags:
+        - Word Analysis
+      summary: Get unique intersecting rank
+      description: Calculate the unique intersecting rank between two strings
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string for unique intersection ranking
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ==============
+  # AUTHENTICATION
+  # ==============
+
+  /auth/login:
+    get:
+      tags:
+        - Authentication
+      summary: User login
+      description: Authenticate a user with username and password
+      parameters:
+        - $ref: '#/components/parameters/usernameRequired'
+        - $ref: '#/components/parameters/passwordRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Login successful"
+                string: "testuser"
+                language: "english"
+                data: 
+                  token: "auth_token_here"
+                  user_id: 123
+  /auth/user-exists:
+    get:
+      tags:
+        - Authentication
+      summary: Check if user exists
+      description: Check if a username already exists in the system
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: Username to check
+          schema:
+            type: string
+            example: "testuser"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
         '400':
-          description: Missing required parameters
+          description: Missing required parameter
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+
+
+  # =================================================
+  # CHARACTER ANALYSIS (requires string AND language)
+  # =================================================
 
   /characters/add-at:
     get:
@@ -450,7 +688,130 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
+  /characters/add-end:
+    get:
+      tags:
+        - Character Analysis
+      summary: Add character at end
+      description: Append a character to the end of the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Character to add at the end
+          schema:
+            type: string
+            example: "క"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /characters/base:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get base characters
+      description: Extract base characters from the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /characters/base-consonants:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get base consonants
+      description: Calculate base consonants for the input strings
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: false
+          description: Secondary string for consonant comparison
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /characters/codepoints:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get Unicode code points
+      description: Get Unicode code points for each character in the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /characters/codepoint-length:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get code point length
+      description: Calculate the number of Unicode code points in the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /characters/filler:
     get:
       tags:
@@ -491,121 +852,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  # ============================================================
-  # TEXT OPERATIONS (requires string; language defaults to telugu)
-  # ============================================================
-
-  /text/length:
+  /characters/logical:
     get:
       tags:
-        - Text Operations
-      summary: Get text length
-      description: Calculate the length of the input string
+        - Character Analysis
+      summary: Get logical characters
+      description: Split the input string into logical character components
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-              example:
-                response_code: 200
-                message: "Length calculated"
-                string: "అనన్య"
-                language: "telugu"
-                data: "3"
-                success: true
-                result: "3"
-                error: null
-
-  /text/reverse:
-    get:
-      tags:
-        - Text Operations
-      summary: Reverse text
-      description: Reverse the input string while preserving logical character boundaries
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-
-  /text/randomize:
-    get:
-      tags:
-        - Text Operations
-      summary: Randomize text
-      description: Randomly shuffle the logical characters in the input string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-                
-
-  /text/split:
-    get:
-      tags:
-        - Text Operations
-      summary: Split text by delimiter
-      description: Split the input string by a delimiter and return the parts separated by " | "
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: delimiter
-          in: query
-          required: false
-          description: "Delimiter to split on (default: -). Can also use input2 parameter."
-          schema:
-            type: string
-            default: "-"
-            example: "-"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /text/replace:
-    get:
-      tags:
-        - Text Operations
-      summary: Replace text
-      description: Replace occurrences of a search string with a replacement string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: search
-          in: query
-          required: true
-          description: String to search for (can also use input2 parameter)
-          schema:
-            type: string
-            example: "అ"
-        - name: replace
-          in: query
-          required: false
-          description: Replacement string (can also use input3 parameter)
-          schema:
-            type: string
-            example: "ఆ"
       responses:
         '200':
           description: Successful operation
@@ -614,525 +869,75 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '400':
-          description: Missing required parameter (search)
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /characters/logical-at:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get logical character at position
+      description: Retrieve the logical character at a specific position in the string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: false
+          description: Zero-based position index (default 0)
+          schema:
+            type: integer
+            default: 0
+            example: 0
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /characters/random-logical:
+    get:
+      tags:
+        - Character Analysis
+      summary: Get random logical characters
+      description: Get a random selection of logical characters from the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: count
+          in: query
+          required: false
+          description: Number of random characters to return (default 5)
+          schema:
+            type: integer
+            default: 5
+            example: 5
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  # ============================================================
-  # WORD ANALYSIS (requires string; language defaults to telugu)
-  # ============================================================
-
-  /analysis/is-palindrome:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if palindrome
-      description: Determine if the input string is a palindrome using logical character comparison
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/word-strength:
-    get:
-      tags:
-        - Word Analysis
-      summary: Calculate word strength
-      description: Calculate the linguistic strength metric of the input word
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/word-weight:
-    get:
-      tags:
-        - Word Analysis
-      summary: Calculate word weight
-      description: Calculate the linguistic weight metric of the input word
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/word-level:
-    get:
-      tags:
-        - Word Analysis
-      summary: Calculate word level
-      description: Calculate the linguistic level metric of the input word
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/is-anagram:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if anagram
-      description: Determine if the two input strings are anagrams of each other
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second string to compare for anagram check
-          schema:
-            type: string
-            example: "న్యఅన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/detect-language:
-    get:
-      tags:
-        - Word Analysis
-      summary: Detect language (legacy alias)
-      deprecated: true
-      description: Legacy alias for language detection. Prefer `/utility/language` for new integrations.
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-              example:
-                response_code: 200
-                message: "Language detected"
-                string: "hello"
-                language: null
-                data: "English"
-                success: true
-                result: "English"
-                error: null
-
-  /analysis/parse-to-logical-chars:
-    get:
-      tags:
-        - Word Analysis
-      summary: Parse to logical characters
-      description: Parse the input string into its logical character components
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/parse-to-logical-characters:
-    get:
-      tags:
-        - Word Analysis
-      summary: Parse to logical characters (alternative)
-      description: Alternative method to parse the input string into logical character components
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/split-into-chunks:
-    get:
-      tags:
-        - Word Analysis
-      summary: Split into chunks
-      description: Split the input string into 15 chunks based on logical characters
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/can-make-word:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if word can be formed
-      description: Check if the second word can be formed using characters from the first word
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Word to check if it can be formed from the input string
-          schema:
-            type: string
-            example: "అన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/can-make-all-words:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if all words can be formed
-      description: Check if all words in the second parameter can be formed from the input string
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Comma-separated words to check
-          schema:
-            type: string
-            example: "అన,న్య"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/is-intersecting:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if strings intersect
-      description: Check if the two input strings share any common logical characters
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second string to check for intersection
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/intersecting-rank:
-    get:
-      tags:
-        - Word Analysis
-      summary: Get intersecting rank
-      description: Calculate the intersecting rank between two strings (number of shared characters)
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second string for intersection ranking
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/unique-intersecting-rank:
-    get:
-      tags:
-        - Word Analysis
-      summary: Get unique intersecting rank
-      description: Calculate the unique intersecting rank between two strings
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second string for unique intersection ranking
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/unique-intersecting-logical-chars:
-    get:
-      tags:
-        - Word Analysis
-      summary: Get unique intersecting logical characters
-      description: Get the unique intersecting logical characters between two strings
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second string for unique intersection
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/are-ladder-words:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if ladder words
-      description: Check if two words are ladder words (differ by one logical character)
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second word for ladder word check
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/are-head-tail-words:
-    get:
-      tags:
-        - Word Analysis
-      summary: Check if head-tail words
-      description: Check if the last logical character of the first word matches the first logical character of the second word
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second word for head-tail check
-          schema:
-            type: string
-            example: "న్యాయం"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /analysis/get-match-id-string:
-    get:
-      tags:
-        - Word Analysis
-      summary: Get match ID string
-      description: Generate a match ID string between two words for comparison analysis
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Second string for match ID generation
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  # ============================================================
+  # ================================================
   # STRING COMPARISON (requires string AND language)
-  # ============================================================
-
-  /comparison/equals:
-    get:
-      tags:
-        - String Comparison
-      summary: Check string equality
-      description: Check if two strings are equal
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-        - name: input2
-          in: query
-          required: true
-          description: Second string to compare for equality
-          schema:
-            type: string
-            example: "అనన్య"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /comparison/starts-with:
-    get:
-      tags:
-        - String Comparison
-      summary: Check if starts with
-      description: Check if the string starts with the specified prefix
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-        - name: input2
-          in: query
-          required: true
-          description: Prefix to check
-          schema:
-            type: string
-            example: "అన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /comparison/ends-with:
-    get:
-      tags:
-        - String Comparison
-      summary: Check if ends with
-      description: Check if the string ends with the specified suffix
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-        - name: input2
-          in: query
-          required: true
-          description: Suffix to check
-          schema:
-            type: string
-            example: "న్య"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /comparison/compare:
-    get:
-      tags:
-        - String Comparison
-      summary: Compare strings
-      description: Compare two strings and return ordering result
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
-        - name: input2
-          in: query
-          required: true
-          description: Second string to compare
-          schema:
-            type: string
-            example: "అన్న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Missing required parameters
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+  # ================================================
 
   /comparison/compare-ignore-case:
     get:
@@ -1163,7 +968,87 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
+  /comparison/compare-to:
+    get:
+      tags:
+        - String Comparison
+      summary: Compare strings
+      description: Compare two strings and return ordering result
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string to compare
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /comparison/equals:
+    get:
+      tags:
+        - String Comparison
+      summary: Check string equality
+      description: Check if two strings are equal
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string to compare for equality
+          schema:
+            type: string
+            example: "అనన్య"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /comparison/is-intersecting:
+    get:
+      tags:
+        - Word Analysis
+      summary: Check if strings intersect
+      description: Check if the two input strings share any common logical characters
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Second string to check for intersection
+          schema:
+            type: string
+            example: "అన్న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
   /comparison/reverse-equals:
     get:
       tags:
@@ -1194,7 +1079,327 @@ paths:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
 
-  /comparison/index-of:
+  # ==============================================================
+  # TEXT OPERATIONS (requires string; language defaults to telugu)
+  # ==============================================================
+
+  /text/length:
+    get:
+      tags:
+        - Text Operations
+      summary: Get text length
+      description: Calculate the length of the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Length calculated"
+                string: "అనన్య"
+                language: "telugu"
+                data: "3"
+                success: true
+                result: "3"
+                error: null
+  /text/randomize:
+    get:
+      tags:
+        - Text Operations
+      summary: Randomize text
+      description: Randomly shuffle the logical characters in the input string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /text/replace:
+    get:
+      tags:
+        - Text Operations
+      summary: Replace text
+      description: Replace occurrences of a search string with a replacement string
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Text to find
+          schema:
+            type: string
+            example: "అ"
+        - name: input3
+          in: query
+          required: false
+          description: Replacement text
+          schema:
+            type: string
+            example: "ఆ"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameter (search)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /text/reverse:
+    get:
+      tags:
+        - Text Operations
+      summary: Reverse text
+      description: Reverse the input string while preserving logical character boundaries
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /text/split:
+    get:
+      tags:
+        - Text Operations
+      summary: Split text by delimiter
+      description: Split the input string by a delimiter and return the parts separated by " | "
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: delimiter
+          in: query
+          required: false
+          description: "Delimiter to split on (default: -). Can also use input2 parameter."
+          schema:
+            type: string
+            default: "-"
+            example: "-"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # ===================================================================
+  # CHARACTER VALIDATION (requires string; language defaults to telugu)
+  # ===================================================================
+
+  /validation/contains-all-logical-chars:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if contains all logical characters
+      description: Check if the input string contains all of the specified logical characters
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Logical characters that must all be present
+          schema:
+            type: string
+            example: "అన"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/contains-char:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if contains character
+      description: Check if the input string contains a specific character
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Character to search for
+          schema:
+            type: string
+            example: "న"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/contains-logical-chars:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if contains logical characters
+      description: Check if the input string contains any of the specified logical characters
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Logical characters to check for
+          schema:
+            type: string
+            example: "అన"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/contains-logical-sequence:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if contains logical character sequence
+      description: Check if the input string contains a specific sequence of logical characters
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Logical character sequence to check for
+          schema:
+            type: string
+            example: "అన"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/contains-space:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if contains spaces
+      description: Check if the input string contains any spaces
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/contains-string:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if contains substring
+      description: Check if the input string contains a specific substring
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Substring to search for
+          schema:
+            type: string
+            example: "అన"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+  /validation/starts-with:
+    get:
+      tags:
+        - String Comparison
+      summary: Check if starts with
+      description: Check if the string starts with the specified prefix
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Prefix to check
+          schema:
+            type: string
+            example: "అన"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /validation/ends-with:
+    get:
+      tags:
+        - String Comparison
+      summary: Check if ends with
+      description: Check if the string ends with the specified suffix
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: true
+          description: Suffix to check
+          schema:
+            type: string
+            example: "న్య"
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  # ===================================================================
+  # UTILITY (requires string; language auto-detected unless overridden)
+  # ===================================================================
+
+  /utility/index-of:
     get:
       tags:
         - String Comparison
@@ -1223,198 +1428,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  # ============================================================
-  # CHARACTER VALIDATION (requires string; language defaults to telugu)
-  # ============================================================
-
-  /validation/is-consonant:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if character is consonant
-      description: Determine if the given character is a consonant (uses the first logical character of the input)
-      parameters:
-        - name: string
-          in: query
-          required: true
-          description: Character to check (first logical character is used)
-          schema:
-            type: string
-            example: "క"
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/is-vowel:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if character is vowel
-      description: Determine if the given character is a vowel (uses the first logical character of the input)
-      parameters:
-        - name: string
-          in: query
-          required: true
-          description: Character to check (first logical character is used)
-          schema:
-            type: string
-            example: "అ"
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/contains-space:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if contains spaces
-      description: Check if the input string contains any spaces
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/contains-char:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if contains character
-      description: Check if the input string contains a specific character
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Character to search for
-          schema:
-            type: string
-            example: "న"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/contains-string:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if contains substring
-      description: Check if the input string contains a specific substring
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Substring to search for
-          schema:
-            type: string
-            example: "అన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/contains-logical-chars:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if contains logical characters
-      description: Check if the input string contains any of the specified logical characters
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Logical characters to check for
-          schema:
-            type: string
-            example: "అన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/contains-all-logical-chars:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if contains all logical characters
-      description: Check if the input string contains all of the specified logical characters
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Logical characters that must all be present
-          schema:
-            type: string
-            example: "అన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  /validation/contains-logical-sequence:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if contains logical character sequence
-      description: Check if the input string contains a specific sequence of logical characters
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageOptional'
-        - name: input2
-          in: query
-          required: true
-          description: Logical character sequence to check for
-          schema:
-            type: string
-            example: "అన"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-
-  # ============================================================
-  # UTILITY (requires string; language auto-detected unless overridden)
-  # ============================================================
-
   /utility/language:
     get:
       tags:
@@ -1447,70 +1460,6 @@ paths:
                 success: true
                 result: "Telugu"
                 error: null
-
-  /utility/length-alternative:
-    get:
-      tags:
-        - Utility
-      summary: Alternative length calculation (excluding special characters)
-      
-      description: |
-        Calculates the length of text excluding spaces and special characters (punctuation and symbols).
-        If `language` is omitted, the API auto-detects language (`english` or `telugu`).
-        
-        **Filtered Characters:**
-        - Spaces
-        - Special symbols: `! @ # $ % ^ & * ( ) _ - + = { } [ ] : ; " ' < , > . ? / | \`
-                      
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/utilityLanguageOverride'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-              example:
-                response_code: 200
-                message: "Alternative length calculated"
-                string: "Hello, World!"
-                language: "telugu"
-                data: 10
-                success: true
-                result: 10
-                error: null
-        '400':
-          description: Unsupported override or unable to auto-detect english/telugu
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
-  /utility/length-no-spaces:
-    get:
-      tags:
-        - Utility
-      summary: Length calculation without spaces
-      description: Calculate the length of a string excluding spaces
-      parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/utilityLanguageOverride'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
-        '400':
-          description: Unsupported override or unable to auto-detect english/telugu
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-
   /utility/length-no-spaces-commas:
     get:
       tags:
@@ -1534,25 +1483,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
-  # ============================================================
-  # AUTHENTICATION
-  # ============================================================
-
-  /auth/user-exists:
+  /utility/length-no-spaces:
     get:
       tags:
-        - Authentication
-      summary: Check if user exists
-      description: Check if a username already exists in the system
+        - Utility
+      summary: Length calculation without spaces
+      description: Calculate the length of a string excluding spaces
       parameters:
-        - name: username
-          in: query
-          required: true
-          description: Username to check
-          schema:
-            type: string
-            example: "testuser"
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/utilityLanguageOverride'
       responses:
         '200':
           description: Successful operation
@@ -1561,7 +1500,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
         '400':
-          description: Missing required parameter
+          description: Unsupported override or unable to auto-detect english/telugu
           content:
             application/json:
               schema:
