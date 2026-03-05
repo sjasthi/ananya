@@ -1402,13 +1402,11 @@ paths:
   /utility/index-of:
     get:
       tags:
-        - String Comparison
         - Utility
       summary: Find index of substring
       description: Find the index position of a substring within the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
