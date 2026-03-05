@@ -1403,6 +1403,7 @@ paths:
     get:
       tags:
         - String Comparison
+        - Utility
       summary: Find index of substring
       description: Find the index position of a substring within the input string
       parameters:
@@ -1415,6 +1416,7 @@ paths:
           schema:
             type: string
             example: "న్య"
+        - $ref: '#/components/parameters/utilityLanguageOverride'
       responses:
         '200':
           description: Successful operation
@@ -1460,6 +1462,45 @@ paths:
                 success: true
                 result: "Telugu"
                 error: null
+  /utility/length-alternative:
+    get:
+      tags:
+        - Utility
+      summary: Alternative length calculation (excluding special characters)
+      
+      description: |
+        Calculates the length of text excluding spaces and special characters (punctuation and symbols).
+        If `language` is omitted, the API auto-detects language (`english` or `telugu`).
+        
+        **Filtered Characters:**
+        - Spaces
+        - Special symbols: `! @ # $ % ^ & * ( ) _ - + = { } [ ] : ; " ' < , > . ? / | \`
+                      
+      parameters:
+        - $ref: '#/components/parameters/stringRequired'
+        - $ref: '#/components/parameters/utilityLanguageOverride'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Alternative length calculated"
+                string: "Hello, World!"
+                language: "telugu"
+                data: 10
+                success: true
+                result: 10
+                error: null
+        '400':
+          description: Unsupported override or unable to auto-detect english/telugu
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /utility/length-no-spaces-commas:
     get:
       tags:
