@@ -401,6 +401,40 @@ function handleUtilityAPIs($action) {
     }
     
     switch ($action) {
+        case 'index-of':
+            $input2 = isset($_GET['input2']) ? trim((string)$_GET['input2']) : '';
+
+            if ($string === null || $string === '' || $input2 === '') {
+                sendResponse(400, "Missing required parameters: string and input2", $string, null, null);
+                return;
+            }
+
+            $resolvedLanguage = resolveUtilityLanguage($string, $requestedLanguage);
+            if ($resolvedLanguage === null) {
+                sendResponse(
+                    400,
+                    "Unable to auto-detect a supported language (english/telugu). Provide language explicitly.",
+                    $string,
+                    null,
+                    null
+                );
+                return;
+            }
+
+            $processor = new wordProcessor($string, $resolvedLanguage);
+
+            // Support either method name if both code versions exist
+            if (method_exists($processor, 'indexOf')) {
+                $result = $processor->indexOf($input2);
+            } elseif (method_exists($processor, 'getIndexOf')) {
+                $result = $processor->getIndexOf($input2);
+            } else {
+                sendResponse(500, "Index method not implemented in wordProcessor", $string, $resolvedLanguage, null);
+                return;
+            }
+
+            sendResponse(200, "Index found", $string, $resolvedLanguage, $result);
+            return;
         case 'language':
             $processor = new wordProcessor($string, '');
             $result = $processor->getLangForString();
