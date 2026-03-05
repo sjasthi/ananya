@@ -151,6 +151,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <a class="nav-link" href="#utility-index-of">Index Of </a>
                         <a class="nav-link" href="#utility-language">Language</a>
+                        <a class="nav-link" href="#utility-length-alternative">Length Alternative</a>
                         <a class="nav-link" href="#utility-length-no-spaces-commas">Length No Spaces/Commas</a>
                         <a class="nav-link" href="#utility-length-no-spaces">Length No Spaces</a>
                         
@@ -2050,7 +2051,44 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                     <h2 class="category-header">Utility Operations</h2>
                     <p>If <code>language</code> is omitted for utility length endpoints, the API auto-detects <code>english</code> or <code>telugu</code>. Use <code>language</code> to explicitly override detection.</p>
 
-                    <div id="utility-language" class="api-section">
+                    <div id="utility-index-of" class="api-section">
+    <h3>Index Of</h3>
+    <p>Finds the index position of a substring within the input string.</p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h6>Endpoint</h6>
+            <div class="api-endpoint">GET /api.php/utility/index-of</div>
+        </div>
+        <div class="col-md-6">
+            <h6>Parameters</h6>
+            <ul>
+                <li><code>string</code> (required) - Input string</li>
+                <li><code>input2</code> (required) - Substring to search for</li>
+                <li><code>language</code> (required) - Language (<code>english</code>/<code>telugu</code>)</li>
+            </ul>
+        </div>
+    </div>
+
+    <h6>Example Request</h6>
+    <div class="api-endpoint">
+        <?= $apiBase ?>utility/index-of?string=అనన్య&input2=న్య&language=telugu
+    </div>
+
+    <h6>Example Response</h6>
+    <pre><code class="language-json">{
+  "response_code": 200,
+  "message": "Index found",
+  "string": "అనన్య",
+  "language": "telugu",
+  "data": 2,
+  "success": true,
+  "result": 2,
+  "error": null
+}</code></pre>
+</div>
+
+<div id="utility-language" class="api-section">
                         <h3>Detect Language</h3>
                         <p>Automatically detects whether a string is primarily English, Telugu, or mixed/other.</p>
                         
