@@ -2,9 +2,78 @@
 var local = true;
 
 if (local == true) {
-    apiURL = "http://localhost/ananya/api.php/";
+    apiURL = "http://localhost/ananya/";
 } else {
-    apiURL = "https://ananya.thisisjava.com/api.php/";
+    apiURL = "https://ananya.thisisjava.com/";
+}
+
+const apiEndpoints = {
+    // api/analysis/
+    areHeadAndTailWords: "api/analysis/heads-tails-words.php",
+    areLadderWords: "api/analysis/ladder-words.php",
+    canMakeAllWords: "api/analysis/can-make-all-words.php",
+    canMakeWord: "api/analysis/can-make-word.php",
+    charConstant: "api/analysis/is-consonant.php",
+    charVowel: "api/analysis/is-vowel.php",
+    getIntersectingRank: "api/analysis/intersecting-rank.php",
+    getMatchIdString: "api/analysis/get-match-id-string.php",
+    getUniqueIntersectingLogicalChars: "api/analysis/unique-intersecting-chars.php",
+    getUniqueIntersectingRank: "api/analysis/unique-intersecting-rank.php",
+    getWordLevel: "api/analysis/level.php",
+    getWordStrength: "api/analysis/strength.php",
+    getWordWeight: "api/analysis/weight.php",
+    isAnagram: "api/analysis/is-anagram.php",
+    isPalindrome: "api/analysis/is-palindrome.php",
+    parseToLogicalCharacters: "api/analysis/parse-to-logical-characters.php",
+    splitInto15Chunks: "api/analysis/split-into-chunks.php",
+
+    // api/characters/
+    addCharacterAt: "api/characters/add-at.php",
+    addCharacterAtEnd: "api/characters/add-end.php",
+    baseConsonants: "api/characters/base-consonants.php",
+    getBaseCharacters: "api/characters/base.php",
+    getCodePointLength: "api/characters/codepoints-length.php",
+    getCodePoints: "api/characters/codepoints.php",
+    getFillerCharacters: "api/characters/filler-characters.php",
+    getLogicalChars: "api/characters/logical.php",
+    logicalCharAt: "api/characters/logical-at.php",
+
+    // api/comparison/
+    compareTo: "api/comparison/compare-to.php",
+    compareToIgnoreCase: "api/comparison/compare-ignore-case.php",
+    equals: "api/comparison/equals.php",
+    isIntersecting: "api/comparison/is-intersecting.php",
+    reverseEquals: "api/comparison/reverse-equals.php",
+
+    // api/ (legacy root)
+    getLength: "api/getLength.php",
+    getLength2: "api/getLength2.php",
+    getLogicalChars2: "api/getLogicalChars2.php",
+    parseToLogicalChars: "api/parseToLogicalChars2.php",
+
+    // api/text/
+    replace: "api/text/replace.php",
+    reverse: "api/text/reverse.php",
+    splitWord: "api/text/split.php",
+
+    // api/utility/
+    getLengthNoSpaces: "api/utility/length-no-spaces.php",
+    getLengthNoSpacesNoCommas: "api/utility/length-no-spaces-commas.php",
+    indexOf: "api/utility/index-of.php",
+
+    // api/validation/
+    containsAllLogicalChars: "api/validation/contains-all-logical-chars.php",
+    containsChar: "api/validation/contains-char.php",
+    containsLogicalCharSequence: "api/validation/contains-logical-sequence.php",
+    containsLogicalChars: "api/validation/contains-logical-chars.php",
+    containsSpace: "api/validation/contains-space.php",
+    containsString: "api/validation/contains-string.php",
+    endsWith: "api/validation/ends-with.php",
+    startsWith: "api/validation/starts-with.php"
+};
+
+function getMethodEndpoint(methodName) {
+    return apiEndpoints[methodName] || ("api/" + methodName + ".php");
 }
 
 /**
@@ -20,7 +89,7 @@ function changeTheme(objButton) {
     element.classList.toggle("dark-mode");
 
     if (objButton.value == "light") {
-        //changing to Light Mode but making button say Dark
+        //changing to Light Mode but making button stay Dark
         button.value = "dark";
 
         btnDark = document.querySelectorAll(".btn-dark");
@@ -39,7 +108,7 @@ function changeTheme(objButton) {
         table.className = table.className.replace("table-dark", "");
         $("#theme").html("Dark Mode");
     } else {
-        //changing to Dark Mode but making button say Light
+        //changing to Dark Mode but making button stay Light
         button.value = "light";
 
         btnLight = document.querySelectorAll(".btn-light");
@@ -100,34 +169,100 @@ const form = document.querySelector("#form");
 /*Adds event listener on form submit*/
 form.addEventListener("submit", async (e) => {
     e.preventDefault();
-    runTests();
+    await runTests();
 
 })
 
 /*Grabs all the method names from the methods column*/
-var methods = document.querySelectorAll("a.methodURL");
+var methods = document.querySelectorAll(".methodURL");
 
 /*Async function to run the tests*/
 async function runTests() {
-    //Grabs the name of each method in the table and does callAPI function
-    methods.forEach(function (method) {
-        const methodName = method.innerHTML;
-        callAPI(methodName);
-    });
+    const submitButton = form.querySelector('input[type="submit"]');
+    const lastRunIndicator = document.getElementById("lastRunIndicator");
+    const methodLinks = document.querySelectorAll(".methodURL");
+
+    methods = methodLinks;
+
+    if (!methodLinks.length) {
+        console.warn("No test methods found in the table.");
+        if (lastRunIndicator) {
+            lastRunIndicator.textContent = "Last run: no methods found";
+        }
+        return;
+    }
+
+    const originalButtonText = submitButton ? submitButton.value : null;
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.value = "Running tests...";
+    }
+    if (lastRunIndicator) {
+        lastRunIndicator.textContent = "Last run: running...";
+    }
+
+    try {
+        await Promise.all(Array.from(methodLinks).map(function (method) {
+            const methodName = method.textContent.trim();
+            return callAPI(methodName);
+        }));
+    } finally {
+        if (lastRunIndicator) {
+            const completedAt = new Date().toLocaleTimeString();
+            lastRunIndicator.textContent = "Last run: " + completedAt;
+        }
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.value = originalButtonText || "Run All Tests";
+        }
+    }
 }
 
 /*Takes methodName as argument and does API call to retrieve the appropriate data*/
 async function callAPI(methodName) {
 
-    const singleInput = ["getCodePointLength", "getCodePoints", "getLength", "getLogicalChars", "getWordStrength", "getWordWeight", "isPalindrome", "randomize", "reverse", "containsSpace", "getWordLevel", "getLengthNoSpaces", "getLengthNoSpacesNoCommas", "parseToLogicalChars", "parseToLogicalCharacters"];
-    const doubleInput = ["isAnagram", "startsWith", "endsWith", "containsString", "containsChar", "containsLogicalChars", "containsAllLogicalChars", "containsLogicalCharSequence", "canMakeWord", "canMakeAllWords", "addCharacterAtEnd", "isIntersecting", "getIntersectingRank", "getUniqueIntersectingRank", "compareTo", "compareToIgnoreCase", "splitWord", "equals", "reverseEquals", "logicalCharAt", "getUniqueIntersectingLogicalChars", "indexOf", "areLadderWords", "areHeadAndTailWords", "baseConsonants"];
-    const tripleInput = ["addCharacterAt", "replace"];
+    const singleInput = [
+        // api/analysis/
+        "getWordLevel", "getWordStrength", "getWordWeight", "isPalindrome", "parseToLogicalCharacters", "splitInto15Chunks",
+        // api/characters/
+        "getBaseCharacters", "getCodePointLength", "getCodePoints", "getLogicalChars",
+        // api/ (legacy root)
+        "getLength", "getLength2", "getLogicalChars2", "parseToLogicalChars",
+        // api/text/
+        "randomize", "reverse",
+        // api/utility/
+        "getLengthNoSpaces", "getLengthNoSpacesNoCommas",
+        // api/validation/
+        "containsSpace"
+    ];
+    const doubleInput = [
+        // api/analysis/
+        "areHeadAndTailWords", "areLadderWords", "canMakeAllWords", "canMakeWord", "charConstant", "charVowel", "getIntersectingRank", "getMatchIdString", "getUniqueIntersectingLogicalChars", "getUniqueIntersectingRank", "isAnagram",
+        // api/characters/
+        "addCharacterAtEnd", "baseConsonants", "logicalCharAt",
+        // api/comparison/
+        "compareTo", "compareToIgnoreCase", "equals", "isIntersecting", "reverseEquals",
+        // api/text/
+        "splitWord",
+        // api/utility/
+        "indexOf",
+        // api/validation/
+        "containsAllLogicalChars", "containsChar", "containsLogicalCharSequence", "containsLogicalChars", "containsString", "endsWith", "startsWith"
+    ];
+    const tripleInput = [
+        // api/characters/
+        "addCharacterAt",
+        // api/text/
+        "replace"
+    ];
+    let result = "";
 
     if (methodName == "getFillerCharacters") {
         var cellInput = document.getElementById(methodName + 'InputText').value;
         var languageInput = document.getElementById("languageInput").value;
         var type = document.getElementById(methodName + 'TypeText').value;
-        await fetch(apiURL + methodName + '.php?count=' + cellInput + '&language=' + languageInput + '&type=' + type)
+        const endpoint = getMethodEndpoint(methodName);
+        await fetch(apiURL + endpoint + '?count=' + encodeURIComponent(cellInput) + '&language=' + encodeURIComponent(languageInput) + '&type=' + encodeURIComponent(type))
             .then(response => response.text())
             .then(data => result = data);
         newResult = remove_non_ascii(result);
@@ -158,54 +293,74 @@ async function callAPI(methodName) {
         var actualCell = document.getElementById(methodName + "Actual");
         var passFail = document.getElementById(methodName + "PassFail");
 
-        if (singleInput.includes(methodName)) {
-            var cellInput = document.getElementById(methodName + 'InputText').value;
-            await fetch(apiURL + methodName + '.php?string=' + cellInput + '&language=' + languageInput)
-                .then(response => response.text())
-                .then(data => result = data);
-        } else if (doubleInput.includes(methodName)) {
-            var cellInput = document.getElementById(methodName + 'InputText').value;
-            var cellInput2 = document.getElementById(methodName + 'InputText2').value;
-            await fetch(apiURL + methodName + '.php?input1=' + cellInput + '&input2=' + languageInput + '&input3=' + cellInput2)
-                .then(response => response.text())
-                .then(data => result = data);
-        } else if (tripleInput.includes(methodName)) {
-            var cellInput = document.getElementById(methodName + 'InputText').value;
-            var cellInput2 = document.getElementById(methodName + 'InputText2').value;
-            var cellInput3 = document.getElementById(methodName + 'InputText3').value;
-            await fetch(apiURL + methodName + '.php?input1=' + cellInput + '&input2=' + languageInput + '&input3=' + cellInput2 + '&input4=' + cellInput3)
-                .then(response => response.text())
-                .then(data => result = data);
-        }
-        newResult = remove_non_ascii(result);
+        try {
+            const endpoint = getMethodEndpoint(methodName);
+            if (singleInput.includes(methodName)) {
+                var cellInput = document.getElementById(methodName + 'InputText').value;
+                await fetch(apiURL + endpoint + '?string=' + encodeURIComponent(cellInput) + '&language=' + encodeURIComponent(languageInput))
+                    .then(response => response.text())
+                    .then(data => result = data);
+            } else if (doubleInput.includes(methodName)) {
+                var cellInput = document.getElementById(methodName + 'InputText').value;
+                var cellInput2 = document.getElementById(methodName + 'InputText2').value;
+                await fetch(apiURL + endpoint + '?input1=' + encodeURIComponent(cellInput) + '&input2=' + encodeURIComponent(languageInput) + '&input3=' + encodeURIComponent(cellInput2))
+                    .then(response => response.text())
+                    .then(data => result = data);
+            } else if (tripleInput.includes(methodName)) {
+                var cellInput = document.getElementById(methodName + 'InputText').value;
+                var cellInput2 = document.getElementById(methodName + 'InputText2').value;
+                var cellInput3 = document.getElementById(methodName + 'InputText3').value;
+                await fetch(apiURL + endpoint + '?input1=' + encodeURIComponent(cellInput) + '&input2=' + encodeURIComponent(languageInput) + '&input3=' + encodeURIComponent(cellInput2) + '&input4=' + encodeURIComponent(cellInput3))
+                    .then(response => response.text())
+                    .then(data => result = data);
+            } else {
+                jsonElement.innerHTML = JSON.stringify({ response_code: 400, message: "Unsupported method in test runner", method: methodName });
+                actualCell.innerHTML = "Unsupported method";
+                passFail.innerHTML = "FAIL";
+                passFail.classList.remove("pass");
+                passFail.classList.add("fail");
+                passFail.classList.remove("table-success");
+                passFail.classList.add("table-danger");
+                return;
+            }
 
-        const jsonObj = JSON.parse(newResult);
+            newResult = remove_non_ascii(result);
+            const jsonObj = JSON.parse(newResult);
 
-        jsonElement.innerHTML = result;
+            jsonElement.innerHTML = result;
 
-        if (Array.isArray(jsonObj.data)) {
-            actualCell.innerHTML = jsonObj.data.toString();
-        }
-        else if (jsonObj.data?.constructor.name === "Object") {
-            actualCell.innerHTML = JSON.stringify(jsonObj.data);
-        }
-        else {
-            actualCell.innerHTML = jsonObj.data;
-        }
+            if (Array.isArray(jsonObj.data)) {
+                actualCell.innerHTML = jsonObj.data.toString();
+            }
+            else if (jsonObj.data?.constructor.name === "Object") {
+                actualCell.innerHTML = JSON.stringify(jsonObj.data);
+            }
+            else {
+                actualCell.innerHTML = jsonObj.data;
+            }
 
-        if (jsonObj.response_code != 200) {
-            passFail.innerHTML = "FAIL";
-            passFail.classList.remove("pass");
-            passFail.classList.add("fail");
-            passFail.classList.remove("table-success");
-            passFail.classList.add("table-danger");
-        } else if (expectedResult == actualCell.innerHTML) {
-            passFail.innerHTML = "PASS";
-            passFail.classList.remove("fail");
-            passFail.classList.add("pass");
-            passFail.classList.remove("table-danger");
-            passFail.classList.add("table-success");
-        } else {
+            if (jsonObj.response_code != 200) {
+                passFail.innerHTML = "FAIL";
+                passFail.classList.remove("pass");
+                passFail.classList.add("fail");
+                passFail.classList.remove("table-success");
+                passFail.classList.add("table-danger");
+            } else if (expectedResult == actualCell.innerHTML) {
+                passFail.innerHTML = "PASS";
+                passFail.classList.remove("fail");
+                passFail.classList.add("pass");
+                passFail.classList.remove("table-danger");
+                passFail.classList.add("table-success");
+            } else {
+                passFail.innerHTML = "FAIL";
+                passFail.classList.remove("pass");
+                passFail.classList.add("fail");
+                passFail.classList.remove("table-success");
+                passFail.classList.add("table-danger");
+            }
+        } catch (error) {
+            jsonElement.innerHTML = result || String(error);
+            actualCell.innerHTML = "Request/parse error";
             passFail.innerHTML = "FAIL";
             passFail.classList.remove("pass");
             passFail.classList.add("fail");
