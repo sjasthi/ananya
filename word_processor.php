@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 //require("telugu_parser.php");
 
 /*
@@ -838,7 +838,7 @@ class wordProcessor
 								}
 
 								if ($fillerChars == "Consonants") {
-									if (isCharVowel($hexcode, $language)) {
+									if ($this->isCharVowel($hexcode, $language)) {
 										continue;
 									}
 									$english_char .= sprintf("\\u%'04s", dechex($num));
@@ -848,7 +848,7 @@ class wordProcessor
 									$board[$row][$col] = json_decode('"' . $english_char . '"');
 									$validChar = true;
 								} elseif ($fillerChars == "Vowels") {
-									if (isCharConsonant($hexcode, $language)) {
+									if ($this->isCharConsonant($hexcode, $language)) {
 										continue;
 									}
 									$english_char .= sprintf("\\u%'04s", dechex($num));
@@ -946,14 +946,14 @@ class wordProcessor
 								$hexcode = dechex($num);
 
 								if ($fillerChars == "Consonants") {
-									if (isCharVowel($hexcode, $language)) {
+									if ($this->isCharVowel($hexcode, $language)) {
 										continue;
 									}
 									$hindi_char .= sprintf("\\u%'04s", dechex($num));
 									$board[$row][$col] = json_decode('"' . $hindi_char . '"');
 									$validChar = true;
 								} elseif ($fillerChars == "Vowels") {
-									if (isCharConsonant($hexcode, $language)) {
+									if ($this->isCharConsonant($hexcode, $language)) {
 										continue;
 									}
 									$hindi_char .= sprintf("\\u%'04s", dechex($num));
@@ -990,14 +990,14 @@ class wordProcessor
 								if (is_blank_Gujarati($hexcode)) {
 									continue;
 								} elseif ($fillerChars == "Consonants") {
-									if (isCharVowel($hexcode, $language)) {
+									if ($this->isCharVowel($hexcode, $language)) {
 										continue;
 									}
 									$gujarati_char  .= sprintf("\\u%'04s", dechex($num));
 									$board[$row][$col] = json_decode('"' . $gujarati_char  . '"');
 									$validChar = true;
 								} elseif ($fillerChars == "Vowels") {
-									if (isCharConsonant($hexcode, $language)) {
+									if ($this->isCharConsonant($hexcode, $language)) {
 										continue;
 									}
 									$gujarati_char  .= sprintf("\\u%'04s", dechex($num));
@@ -1033,14 +1033,14 @@ class wordProcessor
 								if (is_blank_Malayalam($hexcode)) {
 									continue;
 								} elseif ($fillerChars == "Consonants") {
-									if (isCharVowel($hexcode, $language)) {
+									if ($this->isCharVowel($hexcode, $language)) {
 										continue;
 									}
 									$malay_char .= sprintf("\\u%'04s", dechex($num));
 									$board[$row][$col] = json_decode('"' . $malay_char . '"');
 									$validChar = true;
 								} elseif ($fillerChars == "Vowels") {
-									if (isCharConsonant($hexcode, $language)) {
+									if ($this->isCharConsonant($hexcode, $language)) {
 										continue;
 									}
 									$malay_char .= sprintf("\\u%'04s", dechex($num));
@@ -1217,8 +1217,8 @@ class wordProcessor
 		}
 
 		if (strtolower($this->language) == "telugu") {
-			$teluguCon1 = "3093";  //"క"
-			$teluguCon2 = "3120";       //"ర"
+			$teluguCon1 = "3093";  //"?"
+			$teluguCon2 = "3120";       //"?"
 			$teluguCon = array($teluguCon1, $teluguCon2);
 			$this->setWord($firstWord);
 			$firstWordLength = $this->getLength();
