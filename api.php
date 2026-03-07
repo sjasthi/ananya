@@ -63,13 +63,13 @@ function handleCharacterAPIs($action) {
     $string = $_GET['string'] ?? '';
     $language = $_GET['language'] ?? '';
     
-    // Filler API doesn't need a string parameter, only language
-    if ($action !== 'filler' && (empty($string) || empty($language))) {
+    // Filler and random-logical APIs do not require a string parameter
+    if (!in_array($action, ['filler', 'random-logical']) && (empty($string) || empty($language))) {
         sendResponse(400, "Missing required parameters: string and language", null, null, null);
         return;
     }
     
-    if ($action === 'filler' && empty($language)) {
+    if (in_array($action, ['filler', 'random-logical']) && empty($language)) {
         sendResponse(400, "Missing required parameter: language", null, null, null);
         return;
     }
@@ -96,7 +96,7 @@ function handleCharacterAPIs($action) {
         case 'random-logical':
             $n = $_GET['count'] ?? '5';
             $result = $processor->getRandomLogicalChars(intval($n));
-            sendResponse(200, "Random logical characters generated", $string, $language, $result);
+            sendResponse(200, "Random logical characters generated", null, $language, $result);
             break;
         case 'add-end':
             $input2 = $_GET['input2'] ?? '';
@@ -356,6 +356,17 @@ function handleValidationAPIs($action) {
     }
     
     $processor = new wordProcessor($string, $language);
+
+    $parseInput2List = function (string $input2): array {
+        if ($input2 === '') {
+            return [];
+        }
+
+        $parts = array_map('trim', explode(',', $input2));
+        return array_values(array_filter($parts, static function ($v) {
+            return $v !== '';
+        }));
+    };
     
     switch ($action) {
         case 'contains-space':
@@ -364,21 +375,52 @@ function handleValidationAPIs($action) {
             break;
         case 'contains-char':
             $input2 = $_GET['input2'] ?? '';
+            if ($input2 === '') {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
             $result = $processor->containsChar($input2);
             sendResponse(200, "Character check completed", $string, $language, $result);
             break;
         case 'contains-logical-chars':
             $input2 = $_GET['input2'] ?? '';
-            $result = $processor->containsLogicalChars($input2);
+
+            $logicalChars = $parseInput2List($input2);
+            if (empty($logicalChars)) {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
+
+            // This endpoint checks whether ANY candidate logical character is present.
+            $result = false;
+            foreach ($logicalChars as $char) {
+                if ($processor->containsChar($char)) {
+                    $result = true;
+                    break;
+                }
+            }
             sendResponse(200, "Logical characters check completed", $string, $language, $result);
             break;
         case 'contains-all-logical-chars':
             $input2 = $_GET['input2'] ?? '';
-            $result = $processor->containsAllLogicalChars($input2);
+
+            $logicalChars = $parseInput2List($input2);
+            if (empty($logicalChars)) {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
+
+            $result = $processor->containsAllLogicalChars($logicalChars);
             sendResponse(200, "All logical characters check completed", $string, $language, $result);
             break;
         case 'contains-logical-sequence':
             $input2 = $_GET['input2'] ?? '';
+
+            if ($input2 === '') {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
+
             $result = $processor->containsLogicalCharSequence($input2);
             sendResponse(200, "Logical character sequence check completed", $string, $language, $result);
             break;
@@ -398,8 +440,36 @@ function handleValidationAPIs($action) {
             break;
         case 'contains-string':
             $input2 = $_GET['input2'] ?? '';
+
+            if ($input2 === '') {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
+
             $result = $processor->containsString($input2);
             sendResponse(200, "String check completed", $string, $language, $result);
+            break;
+        case 'starts-with':
+            $input2 = $_GET['input2'] ?? '';
+
+            if ($input2 === '') {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
+
+            $result = $processor->startsWith($input2);
+            sendResponse(200, "Prefix check completed", $string, $language, $result);
+            break;
+        case 'ends-with':
+            $input2 = $_GET['input2'] ?? '';
+
+            if ($input2 === '') {
+                sendResponse(400, "Missing required parameter: input2", $string, $language, null);
+                break;
+            }
+
+            $result = $processor->endsWith($input2);
+            sendResponse(200, "Suffix check completed", $string, $language, $result);
             break;
         default:
             sendResponse(404, "Validation API action not found: $action", null, null, null);
@@ -507,14 +577,13 @@ function normalizeSupportedUtilityLanguage($language)
 
 function handleAuthAPIs($action) {
     switch ($action) {
+        case 'login':
+            // Route to actual authentication implementation
+            require_once 'api/auth/login.php';
+            break;
         case 'user-exists':
-            $username = $_GET['username'] ?? '';
-            if (empty($username)) {
-                sendResponse(400, "Missing required parameter: username", null, null, null);
-                return;
-            }
-            // Implementation for user existence check
-            sendResponse(200, "User existence checked", $username, null, false);
+            // Route to actual user exists implementation
+            require_once 'api/auth/user-exists.php';
             break;
         default:
             sendResponse(404, "Auth API action not found: $action", null, null, null);

@@ -1,6 +1,13 @@
-<!-- Currently allows characters other than letters to be added to the end of the string. -->
 <?php
-require_once("../../word_processor.php");
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+// Change to project root so relative paths in word_processor.php work correctly
+chdir(dirname(__FILE__) . '/../../');
+
+// Currently allows characters other than letters to be added to the end of the string.
+require_once("word_processor.php");
 
 if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['char'])) {
     $string = $_GET['string'];
@@ -12,18 +19,23 @@ if (isset($_GET['string']) && isset($_GET['language']) && isset($_GET['char'])) 
     $char = $_GET['input3'];
 }
 
-if (!empty($string) && !empty($language) && !empty($char)) {
+// Validate inputs
+$allowed_languages = array('english', 'telugu', 'hindi', 'gujarati', 'malayalam');
+
+if (!isset($string) || $string === '') {
+    invalidResponse("Invalid or Empty Word");
+} else if (strlen($string) > 10000) {
+    invalidResponse("String exceeds maximum length of 10000 characters");
+} else if (!isset($language) || $language === '') {
+    invalidResponse("Invalid or Empty Language");
+} else if (!in_array(strtolower($language), $allowed_languages)) {
+    invalidResponse("Unsupported language. Supported: English, Telugu, Hindi, Gujarati, Malayalam");
+} else if (!isset($char) || $char === '') {
+    invalidResponse("Invalid or Empty Char");
+} else {
     $processor = new wordProcessor($string, $language);
     $result = $processor->addCharacterAtEnd($char);
     response(200, "addCharacterAtEnd() Processed", $string, $language, $result, $char);
-} else if (isset($string) && empty($string)) {
-    invalidResponse("Invalid or Empty Word");
-} else if (isset($language) && empty($language)) {
-    invalidResponse("Invalid or Empty Language");
-} else if (empty($char)) {
-    invalidResponse("Invalid or Empty Char");
-} else {
-    invalidResponse("Invalid Request");
 }
 
 function invalidResponse($message)

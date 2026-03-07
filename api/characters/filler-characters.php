@@ -1,6 +1,18 @@
 <?php
 
-require_once("../../word_processor.php");
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+// Change to project root so relative paths in word_processor.php work correctly
+chdir(dirname(__FILE__) . '/../../');
+
+require_once("word_processor.php");
+
+// Initialize variables
+$count = '';
+$language = '';
+$type = '';
 
 if (isset($_GET['count']) && isset($_GET['language']) && isset($_GET['type'])) {
     $count = $_GET['count'];
@@ -12,23 +24,24 @@ if (isset($_GET['count']) && isset($_GET['language']) && isset($_GET['type'])) {
     $type = $_GET['input3'];
 }
 
-if (!empty($count) && !empty($language)) {
-    $processor = new wordProcessor($count, $language);
+// Validate inputs
+$allowed_languages = array('english', 'telugu', 'hindi', 'gujarati', 'malayalam');
+$allowed_types = array('vowel', 'consonant', 'all');
 
-    if (intval($count) <= 0) {
-        invalidResponse("You must provide a number greater than 0.");
-    } else {
-        $fillerCharacters = $processor->getFillerCharacters($count, $type);
-        response(200, "Filler Characters Generated", $count, $type, $language, $fillerCharacters);
-    }
-} else if (isset($count) && empty($count)) {
+if (!isset($count) || $count === '') {
     invalidResponse("Invalid or Empty Count");
-} else if (isset($type) && empty($type)) {
-    invalidResponse("Invalid or Empty Type");
-} else if (isset($language) && empty($language)) {
+} else if (!is_numeric($count) || intval($count) <= 0 || intval($count) > 10000) {
+    invalidResponse("Count must be an integer between 1 and 10000");
+} else if (!isset($language) || $language === '') {
     invalidResponse("Invalid or Empty Language");
+} else if (!in_array(strtolower($language), $allowed_languages)) {
+    invalidResponse("Unsupported language. Supported: English, Telugu, Hindi, Gujarati, Malayalam");
+} else if ($type !== '' && !in_array(strtolower($type), $allowed_types)) {
+    invalidResponse("Invalid Type. Supported: vowel, consonant, all");
 } else {
-    invalidResponse("Invalid Request");
+    $processor = new wordProcessor("", $language);
+    $fillerCharacters = $processor->getFillerCharacters($count, $type);
+    response(200, "Filler Characters Generated", $count, $type, $language, $fillerCharacters);
 }
 
 function invalidResponse($message)

@@ -287,6 +287,7 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 - **Comprehensive Test Suite**: 50 automated tests covering all major functionality
 - **Multi-language Support**: Tested with Telugu, Hindi, Gujarati, Malayalam, and English
 - **Unicode Compliance**: Full UTF-8 support for complex Indic scripts
+- **Contract Drift Check**: `python scripts/contract_check.py` verifies key router contracts (params, messages, response shape)
 
 ## 🏗️ Architecture
 

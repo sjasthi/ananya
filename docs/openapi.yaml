@@ -100,8 +100,9 @@ components:
       description: "Language of the input string (e.g., telugu, hindi, gujarati, malayalam)"
       schema:
         type: string
-        enum: [english, telugu]
-        example: "english"
+        enum: [telugu, english]
+        default: telugu
+        example: "telugu"
     languageOptional:
       name: language
       in: query
@@ -109,7 +110,7 @@ components:
       description: Language of the input text
       schema:
         type: string
-        enum: [english, telugu]
+        enum: [telugu, english]
         default: telugu
     utilityLanguageOverride:
       name: language
@@ -209,7 +210,6 @@ paths:
       description: Check if all words in the second parameter can be formed from the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -217,6 +217,7 @@ paths:
           schema:
             type: string
             example: "అన,న్య"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -232,7 +233,6 @@ paths:
       description: Check if the second word can be formed using characters from the first word
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -240,6 +240,7 @@ paths:
           schema:
             type: string
             example: "అన"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -281,7 +282,6 @@ paths:
       description: Generate a match ID string between two words for comparison analysis
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -289,6 +289,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -304,7 +305,6 @@ paths:
       description: Check if the last logical character of the first word matches the first logical character of the second word
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -312,6 +312,7 @@ paths:
           schema:
             type: string
             example: "న్యాయం"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -327,7 +328,6 @@ paths:
       description: Calculate the intersecting rank between two strings (number of shared characters)
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -335,6 +335,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -350,7 +351,6 @@ paths:
       description: Determine if the two input strings are anagrams of each other
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -358,6 +358,7 @@ paths:
           schema:
             type: string
             example: "న్యఅన"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -368,7 +369,7 @@ paths:
   /analysis/is-consonant:
     get:
       tags:
-        - Character Validation
+        - Word Analysis
       summary: Check if character is consonant
       description: Determine if the given character is a consonant (uses the first logical character of the input)
       parameters:
@@ -417,7 +418,7 @@ paths:
           schema:
             type: string
             example: "అ"
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -433,7 +434,6 @@ paths:
       description: Check if two words are ladder words (differ by one logical character)
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -441,6 +441,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -552,7 +553,6 @@ paths:
       description: Get the unique intersecting logical characters between two strings
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -560,6 +560,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -575,7 +576,6 @@ paths:
       description: Calculate the unique intersecting rank between two strings
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -583,6 +583,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -600,10 +601,61 @@ paths:
       tags:
         - Authentication
       summary: User login
-      description: Authenticate a user with username and password
+      description: |
+        Authenticate a user with email and password.
+
+        **Test Mode:** Use email ending in `@example.com` or `@test.com` for testing without a database.
+        - `test@example.com` with `password123` -> successful login
+        - Any other `@example.com`/`@test.com` email -> authentication failed
       parameters:
-        - $ref: '#/components/parameters/usernameRequired'
+        - $ref: '#/components/parameters/emailRequired'
         - $ref: '#/components/parameters/passwordRequired'
+      responses:
+        '200':
+          description: Successful authentication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Login successful"
+                data:
+                  authenticated: true
+                  user_id: 999
+                success: true
+                error: null
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                response_code: 401
+                message: "Authentication failed"
+                data: null
+                success: false
+                error: "Invalid email or password"
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/user-exists:
+    get:
+      tags:
+        - Authentication
+      summary: Check if user exists
+      description: |
+        Check if an email address already exists in the system.
+
+        **Test Mode:** Use email ending in `@example.com` or `@test.com` for testing without a database.
+        - `test@example.com` -> returns `true`
+        - Other `@example.com`/`@test.com` emails -> returns `false`
+      parameters:
+        - $ref: '#/components/parameters/emailRequired'
       responses:
         '200':
           description: Successful operation
@@ -613,33 +665,10 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
               example:
                 response_code: 200
-                message: "Login successful"
-                string: "testuser"
-                language: "english"
-                data: 
-                  token: "auth_token_here"
-                  user_id: 123
-  /auth/user-exists:
-    get:
-      tags:
-        - Authentication
-      summary: Check if user exists
-      description: Check if a username already exists in the system
-      parameters:
-        - name: username
-          in: query
-          required: true
-          description: Username to check
-          schema:
-            type: string
-            example: "testuser"
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
+                message: "User exists"
+                data: true
+                success: true
+                error: null
         '400':
           description: Missing required parameter
           content:
@@ -660,7 +689,6 @@ paths:
       description: Insert a character at a specific position in the string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -675,6 +703,7 @@ paths:
           schema:
             type: string
             example: "క"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -682,6 +711,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Character added at position"
+                string: "hello"
+                language: "English"
+                data: "heXllo"
+                success: true
+                result: "heXllo"
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -696,7 +734,6 @@ paths:
       description: Append a character to the end of the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -704,6 +741,7 @@ paths:
           schema:
             type: string
             example: "క"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -711,6 +749,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Character added at end"
+                string: "hello"
+                language: "English"
+                data: "hello!"
+                success: true
+                result: "hello!"
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -733,6 +780,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Base characters processed"
+                string: "hello"
+                language: "English"
+                data: ["h", "e", "l", "l", "o"]
+                success: true
+                result: ["h", "e", "l", "l", "o"]
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -747,14 +803,14 @@ paths:
       description: Calculate base consonants for the input strings
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
-          required: false
+          required: true
           description: Secondary string for consonant comparison
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -762,6 +818,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Base consonants calculated"
+                string: "hello"
+                language: "English"
+                data: ["l"]
+                success: true
+                result: ["l"]
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -784,6 +849,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Code points processed"
+                string: "hello"
+                language: "English"
+                data: [[104], [101], [108], [108], [111]]
+                success: true
+                result: [[104], [101], [108], [108], [111]]
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -806,6 +880,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Code point length calculated"
+                string: "hello"
+                language: "English"
+                data: 5
+                success: true
+                result: 5
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -819,7 +902,6 @@ paths:
       summary: Get filler characters
       description: Generate filler characters for the specified language (does not require a string input)
       parameters:
-        - $ref: '#/components/parameters/languageRequired'
         - name: count
           in: query
           required: false
@@ -839,6 +921,7 @@ paths:
               - consonant
               - vowel
             example: "consonant"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -846,6 +929,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Filler characters generated"
+                string: "5 consonant"
+                language: "english"
+                data: ["b", "c", "d", "f", "g"]
+                success: true
+                result: ["b", "c", "d", "f", "g"]
+                error: null
         '400':
           description: Missing required parameter (language)
           content:
@@ -868,6 +960,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Logical characters processed"
+                string: "hello"
+                language: "English"
+                data: ["h", "e", "l", "l", "o"]
+                success: true
+                result: ["h", "e", "l", "l", "o"]
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -882,7 +983,6 @@ paths:
       description: Retrieve the logical character at a specific position in the string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: false
@@ -891,6 +991,7 @@ paths:
             type: integer
             default: 0
             example: 0
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -898,6 +999,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Logical character at position retrieved"
+                string: "hello"
+                language: "English"
+                data: "e"
+                success: true
+                result: "e"
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -909,10 +1019,8 @@ paths:
       tags:
         - Character Analysis
       summary: Get random logical characters
-      description: Get a random selection of logical characters from the input string
+      description: Get a random selection of logical characters from the corpus for the selected language
       parameters:
-        - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: count
           in: query
           required: false
@@ -921,6 +1029,7 @@ paths:
             type: integer
             default: 5
             example: 5
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -928,8 +1037,17 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Random logical characters generated"
+                string: null
+                language: "english"
+                data: ["h", "e", "l"]
+                success: true
+                result: ["h", "e", "l"]
+                error: null
         '400':
-          description: Missing required parameters
+          description: Missing required parameter (language)
           content:
             application/json:
               schema:
@@ -947,7 +1065,6 @@ paths:
       description: Compare two strings ignoring case differences
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -955,6 +1072,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -976,7 +1094,6 @@ paths:
       description: Compare two strings and return ordering result
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -984,6 +1101,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1005,7 +1123,6 @@ paths:
       description: Check if two strings are equal
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1013,6 +1130,7 @@ paths:
           schema:
             type: string
             example: "అనన్య"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1034,7 +1152,6 @@ paths:
       description: Check if the two input strings share any common logical characters
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1042,6 +1159,7 @@ paths:
           schema:
             type: string
             example: "అన్న"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1057,7 +1175,6 @@ paths:
       description: Check if reversing the first string equals the second string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1065,6 +1182,7 @@ paths:
           schema:
             type: string
             example: "న్యనఅ"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1132,7 +1250,6 @@ paths:
       description: Replace occurrences of a search string with a replacement string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1147,6 +1264,7 @@ paths:
           schema:
             type: string
             example: "ఆ"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1184,7 +1302,6 @@ paths:
       description: Split the input string by a delimiter and return the parts separated by " | "
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: delimiter
           in: query
           required: false
@@ -1193,6 +1310,7 @@ paths:
             type: string
             default: "-"
             example: "-"
+        - $ref: '#/components/parameters/languageRequired'
       responses:
         '200':
           description: Successful operation
@@ -1202,7 +1320,7 @@ paths:
                 $ref: '#/components/schemas/ApiResponse'
 
   # ===================================================================
-  # CHARACTER VALIDATION (requires string; language defaults to telugu)
+  # CHARACTER VALIDATION (requires string; language optional, defaults to telugu)
   # ===================================================================
 
   /validation/contains-all-logical-chars:
@@ -1213,14 +1331,14 @@ paths:
       description: Check if the input string contains all of the specified logical characters
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
-          description: Logical characters that must all be present
+          description: Comma-separated logical characters that must all be present
           schema:
             type: string
-            example: "అన"
+            example: "అ,న"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1236,7 +1354,6 @@ paths:
       description: Check if the input string contains a specific character
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1244,6 +1361,7 @@ paths:
           schema:
             type: string
             example: "న"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1259,14 +1377,14 @@ paths:
       description: Check if the input string contains any of the specified logical characters
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
-          description: Logical characters to check for
+          description: Comma-separated logical characters; returns true if any listed character is present
           schema:
             type: string
-            example: "అన"
+            example: "అ,న"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1282,14 +1400,14 @@ paths:
       description: Check if the input string contains a specific sequence of logical characters
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
-          description: Logical character sequence to check for
+          description: Exact sequence to check for (not a comma-separated list)
           schema:
             type: string
             example: "అన"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1305,7 +1423,7 @@ paths:
       description: Check if the input string contains any spaces
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1321,7 +1439,6 @@ paths:
       description: Check if the input string contains a specific substring
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1329,6 +1446,7 @@ paths:
           schema:
             type: string
             example: "అన"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1344,7 +1462,6 @@ paths:
       description: Check if the string starts with the specified prefix
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1352,6 +1469,7 @@ paths:
           schema:
             type: string
             example: "అన"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1373,7 +1491,6 @@ paths:
       description: Check if the string ends with the specified suffix
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
         - name: input2
           in: query
           required: true
@@ -1381,6 +1498,7 @@ paths:
           schema:
             type: string
             example: "న్య"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation

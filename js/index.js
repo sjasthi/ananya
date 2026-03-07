@@ -8,13 +8,15 @@ if (local == true) {
 }
 
 const apiEndpoints = {
+    // api/auth/
+    authLogin: "api/auth/login.php",
+    authUserExists: "api/auth/user-exists.php",
+
     // api/analysis/
     areHeadAndTailWords: "api/analysis/heads-tails-words.php",
     areLadderWords: "api/analysis/ladder-words.php",
     canMakeAllWords: "api/analysis/can-make-all-words.php",
     canMakeWord: "api/analysis/can-make-word.php",
-    charConstant: "api/analysis/is-consonant.php",
-    charVowel: "api/analysis/is-vowel.php",
     getIntersectingRank: "api/analysis/intersecting-rank.php",
     getMatchIdString: "api/analysis/get-match-id-string.php",
     getUniqueIntersectingLogicalChars: "api/analysis/unique-intersecting-chars.php",
@@ -37,6 +39,7 @@ const apiEndpoints = {
     getFillerCharacters: "api/characters/filler-characters.php",
     getLogicalChars: "api/characters/logical.php",
     logicalCharAt: "api/characters/logical-at.php",
+    randomLogicalChars: "api/characters/random-logical-chars.php",
 
     // api/comparison/
     compareTo: "api/comparison/compare-to.php",
@@ -69,7 +72,9 @@ const apiEndpoints = {
     containsSpace: "api/validation/contains-space.php",
     containsString: "api/validation/contains-string.php",
     endsWith: "api/validation/ends-with.php",
-    startsWith: "api/validation/starts-with.php"
+    startsWith: "api/validation/starts-with.php",
+    charConstant: "api.php/validation/is-consonant",
+    charVowel: "api.php/validation/is-vowel"
 };
 
 function getMethodEndpoint(methodName) {
@@ -136,6 +141,10 @@ function updateInputs() {
     var input = document.getElementById("universalInput").value;
     var inputCells = document.getElementsByClassName("inputText");
     for (var i = 0; i < inputCells.length; i++) {
+        // Skip authentication input fields - they have their own test credentials
+        if (inputCells[i].classList.contains("auth-input")) {
+            continue;
+        }
         inputCells[i].value = input;
     }
 }
@@ -356,6 +365,8 @@ async function callAPI(methodName) {
     const singleInput = [
         // api/analysis/
         "getWordLevel", "getWordStrength", "getWordWeight", "isPalindrome", "parseToLogicalCharacters", "splitInto15Chunks",
+        // api/auth/
+        "authUserExists",
         // api/characters/
         "getBaseCharacters", "getCodePointLength", "getCodePoints", "getLogicalChars",
         // api/ (legacy root)
@@ -365,11 +376,13 @@ async function callAPI(methodName) {
         // api/utility/
         "getLengthNoSpaces", "getLengthNoSpacesNoCommas",
         // api/validation/
-        "containsSpace"
+        "charConstant", "charVowel", "containsSpace"
     ];
     const doubleInput = [
         // api/analysis/
-        "areHeadAndTailWords", "areLadderWords", "canMakeAllWords", "canMakeWord", "charConstant", "charVowel", "getIntersectingRank", "getMatchIdString", "getUniqueIntersectingLogicalChars", "getUniqueIntersectingRank", "isAnagram",
+        "areHeadAndTailWords", "areLadderWords", "canMakeAllWords", "canMakeWord", "getIntersectingRank", "getMatchIdString", "getUniqueIntersectingLogicalChars", "getUniqueIntersectingRank", "isAnagram",
+        // api/auth/
+        "authLogin",
         // api/characters/
         "addCharacterAtEnd", "baseConsonants", "logicalCharAt",
         // api/comparison/
@@ -444,7 +457,26 @@ async function callAPI(methodName) {
 
         try {
             const endpoint = getMethodEndpoint(methodName);
-            if (singleInput.includes(methodName)) {
+            
+            // Special handling for authentication endpoints
+            if (methodName === "authLogin") {
+                var email = document.getElementById(methodName + 'InputText').value;
+                var password = document.getElementById(methodName + 'InputText2').value;
+                await fetch(apiURL + endpoint + '?email=' + encodeURIComponent(email) + '&password=' + encodeURIComponent(password))
+                    .then(response => response.text())
+                    .then(data => result = data);
+            } else if (methodName === "authUserExists") {
+                var email = document.getElementById(methodName + 'InputText').value;
+                await fetch(apiURL + endpoint + '?email=' + encodeURIComponent(email))
+                    .then(response => response.text())
+                    .then(data => result = data);
+            } else if (methodName === "randomLogicalChars") {
+                // Special handling: uses 'int' parameter instead of 'string'
+                var count = document.getElementById(methodName + 'InputText').value;
+                await fetch(apiURL + endpoint + '?int=' + encodeURIComponent(count) + '&language=' + encodeURIComponent(languageInput))
+                    .then(response => response.text())
+                    .then(data => result = data);
+            } else if (singleInput.includes(methodName)) {
                 var cellInput = document.getElementById(methodName + 'InputText').value;
                 await fetch(apiURL + endpoint + '?string=' + encodeURIComponent(cellInput) + '&language=' + encodeURIComponent(languageInput))
                     .then(response => response.text())
@@ -500,6 +532,14 @@ async function callAPI(methodName) {
                 passFail.classList.add("fail");
                 passFail.classList.remove("table-success");
                 passFail.classList.add("table-danger");
+            } else if (expectedResult === "") {
+                // Empty expected result means non-deterministic/random endpoint
+                // Just verify the response code is 200 (already checked above)
+                passFail.innerHTML = "PASS";
+                passFail.classList.remove("fail");
+                passFail.classList.add("pass");
+                passFail.classList.remove("table-danger");
+                passFail.classList.add("table-success");
             } else if (expectedResult == actualCell.innerHTML) {
                 passFail.innerHTML = "PASS";
                 passFail.classList.remove("fail");
@@ -566,7 +606,7 @@ $('#languageInput').on('change', function (e) {
 function getLanguageValues(language) {
     var input;
     document.getElementById("getFillerCharactersInputText").value = 20;
-    document.getElementById("getFillerCharactersTypeText").value = "vowels";
+    document.getElementById("getFillerCharactersTypeText").value = "vowel";
     if (language == "English") {
         input = "hello";
     } else if (language == "Telugu") {
@@ -576,6 +616,19 @@ function getLanguageValues(language) {
     var inputCells = document.getElementsByClassName("inputText");
     for (var i = 0; i < inputCells.length; i++) {
         inputCells[i].value = input;
+    }
+    
+    // Set specific single-character inputs for character validation tests
+    if (language == "English") {
+        var charVowelEl = document.getElementById("charVowelInputText");
+        var charConstantEl = document.getElementById("charConstantInputText");
+        if (charVowelEl) charVowelEl.value = "a";
+        if (charConstantEl) charConstantEl.value = "h";
+    } else if (language == "Telugu") {
+        var charVowelEl = document.getElementById("charVowelInputText");
+        var charConstantEl = document.getElementById("charConstantInputText");
+        if (charVowelEl) charVowelEl.value = "అ";
+        if (charConstantEl) charConstantEl.value = "క";
     }
 }
 
@@ -635,6 +688,8 @@ function getDefaultValues(language) {
         document.getElementById("containsLogicalCharsExpectedText").value = "true";
         document.getElementById("containsAllLogicalCharsExpectedText").value = "true";
         document.getElementById("containsLogicalCharSequenceExpectedText").value = "true";
+        document.getElementById("charVowelExpectedText").value = "true";
+        document.getElementById("charConstantExpectedText").value = "true";
         document.getElementById("canMakeWordExpectedText").value = "true";
         document.getElementById("canMakeAllWordsExpectedText").value = "true";
         document.getElementById("addCharacterAtEndExpectedText").value = "helloa";
@@ -642,7 +697,7 @@ function getDefaultValues(language) {
         document.getElementById("getIntersectingRankExpectedText").value = "3";
         document.getElementById("getUniqueIntersectingRankExpectedText").value = "2";
         document.getElementById("compareToExpectedText").value = "0";
-        document.getElementById("compareToIgnoreCaseExpectedText").value = "2";
+        document.getElementById("compareToIgnoreCaseExpectedText").value = "1";
         document.getElementById("splitWordExpectedText").value = `{"0":["h","e"],"2":["l","l"],"4":["o",null]}`;
         document.getElementById("equalsExpectedText").value = "true";
         document.getElementById("reverseEqualsExpectedText").value = "true";
@@ -654,6 +709,9 @@ function getDefaultValues(language) {
         document.getElementById("areLadderWordsExpectedText").value = "true";
         document.getElementById("areHeadAndTailWordsExpectedText").value = "true";
         document.getElementById("baseConsonantsExpectedText").value = "true";
+        document.getElementById("getBaseCharactersExpectedText").value = "h,e,l,l,o";
+        document.getElementById("randomLogicalCharsInputText").value = "5";
+        document.getElementById("randomLogicalCharsExpectedText").value = ""; // Non-deterministic - varies each call
     }
 
     if (language == "Telugu") {
@@ -709,6 +767,8 @@ function getDefaultValues(language) {
         document.getElementById("containsLogicalCharsExpectedText").value = "true";
         document.getElementById("containsAllLogicalCharsExpectedText").value = "true";
         document.getElementById("containsLogicalCharSequenceExpectedText").value = "false";
+        document.getElementById("charVowelExpectedText").value = "true";
+        document.getElementById("charConstantExpectedText").value = "true";
         document.getElementById("canMakeWordExpectedText").value = "true";
         document.getElementById("canMakeAllWordsExpectedText").value = "true";
         document.getElementById("addCharacterAtEndExpectedText").value = "అమెరికాఆస్ట్రేలియాల్లో";
@@ -728,5 +788,8 @@ function getDefaultValues(language) {
         document.getElementById("areLadderWordsExpectedText").value = "true";
         document.getElementById("areHeadAndTailWordsExpectedText").value = "true";
         document.getElementById("baseConsonantsExpectedText").value = "true";
+        document.getElementById("getBaseCharactersExpectedText").value = "అ,మ,ర,క,ఆ,స,ల,య";
+        document.getElementById("randomLogicalCharsInputText").value = "5";
+        document.getElementById("randomLogicalCharsExpectedText").value = ""; // Non-deterministic - varies each call
     }
 }

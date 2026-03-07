@@ -280,7 +280,11 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                     <div id="auth-login" class="api-section">
                         <h3>Login</h3>
-                        <p>Authenticates a user with username and password.</p>
+                        <p>Authenticates a user with email and password.</p>
+                        
+                        <div class="alert alert-info">
+                            <strong>Test Mode:</strong> Use <code>test@example.com</code> with password <code>password123</code> to test successful authentication without a database.
+                        </div>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -292,7 +296,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
-                                    <li><code>username</code> (required) - Username</li>
+                                    <li><code>email</code> (required) - User email address</li>
                                     <li><code>password</code> (required) - Password</li>
                                 </ul>
                             </div>
@@ -300,7 +304,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>auth/login?username=testuser&password=secret
+                            <?= $apiBase ?>auth/login?email=user@example.com&password=secret
                         </div>
 
                         <h6>Example Response</h6>
@@ -308,15 +312,30 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
   "message": "Login successful",
   "data": {
-    "token": "auth_token_here",
+    "authenticated": true,
     "user_id": 123
-  }
+  },
+  "success": true,
+  "error": null
+}</code></pre>
+
+                        <h6>Error Response (401)</h6>
+                        <pre><code class="language-json">{
+  "response_code": 401,
+  "message": "Authentication failed",
+  "data": null,
+  "success": false,
+  "error": "Invalid email or password"
 }</code></pre>
                     </div>
 
                     <div id="auth-user-exists" class="api-section">
                         <h3>User Exists</h3>
-                        <p>Checks if a user exists in the system.</p>
+                        <p>Checks if a user with the given email exists in the system.</p>
+                        
+                        <div class="alert alert-info">
+                            <strong>Test Mode:</strong> Use <code>test@example.com</code> to test user exists (returns true), or <code>newuser@example.com</code> to test user not exists (returns false).
+                        </div>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -328,22 +347,23 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
-                                    <li><code>username</code> (required) - Username</li>
+                                    <li><code>email</code> (required) - Email address to check</li>
                                 </ul>
                             </div>
                         </div>
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>auth/user-exists?username=testuser
+                            <?= $apiBase ?>auth/user-exists?email=user@example.com
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "User existence check completed",
-  "string": "testuser",
-  "data": false
+  "message": "User exists",
+  "data": true,
+  "success": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -380,10 +400,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Character added at position",
+    "message": "Character added at position",
   "string": "hello",
   "language": "English",
-  "data": "heXllo"
+    "data": "heXllo",
+    "success": true,
+    "result": "heXllo",
+    "error": null
 }</code></pre>
                     </div>
 
@@ -416,10 +439,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Character added at end",
+    "message": "Character added at end",
   "string": "hello",
   "language": "English",
-  "data": "hello!"
+    "data": "hello!",
+    "success": true,
+    "result": "hello!",
+    "error": null
 }</code></pre>
                     </div>
 
@@ -451,10 +477,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Base characters processed",
+    "message": "Base characters processed",
   "string": "hello",
   "language": "English",
-  "data": ["h", "e", "l", "l", "o"]
+    "data": ["h", "e", "l", "l", "o"],
+    "success": true,
+    "result": ["h", "e", "l", "l", "o"],
+    "error": null
 }</code></pre>
                     </div>
 
@@ -473,8 +502,8 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                     <li><code>input2</code> (required) - Second string to compare</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -487,11 +516,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "baseConsonants Processed",
+    "message": "Base consonants calculated",
   "string": "hello",
   "language": "English",
-    "input2": "world",
-  "data": ["l"]
+    "data": ["l"],
+    "success": true,
+    "result": ["l"],
+    "error": null
 }</code></pre>
                     </div>
 
@@ -523,10 +554,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Code point length calculated",
+    "message": "Code point length calculated",
   "string": "à°…à°®à±†à°°à°¿à°•à°¾",
   "language": "Telugu",
-  "data": 7
+    "data": 7,
+    "success": true,
+    "result": 7,
+    "error": null
 }</code></pre>
                     </div>
 
@@ -558,10 +592,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Code points processed",
+    "message": "Code points processed",
   "string": "hello",
   "language": "English",
-  "data": [[104], [101], [108], [108], [111]]
+    "data": [[104], [101], [108], [108], [111]],
+    "success": true,
+    "result": [[104], [101], [108], [108], [111]],
+    "error": null
 }</code></pre>
                     </div>
 
@@ -579,9 +616,9 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
-                                    <li><code>count</code> (required) - Number of characters to generate (must be > 0)</li>
+                                    <li><code>count</code> (optional) - Number of characters to generate (default 3)</li>
+                                    <li><code>type</code> (optional) - Type of filler characters (default <code>consonant</code>)</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
-                                    <li><code>type</code> (required) - Type of filler characters</li>
                                 </ul>
                             </div>
                         </div>
@@ -594,11 +631,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Filler Characters Generated",
-  "count": "5",
-  "type": "consonant",
+    "message": "Filler characters generated",
+    "string": "5 consonant",
   "language": "Telugu",
-  "data": ["à°•", "à°Ÿ", "à°ª", "à°®", "à°¨"]
+    "data": ["à°•", "à°Ÿ", "à°ª", "à°®", "à°¨"],
+    "success": true,
+    "result": ["à°•", "à°Ÿ", "à°ª", "à°®", "à°¨"],
+    "error": null
 }</code></pre>
                     </div>
 
@@ -630,10 +669,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Logical characters processed",
+    "message": "Logical characters processed",
   "string": "à°…à°®à±†à°°à°¿à°•à°¾",
   "language": "Telugu",
-  "data": ["à°…", "à°®à±†", "à°°à°¿", "à°•à°¾"]
+    "data": ["à°…", "à°®à±†", "à°°à°¿", "à°•à°¾"],
+    "success": true,
+    "result": ["à°…", "à°®à±†", "à°°à°¿", "à°•à°¾"],
+    "error": null
 }</code></pre>
                     </div>
 
@@ -652,7 +694,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Position (0-based index)</li>
+                                    <li><code>input2</code> (optional) - Position (0-based index, default 0)</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
@@ -666,16 +708,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Logical character at position retrieved",
+    "message": "Logical character at position retrieved",
   "string": "hello",
   "language": "English",
-  "data": "e"
+    "data": "e",
+    "success": true,
+    "result": "e",
+    "error": null
 }</code></pre>
                     </div>
 
                     <div id="characters-random-logical" class="api-section">
                         <h3>Random Logical Characters</h3>
-                        <p>Generates random logical characters from the input string.</p>
+                        <p>Generates random logical characters from the corpus for the selected language.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -687,7 +732,6 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                             <div class="col-md-6">
                                 <h6>Parameters</h6>
                                 <ul>
-                                    <li><code>string</code> (required) - Input string</li>
                                     <li><code>count</code> (optional) - Number of characters to generate (default 5)</li>
                                     <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
@@ -696,16 +740,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/random-logical?string=hello&count=3&language=english
+                            <?= $apiBase ?>characters/random-logical?count=3&language=english
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Random logical characters generated",
-  "string": "hello",
-  "language": "English",
-  "data": ["h", "e", "l"]
+    "message": "Random logical characters generated",
+        "string": null,
+  "language": "english",
+    "data": ["h", "e", "l"],
+    "success": true,
+    "result": ["h", "e", "l"],
+    "error": null
 }</code></pre>
                     </div>
 
@@ -714,7 +761,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                     <div id="validation-contains-all-logical-chars" class="api-section">
                         <h3>Contains All Logical Characters</h3>
-                        <p>Checks if the string contains all the specified logical characters.</p>
+                        <p>Checks whether all comma-separated logical characters in <code>input2</code> are present in the input string.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -727,8 +774,8 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Logical characters to check</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>input2</code> (required) - Comma-separated logical characters to check</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -742,15 +789,18 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "All logical characters check completed",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾à°†à°¸à±à°Ÿà±à°°à±‡à°²à°¿à°¯à°¾",
+  "string": "అనన్య",
   "language": "telugu",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
                     <div id="validation-contains-char" class="api-section">
                         <h3>Contains Character</h3>
-                        <p>Checks if a string contains a specific character.</p>
+                        <p>Checks if the input string contains a specific logical character.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -764,7 +814,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Character to search for</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -777,16 +827,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Character containment check completed",
+  "message": "Character check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
                     <div id="validation-contains-logical-chars" class="api-section">
                         <h3>Contains Logical Characters</h3>
-                        <p>Checks if the string contains any of the specified logical characters (comma-separated).</p>
+                        <p>Checks whether the string contains at least one logical character from the comma-separated <code>input2</code> list.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -799,31 +852,33 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                     <li><code>input2</code> (required) - Comma-separated logical characters to check</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>validation/contains-logical-chars?string=à°…à°®à±†à°°à°¿à°•à°¾&input2=à°…,à°•&language=telugu
+                            <?= $apiBase ?>validation/contains-logical-chars?string=hello&input2=e,l,z
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "containsLogicalChars() Processed",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾",
-  "language": "Telugu",
-    "input2": "à°…,à°•",
-  "data": true
+  "message": "Logical characters check completed",
+  "string": "hello",
+  "language": "telugu",
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
                     <div id="validation-contains-logical-sequence" class="api-section">
                         <h3>Contains Logical Sequence</h3>
-                        <p>Checks if the string contains a specific sequence of logical characters.</p>
+                        <p>Checks if the string contains an exact logical-character sequence provided in <code>input2</code>.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -836,24 +891,27 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>input2</code> (required) - Logical character sequence</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>input2</code> (required) - Logical character sequence (not comma-separated)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>validation/contains-logical-sequence?string=à°…à°®à±†à°°à°¿à°•à°¾&input2=à°®à±†,à°°à°¿&language=telugu
+                            <?= $apiBase ?>validation/contains-logical-sequence?string=hello&input2=ell
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "Logical character sequence check completed",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾",
+  "string": "hello",
   "language": "telugu",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -872,7 +930,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -888,7 +946,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Space check completed",
   "string": "hello world",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -908,7 +969,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Substring to search for</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -921,10 +982,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "String containment check completed",
+  "message": "String check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -944,7 +1008,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Suffix to check</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -960,13 +1024,16 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Suffix check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
                     <div id="validation-is-vowel" class="api-section">
                         <h3>Is Vowel</h3>
-                        <p>Checks if a character is a vowel in the specified language.</p>
+                        <p>Checks if the first logical character of <code>string</code> is a vowel in the specified language.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -979,7 +1046,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -995,7 +1062,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Vowel check completed",
   "string": "e",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1015,7 +1085,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Prefix to check</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1031,7 +1101,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Prefix check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1771,8 +1844,8 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - First word</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                     <li><code>input2</code> (required) - Second word</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1950,8 +2023,8 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - First word</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                     <li><code>input2</code> (required) - Second word</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
                                 </ul>
                             </div>
                         </div>
