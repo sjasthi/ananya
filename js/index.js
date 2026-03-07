@@ -176,11 +176,139 @@ form.addEventListener("submit", async (e) => {
 /*Grabs all the method names from the methods column*/
 var methods = document.querySelectorAll(".methodURL");
 
+function renderRunSummary(summary, isRunning) {
+    var summaryEl = document.getElementById("testRunSummary");
+    if (!summaryEl) {
+        return;
+    }
+
+    summaryEl.classList.remove("alert-secondary", "alert-info", "alert-success", "alert-danger", "alert-warning");
+
+    if (isRunning) {
+        summaryEl.classList.add("alert-info");
+        summaryEl.textContent = "Running tests...";
+        return;
+    }
+
+    if (!summary) {
+        summaryEl.classList.add("alert-secondary");
+        summaryEl.textContent = "Status: Not run yet";
+        return;
+    }
+
+    if (summary.automatedTotal === 0) {
+        summaryEl.classList.add("alert-warning");
+        summaryEl.textContent = "No automated tests found in the current table.";
+        return;
+    }
+
+    if (summary.failed === 0) {
+        summaryEl.classList.add("alert-success");
+        summaryEl.textContent = "All automated tests passed. " + summary.passed + "/" + summary.automatedTotal + " passed" + (summary.notAutomated > 0 ? " | Not automated: " + summary.notAutomated : "");
+    } else {
+        summaryEl.classList.add("alert-danger");
+        summaryEl.textContent = "Some tests failed. Passed: " + summary.passed + ", Failed: " + summary.failed + ", Total: " + summary.automatedTotal + (summary.notAutomated > 0 ? " | Not automated: " + summary.notAutomated : "");
+    }
+}
+
+function collectRunSummary() {
+    var passFailCells = Array.from(document.querySelectorAll("#apiTable .passFail"));
+    var notAutomated = passFailCells.filter(function (cell) {
+        return (cell.textContent || "").trim().toUpperCase() === "N/A";
+    }).length;
+
+    var methodLinks = Array.from(document.querySelectorAll(".methodURL"));
+    var automatedTotal = methodLinks.length;
+    var passed = 0;
+    var failed = 0;
+
+    methodLinks.forEach(function (link) {
+        var methodName = link.textContent.trim();
+        var statusCell = document.getElementById(methodName + "PassFail");
+        var statusText = statusCell ? (statusCell.textContent || "").trim().toUpperCase() : "";
+
+        if (statusText === "PASS") {
+            passed += 1;
+        } else {
+            failed += 1;
+        }
+    });
+
+    return {
+        automatedTotal: automatedTotal,
+        passed: passed,
+        failed: failed,
+        notAutomated: notAutomated
+    };
+}
+
+function highlightSectionsWithFailures() {
+    // Get all section headers
+    var sectionHeaders = document.querySelectorAll('#testSuite tr.section-header-row[data-section]');
+    
+    sectionHeaders.forEach(function(header) {
+        var sectionKey = header.getAttribute('data-section');
+        // Find all rows in this section
+        var sectionRows = document.querySelectorAll('#testSuite tr.section-item-row[data-section="' + sectionKey + '"]');
+        
+        var hasFailures = false;
+        sectionRows.forEach(function(row) {
+            var passFail = row.querySelector('.passFail');
+            if (passFail) {
+                var statusText = (passFail.textContent || "").trim().toUpperCase();
+                if (statusText === "FAIL") {
+                    hasFailures = true;
+                }
+            }
+        });
+        
+        // Add or remove the failure class
+        if (hasFailures) {
+            header.classList.add('section-has-failures');
+        } else {
+            header.classList.remove('section-has-failures');
+        }
+    });
+}
+
+function formatResponseForDisplay(jsonObj, fallbackRaw) {
+    if (!jsonObj || typeof jsonObj !== "object") {
+        return String(fallbackRaw || "");
+    }
+
+    var responseCode = Number.isInteger(jsonObj.response_code)
+        ? jsonObj.response_code
+        : (jsonObj.success === false ? 500 : 200);
+
+    var normalized = {
+        response_code: responseCode,
+        message: jsonObj.message || (jsonObj.error ? String(jsonObj.error) : ""),
+        data: jsonObj.data !== undefined ? jsonObj.data : (jsonObj.result !== undefined ? jsonObj.result : null),
+        success: typeof jsonObj.success === "boolean" ? jsonObj.success : responseCode === 200,
+        error: jsonObj.error !== undefined ? jsonObj.error : null
+    };
+
+    // Manually format to keep data field compact (including nested arrays) while keeping outer structure readable
+    var pretty = "{\n";
+    pretty += '  "response_code": ' + normalized.response_code + ',\n';
+    pretty += '  "message": ' + JSON.stringify(normalized.message) + ',\n';
+    pretty += '  "data": ' + JSON.stringify(normalized.data) + ',\n';
+    pretty += '  "success": ' + normalized.success + ',\n';
+    pretty += '  "error": ' + JSON.stringify(normalized.error) + '\n';
+    pretty += "}";
+
+    return pretty;
+}
+
 /*Async function to run the tests*/
 async function runTests() {
     const submitButton = form.querySelector('input[type="submit"]');
     const lastRunIndicator = document.getElementById("lastRunIndicator");
     const methodLinks = document.querySelectorAll(".methodURL");
+
+    if (typeof window.collapseAllTestSections === "function") {
+        window.collapseAllTestSections();
+    }
 
     methods = methodLinks;
 
@@ -189,6 +317,7 @@ async function runTests() {
         if (lastRunIndicator) {
             lastRunIndicator.textContent = "Last run: no methods found";
         }
+        renderRunSummary({ automatedTotal: 0, passed: 0, failed: 0, notAutomated: 0 }, false);
         return;
     }
 
@@ -200,13 +329,16 @@ async function runTests() {
     if (lastRunIndicator) {
         lastRunIndicator.textContent = "Last run: running...";
     }
+    renderRunSummary(null, true);
 
     try {
-        await Promise.all(Array.from(methodLinks).map(function (method) {
+        await Promise.allSettled(Array.from(methodLinks).map(function (method) {
             const methodName = method.textContent.trim();
             return callAPI(methodName);
         }));
     } finally {
+        renderRunSummary(collectRunSummary(), false);
+        highlightSectionsWithFailures();
         if (lastRunIndicator) {
             const completedAt = new Date().toLocaleTimeString();
             lastRunIndicator.textContent = "Last run: " + completedAt;
@@ -258,33 +390,50 @@ async function callAPI(methodName) {
     let result = "";
 
     if (methodName == "getFillerCharacters") {
-        var cellInput = document.getElementById(methodName + 'InputText').value;
-        var languageInput = document.getElementById("languageInput").value;
-        var type = document.getElementById(methodName + 'TypeText').value;
-        const endpoint = getMethodEndpoint(methodName);
-        await fetch(apiURL + endpoint + '?count=' + encodeURIComponent(cellInput) + '&language=' + encodeURIComponent(languageInput) + '&type=' + encodeURIComponent(type))
-            .then(response => response.text())
-            .then(data => result = data);
-        newResult = remove_non_ascii(result);
-        const jsonObj = JSON.parse(newResult);
-
         var jsonElement = document.getElementById(methodName + "JSON");
         var actualCell = document.getElementById(methodName + "Actual");
         var passFail = document.getElementById(methodName + "PassFail");
-        jsonElement.innerHTML = result;
-        actualCell.innerHTML = jsonObj.data;
-        if (jsonObj.response_code != 200) {
+
+        try {
+            var cellInput = document.getElementById(methodName + 'InputText').value;
+            var languageInput = document.getElementById("languageInput").value;
+            var type = document.getElementById(methodName + 'TypeText').value;
+            const endpoint = getMethodEndpoint(methodName);
+            await fetch(apiURL + endpoint + '?count=' + encodeURIComponent(cellInput) + '&language=' + encodeURIComponent(languageInput) + '&type=' + encodeURIComponent(type))
+                .then(response => response.text())
+                .then(data => result = data);
+            newResult = remove_non_ascii(result);
+            const jsonObj = JSON.parse(newResult);
+
+            jsonElement.textContent = formatResponseForDisplay(jsonObj, result);
+            actualCell.innerHTML = jsonObj.data;
+            if (jsonObj.response_code != 200) {
+                passFail.innerHTML = "FAIL";
+                passFail.classList.remove("pass")
+                passFail.classList.add("fail")
+                passFail.classList.remove("table-success")
+                passFail.classList.add("table-danger")
+            } else {
+                passFail.innerHTML = "PASS";
+                passFail.classList.remove("fail")
+                passFail.classList.add("pass")
+                passFail.classList.remove("table-danger")
+                passFail.classList.add("table-success")
+            }
+        } catch (error) {
+            jsonElement.textContent = formatResponseForDisplay({
+                response_code: 500,
+                message: "Request/parse error",
+                data: null,
+                success: false,
+                error: String(error)
+            });
+            actualCell.innerHTML = "Request/parse error";
             passFail.innerHTML = "FAIL";
-            passFail.classList.remove("pass")
-            passFail.classList.add("fail")
-            passFail.classList.remove("table-success")
-            passFail.classList.add("table-danger")
-        } else {
-            passFail.innerHTML = "PASS";
-            passFail.classList.remove("fail")
-            passFail.classList.add("pass")
-            passFail.classList.remove("table-danger")
-            passFail.classList.add("table-success")
+            passFail.classList.remove("pass");
+            passFail.classList.add("fail");
+            passFail.classList.remove("table-success");
+            passFail.classList.add("table-danger");
         }
     } else {
         var languageInput = document.getElementById("languageInput").value;
@@ -314,7 +463,13 @@ async function callAPI(methodName) {
                     .then(response => response.text())
                     .then(data => result = data);
             } else {
-                jsonElement.innerHTML = JSON.stringify({ response_code: 400, message: "Unsupported method in test runner", method: methodName });
+                jsonElement.textContent = JSON.stringify({
+                    response_code: 400,
+                    message: "Unsupported method in test runner",
+                    data: { method: methodName },
+                    success: false,
+                    error: "Unsupported method"
+                }, null, 2);
                 actualCell.innerHTML = "Unsupported method";
                 passFail.innerHTML = "FAIL";
                 passFail.classList.remove("pass");
@@ -327,7 +482,7 @@ async function callAPI(methodName) {
             newResult = remove_non_ascii(result);
             const jsonObj = JSON.parse(newResult);
 
-            jsonElement.innerHTML = result;
+            jsonElement.textContent = formatResponseForDisplay(jsonObj, result);
 
             if (Array.isArray(jsonObj.data)) {
                 actualCell.innerHTML = jsonObj.data.toString();
@@ -359,7 +514,13 @@ async function callAPI(methodName) {
                 passFail.classList.add("table-danger");
             }
         } catch (error) {
-            jsonElement.innerHTML = result || String(error);
+            jsonElement.textContent = formatResponseForDisplay({
+                response_code: 500,
+                message: "Request/parse error",
+                data: null,
+                success: false,
+                error: String(error)
+            });
             actualCell.innerHTML = "Request/parse error";
             passFail.innerHTML = "FAIL";
             passFail.classList.remove("pass");
