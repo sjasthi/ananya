@@ -113,6 +113,8 @@
                     SwaggerUIBundle.plugins.DownloadUrl
                 ],
                 layout: "StandaloneLayout",
+                operationsSorter: 'alpha',
+                tagsSorter: 'alpha',
                 validatorUrl: null,
                 tryItOutEnabled: true,
                 supportedSubmitMethods: ['get', 'post', 'put', 'delete'],

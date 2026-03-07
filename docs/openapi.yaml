@@ -1029,7 +1029,7 @@ paths:
   /comparison/is-intersecting:
     get:
       tags:
-        - Word Analysis
+        - String Comparison
       summary: Check if strings intersect
       description: Check if the two input strings share any common logical characters
       parameters:
@@ -1339,7 +1339,7 @@ paths:
   /validation/starts-with:
     get:
       tags:
-        - String Comparison
+        - Character Validation
       summary: Check if starts with
       description: Check if the string starts with the specified prefix
       parameters:
@@ -1368,7 +1368,7 @@ paths:
   /validation/ends-with:
     get:
       tags:
-        - String Comparison
+        - Character Validation
       summary: Check if ends with
       description: Check if the string ends with the specified suffix
       parameters:
