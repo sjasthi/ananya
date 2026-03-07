@@ -1517,10 +1517,11 @@ class wordProcessor
                 while (!feof($fh)){
                    
                      $this->setWord(fgets($fh));
-                    $myArray=array_merge($myArray,$this->getLogicalChars2());
-                    shuffle($myArray);
+					$filtered = $this->filterRandomLogicalCharsByLanguage($this->getLogicalChars2(), "english");
+					$myArray=array_merge($myArray,$filtered);
                 }
             }
+			shuffle($myArray);
             if($int_val > count($myArray)){
                 return "Not enough Logical characters in file. Lower N";
             }
@@ -1535,10 +1536,11 @@ class wordProcessor
             if ($fh){
                 while (!feof($fh)){
                     $this->setWord(fgets($fh));
-                    $teluguArray=array_merge($teluguArray,$this->getLogicalChars2());
-                    shuffle($teluguArray);
+					$filtered = $this->filterRandomLogicalCharsByLanguage($this->getLogicalChars2(), "telugu");
+					$teluguArray=array_merge($teluguArray,$filtered);
                 }
             }
+			shuffle($teluguArray);
             if($int_val > count($teluguArray)){
                 return "Not enough characters. Lower N";
             }
@@ -1549,6 +1551,45 @@ class wordProcessor
         }
        
     }
+
+	// Keep only valid, printable logical characters for the selected language.
+	function filterRandomLogicalCharsByLanguage($chars, $language)
+	{
+		if (!is_array($chars)) {
+			return array();
+		}
+
+		$filtered = array();
+		foreach ($chars as $char) {
+			if (!is_string($char)) {
+				continue;
+			}
+
+			$char = trim($char);
+			if ($char === "") {
+				continue;
+			}
+
+			// Drop control characters and malformed fragments.
+			if (preg_match('/[\x00-\x1F\x7F]/u', $char)) {
+				continue;
+			}
+
+			if ($language === "telugu") {
+				if (!preg_match('/[\x{0C00}-\x{0C7F}]/u', $char)) {
+					continue;
+				}
+			} elseif ($language === "english") {
+				if (!preg_match('/^[A-Za-z]$/', $char)) {
+					continue;
+				}
+			}
+
+			$filtered[] = $char;
+		}
+
+		return $filtered;
+	}
 
 	
 }

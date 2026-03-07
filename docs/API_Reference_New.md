@@ -18,9 +18,9 @@ GET {base_url}/{category}/{action}?string={text}&language={lang}
 ### API Categories
 - **text** - Text operations (length, reverse, randomize, replace, split)
 - **characters** - Character analysis (base, logical, codepoints, add-at, add-end)
-- **analysis** - Advanced analysis (word-strength, palindrome, anagram, intersecting)
+- **analysis** - Advanced analysis (word-strength, palindrome, anagram, intersecting, is-consonant)
 - **comparison** - String comparison (equals, starts-with, ends-with, compare)
-- **validation** - Content validation (contains-space, contains-char, is-consonant)
+- **validation** - Content validation (contains-space, contains-char)
 - **utility** - Utility functions (length variations, parsing functions)
 
 ### Response Format
@@ -204,7 +204,7 @@ GET /validation/contains-string?string={text}&language={lang}&input2={substring}
 #### Is Consonant
 Checks if character is a consonant.
 ```
-GET /validation/is-consonant?string={text}&language={lang}&input2={char}
+GET /analysis/is-consonant?string={text}&language={lang}
 ```
 
 #### Is Vowel

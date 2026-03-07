@@ -1,6 +1,12 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
 
-require_once("../../word_processor.php");
+// Change to project root so relative paths in word_processor.php work correctly
+chdir(dirname(__FILE__) . '/../../');
+
+require_once("word_processor.php");
 
 if (isset($_GET['string']) && isset($_GET['language'])) {
     $string = $_GET['string'];
@@ -10,18 +16,23 @@ if (isset($_GET['string']) && isset($_GET['language'])) {
     $language = $_GET['input2'];
 }
 
-if (!empty($string) && !empty($language)) {
+// Validate inputs
+$allowed_languages = array('english', 'telugu', 'hindi', 'gujarati', 'malayalam');
+
+if (!isset($string) || $string === '') {
+    invalidResponse("Invalid or Empty Word");
+} else if (strlen($string) > 10000) {
+    invalidResponse("String exceeds maximum length of 10000 characters");
+} else if (!isset($language) || $language === '') {
+    invalidResponse("Invalid or Empty Language");
+} else if (!in_array(strtolower($language), $allowed_languages)) {
+    invalidResponse("Unsupported language. Supported: English, Telugu, Hindi, Gujarati, Malayalam");
+} else {
     $processor = new wordProcessor($string, $language);
     $processor->parseToLogicalChars($string);
     $logicalChars = $processor->getLogicalChars();
 
     response(200, "Logical Chars Calculated", $string, $language, $logicalChars);
-} else if (isset($string) && empty($string)) {
-    invalidResponse("Invalid or Empty Word");
-} else if (isset($language) && empty($language)) {
-    invalidResponse("Invalid or Empty Language");
-} else {
-    invalidResponse("Invalid Request");
 }
 
 function invalidResponse($message)

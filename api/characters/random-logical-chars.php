@@ -1,5 +1,12 @@
 <?php
-require_once("../../word_processor.php");
+error_reporting(E_ALL);
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
+// Change to project root so relative paths in word_processor.php work correctly
+chdir(dirname(__FILE__) . '/../../');
+
+require_once("word_processor.php");
 
 if (isset($_GET['int']) && isset($_GET['language'])) {
     $count = $_GET['int'];
@@ -9,18 +16,22 @@ if (isset($_GET['int']) && isset($_GET['language'])) {
     $language = $_GET['input2'];
 }
 
-if (!empty($count) && !empty($language)) {
+// Validate inputs
+$allowed_languages = array('english', 'telugu', 'hindi', 'gujarati', 'malayalam');
+
+if (!isset($count) || $count === '') {
+    invalidResponse("Invalid or Empty Count");
+} else if (!is_numeric($count) || intval($count) <= 0 || intval($count) > 10000) {
+    invalidResponse("Count must be an integer between 1 and 10000");
+} else if (!isset($language) || $language === '') {
+    invalidResponse("Invalid or Empty Language");
+} else if (!in_array(strtolower($language), $allowed_languages)) {
+    invalidResponse("Unsupported language. Supported: English, Telugu, Hindi, Gujarati, Malayalam");
+} else {
     $processor = new wordProcessor("", $language);
     $logicalChars = $processor->getRandomLogicalChars($count);
-    #$logicalChars = "CheckingMethod";
 
     response(200, "Random Logical Chars", $count, $language, $logicalChars);
-} else if (isset($count) && empty($count)) {
-    invalidResponse("Invalid or Empty Word");
-} else if (isset($language) && empty($language)) {
-    invalidResponse("Invalid or Empty Language");
-} else {
-    invalidResponse("Invalid Request");
 }
 
 function invalidResponse($message)
