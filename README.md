@@ -1,10 +1,11 @@
 # Ananya - Indic Language Text Processing API
+
 > Comprehensive text processing toolkit for Indic languages with REST API interface
 
 ## 🌍 Supported Languages
 
 - **Telugu** ✅ (Fully implemented)
-- **English** ✅ (Fully implemented) 
+- **English** ✅ (Fully implemented)
 - **Hindi** ✅ (Implemented)
 - **Gujarati** ✅ (Implemented)
 - **Malayalam** ✅ (Implemented)
@@ -14,6 +15,7 @@
 ## 🚀 Quick Start
 
 ### Local Deployment
+
 ```bash
 # Deploy to your web server
 cp -r ananya/ /path/to/htdocs/
@@ -27,52 +29,62 @@ http://localhost/ananya/
 This project can use Ollama for local, free LLM responses (no API key needed).
 
 1. **Download Ollama**
-  - https://ollamacurl -fsSL https://ollama.com/install.sh | sh.ai (Windows, macOS, Linux)
+   - <https://ollama.ai> (Windows, macOS, Linux)
 
-2. **Start Ollama**
-  - Windows (PowerShell):
-    ```powershell
-    ollama serve
-    ```
-  - macOS/Linux (Terminal):
-    ```bash
-    ollama serve
-    ```
+1. **Start Ollama**
+   - Windows (PowerShell):
 
-3. **Download a model** (recommended: mistral)
-  ```bash
-  ollama pull mistral
-  ```
+     ```powershell
+     ollama serve
+     ```
 
-4. **Configure the app**
-  - Copy the example environment file:
-    ```bash
-    cp .env.example .env
-    ```
-  - Ensure it contains:
-    ```
-    OLLAMA_URL=http://localhost:11434
-    ```
+   - macOS/Linux (Terminal):
 
-5. **Open the chat UI**
-  - http://localhost/ananya/ananya_files/chat.php
+     ```bash
+     ollama serve
+     ```
 
-**Troubleshooting**
+1. **Download a model** (recommended: mistral)
+
+   ```bash
+   ollama pull mistral
+   ```
+
+1. **Configure the app**
+   - Copy the example environment file:
+
+     ```bash
+     cp .env.example .env
+     ```
+
+   - Ensure it contains:
+
+     ```env
+     OLLAMA_URL=http://localhost:11434
+     ```
+
+1. **Open the chat UI**
+   - <http://localhost/ananya/ananya_files/chat.php>
+
+#### Troubleshooting
 
 - **Port already in use (11434)**
   - Ollama is probably already running. Check:
+
     ```powershell
     Get-Process ollama
     ```
 
 - **Model not found**
   - Pull it first:
+
     ```bash
     ollama pull mistral
     ```
 
 - **No response from model**
   - Make sure Ollama is running:
+
     ```bash
     ollama serve
     ```
@@ -82,92 +94,102 @@ This project can use Ollama for local, free LLM responses (no API key needed).
 The MCP server runs a local orchestration service that calls Ananya APIs as tools.
 
 1. **Install Python 3.10+**
-  - https://www.python.org/downloads/
-  - On Windows, check **Add Python to PATH** during install.
+   - <https://www.python.org/downloads/>
+   - On Windows, check **Add Python to PATH** during install.
 
-2. **Install MCP dependencies**
-  ```powershell
-  cd ananya/ananya_files/mcp_server
-  python -m pip install -r requirements.txt
-  ```
+1. **Install MCP dependencies**
 
-3. **Configure MCP environment**
-  - Edit `ananya/ananya_files/mcp_server/.env` and set:
-  ```
-  LLM_PROVIDER=ollama
-  OLLAMA_URL=http://localhost:11434
-  LLM_MODEL=mistral
-  API_BASE_URL=http://localhost/ananya/ananya_files/api.php
-  MCP_HOST=localhost
-  MCP_PORT=8000
-  ```
+   ```powershell
+   cd ananya/ananya_files/mcp_server
+   python -m pip install -r requirements.txt
+   ```
 
-4. **Start the MCP server**
-  ```powershell
-  cd ananya/ananya_files/mcp_server
-  python server.py
-  ```
+1. **Configure MCP environment**
+   - Edit `ananya/ananya_files/mcp_server/.env` and set:
 
-5. **Verify it is running**
-  - Visit: http://localhost:8000/health
-  - Then open: http://localhost/ananya/ananya_files/chat.php
+     ```env
+     LLM_PROVIDER=ollama
+     OLLAMA_URL=http://localhost:11434
+     LLM_MODEL=mistral
+     API_BASE_URL=http://localhost/ananya/ananya_files/api.php
+     MCP_HOST=localhost
+     MCP_PORT=8000
+     ```
+
+1. **Start the MCP server**
+
+   ```powershell
+   cd ananya/ananya_files/mcp_server
+   python server.py
+   ```
+
+1. **Verify it is running**
+   - Visit: <http://localhost:8000/health>
+   - Then open: <http://localhost/ananya/ananya_files/chat.php>
 
 ### MCP Server (Remote Setup for Live Demos)
 
-Use this when hosting at http://ananya.telugupuzzle.com for weekly demos.
+Use this when hosting at <http://ananya.telugupuzzle.com> for weekly demos.
 
 1. **Deploy code to the server**
-  - Ensure `ananya_files/` and `mcp_server/` are present on the server.
+   - Ensure `ananya_files/` and `mcp_server/` are present on the server.
 
-2. **Install Python 3.10+ on the server**
-  - Confirm `python` is available on PATH.
+1. **Install Python 3.10+ on the server**
+   - Confirm `python` is available on PATH.
 
-3. **Install MCP dependencies**
-  ```bash
-  cd /path/to/ananya/ananya_files/mcp_server
-  python -m pip install -r requirements.txt
-  ```
+1. **Install MCP dependencies**
 
-4. **Configure MCP environment**
-  - Edit `/path/to/ananya/ananya_files/mcp_server/.env`:
-  ```
-  LLM_PROVIDER=ollama
-  OLLAMA_URL=http://localhost:11434
-  LLM_MODEL=mistral
-  API_BASE_URL=http://ananya.telugupuzzle.com/ananya_files/api.php
-  MCP_HOST=0.0.0.0
-  MCP_PORT=8000
-  ```
+   ```bash
+   cd /path/to/ananya/ananya_files/mcp_server
+   python -m pip install -r requirements.txt
+   ```
 
-5. **Start MCP server (keep it running)**
-  ```bash
-  cd /path/to/ananya/ananya_files/mcp_server
-  python server.py
-  ```
+1. **Configure MCP environment**
+   - Edit `/path/to/ananya/ananya_files/mcp_server/.env`:
 
-6. **Verify from the server**
-  - http://localhost:8000/health
+     ```env
+     LLM_PROVIDER=ollama
+     OLLAMA_URL=http://localhost:11434
+     LLM_MODEL=mistral
+     API_BASE_URL=http://ananya.telugupuzzle.com/ananya_files/api.php
+     MCP_HOST=0.0.0.0
+     MCP_PORT=8000
+     ```
 
-7. **If you need public access to MCP**
-  - Place it behind a reverse proxy (Nginx/Apache) or SSH tunnel.
-  - Example Nginx location:
-  ```nginx
-  location /mcp/ {
-      proxy_pass http://127.0.0.1:8000/;
-      proxy_set_header Host $host;
-      proxy_set_header X-Real-IP $remote_addr;
-      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-  }
-  ```
-  - Example Apache (enable `proxy` and `proxy_http`):
-  ```apache
-  ProxyPass /mcp/ http://127.0.0.1:8000/
-  ProxyPassReverse /mcp/ http://127.0.0.1:8000/
-  ProxyPreserveHost On
-  RequestHeader set X-Forwarded-Proto "https"
-  ```
+1. **Start MCP server (keep it running)**
+
+   ```bash
+   cd /path/to/ananya/ananya_files/mcp_server
+   python server.py
+   ```
+
+1. **Verify from the server**
+   - <http://localhost:8000/health>
+
+1. **If you need public access to MCP**
+   - Place it behind a reverse proxy (Nginx/Apache) or SSH tunnel.
+   - Example Nginx location:
+
+     ```nginx
+     location /mcp/ {
+         proxy_pass http://127.0.0.1:8000/;
+         proxy_set_header Host $host;
+         proxy_set_header X-Real-IP $remote_addr;
+         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+     }
+     ```
+
+   - Example Apache (enable `proxy` and `proxy_http`):
+
+     ```apache
+     ProxyPass /mcp/ http://127.0.0.1:8000/
+     ProxyPassReverse /mcp/ http://127.0.0.1:8000/
+     ProxyPreserveHost On
+     RequestHeader set X-Forwarded-Proto "https"
+     ```
 
 ### API Usage
+
 ```bash
 # Basic text length example
 GET http://localhost/ananya/api.php/text/length?string=అమెరికా&language=telugu
@@ -187,7 +209,7 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ### **📊 Total API Endpoints: 51**
 
 | **Category** | **Count** | **Percentage** | **Description** |
-|--------------|-----------|----------------|-----------------|
+| ------------ | --------- | -------------- | --------------- |
 | 🔤 **Characters** | 10 endpoints | 19.6% | Character manipulation & analysis |
 | 📝 **Text** | 5 endpoints | 9.8% | Basic text operations |
 | 🔍 **Analysis** | 17 endpoints | 33.3% | Advanced linguistic analysis |
@@ -197,7 +219,8 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 | 🔐 **Authentication** | 1 endpoint | 2.0% | User management |
 
 ### **🔤 Characters Operations (10 endpoints)**
-```
+
+```text
 1. characters/base                    - Get base characters
 2. characters/logical                 - Get logical characters
 3. characters/codepoints             - Get Unicode codepoints
@@ -211,7 +234,8 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ```
 
 ### **📝 Text Operations (5 endpoints)**
-```
+
+```text
 1. text/length                       - Calculate text length
 2. text/reverse                      - Reverse text
 3. text/randomize                    - Randomize character order
@@ -220,7 +244,8 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ```
 
 ### **🔍 Analysis Operations (17 endpoints)**
-```
+
+```text
 1. analysis/is-palindrome            - Check if palindrome
 2. analysis/word-strength            - Calculate word strength
 3. analysis/word-weight              - Calculate word weight
@@ -241,7 +266,8 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ```
 
 ### **⚖️ Comparison Operations (7 endpoints)**
-```
+
+```text
 1. comparison/equals                 - Check equality
 2. comparison/starts-with            - Check prefix match
 3. comparison/ends-with              - Check suffix match
@@ -252,7 +278,8 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ```
 
 ### **✅ Validation Operations (8 endpoints)**
-```
+
+```text
 1. validation/contains-space         - Check for spaces
 2. validation/contains-char          - Check for specific character
 3. validation/contains-logical-chars - Check for logical characters
@@ -264,14 +291,16 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ```
 
 ### **🛠️ Utility Operations (3 endpoints)**
-```
+
+```text
 1. utility/length-no-spaces          - Length excluding spaces
 2. utility/length-no-spaces-commas   - Length excluding spaces & commas
 3. utility/length-alternative        - Alternative length calculation
 ```
 
 ### **🔐 Authentication (1 endpoint)**
-```
+
+```text
 1. auth/user-exists                  - Check user existence
 ```
 
@@ -292,13 +321,14 @@ GET http://localhost/ananya/api.php/text/length?string=అమెరికా&lan
 ## 🏗️ Architecture
 
 - **Clean URLs**: RESTful API design with `api.php/category/action` structure
-- **Single Entry Point**: All requests routed through `api.php` 
+- **Single Entry Point**: All requests routed through `api.php`
 - **JSON Responses**: Consistent response format with proper error handling
 - **Language Agnostic**: Same API works across all supported languages
 
 ## 💡 Usage Examples
 
 ### Telugu Text Analysis
+
 ```bash
 # Get logical characters
 GET api.php/characters/logical?string=అమెరికా&language=telugu
@@ -314,6 +344,7 @@ GET api.php/analysis/word-strength?string=అమెరికా&language=telugu
 ```
 
 ### Cross-Language Comparison
+
 ```bash
 # Compare Telugu and English
 GET api.php/comparison/compare?string=అమెరికా&input2=america&language=telugu
@@ -323,11 +354,11 @@ GET api.php/comparison/compare?string=అమెరికా&input2=america&langu
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Run tests (`python api_telugu_tester.py`)
-4. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-5. Push to the branch (`git push origin feature/AmazingFeature`)
-6. Open a Pull Request
+1. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+1. Run tests (`python api_telugu_tester.py`)
+1. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+1. Push to the branch (`git push origin feature/AmazingFeature`)
+1. Open a Pull Request
 
 ## 📄 License
 
@@ -342,6 +373,4 @@ This project is open source. See the source files for more information.
 - **Full documentation** with interactive examples
 - **Unicode compliant** with proper handling of complex characters
 - **Production ready** with error handling and response caching
-
-## 🎯 Key Features
-- Go to **https://ananya.telugupuzzles.com** to play with Telugu and Technology.
+- Go to <https://ananya.telugupuzzles.com> to play with Telugu and Technology.
