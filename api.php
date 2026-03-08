@@ -15,8 +15,9 @@ require_once("word_processor.php");
 // Get the request path
 $request = $_SERVER['REQUEST_URI'];
 $path = parse_url($request, PHP_URL_PATH);
-$path = str_replace('/ananya/api.php/', '', $path);
-$path = str_replace('/ananya/api.php', '', $path);
+
+// Remove api.php and any path prefix (works for both /ananya/api.php/ and /api.php/)
+$path = preg_replace('#^.*/api\.php/?#', '', $path);
 
 // Remove leading slash if present
 $path = ltrim($path, '/');

@@ -1,11 +1,7 @@
-/*Set local = true for local api endpoints, else set local = false to use thisisjava.com domain endpoints */
-var local = true;
-
-if (local == true) {
-    apiURL = "http://localhost/ananya/";
-} else {
-    apiURL = "https://ananya.thisisjava.com/";
-}
+/* Auto-detect base URL so tests work in both local (/ananya/) and root deployments. */
+var currentPath = window.location.pathname.toLowerCase();
+var basePath = currentPath.indexOf('/ananya/') !== -1 ? '/ananya/' : '/';
+var apiURL = window.location.origin + basePath;
 
 const apiEndpoints = {
     // api/auth/
