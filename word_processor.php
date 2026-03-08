@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 //require("telugu_parser.php");
 
 /*
@@ -636,7 +636,11 @@ class wordProcessor
 				// live version, uncomment for live site
 				//$myfile = fopen("/home2/icsbinco/public_html/indic-wp/telugu_seed.txt", "r") or die("Unable to open file!");
 				// local version, comment out for live site
-				$myfile = fopen("telugu_seed.txt", "r") or die("Unable to open file!");
+				$seedFile = __DIR__ . DIRECTORY_SEPARATOR . "telugu_seed.txt";
+				$myfile = fopen($seedFile, "r");
+				if ($myfile === false) {
+					return ["Unable to open telugu_seed.txt"];
+				}
 
 				$lines = [];
 				$word = [];
@@ -772,7 +776,11 @@ class wordProcessor
 		// live version, uncomment for live site
 		//$myfile = fopen("/home2/icsbinco/public_html/indic-wp/telugu_seed.txt", "r") or die("Unable to open file!");
 		// local version, comment out for live site
-		$myfile = fopen("telugu_seed.txt", "r") or die("Unable to open file!");
+		$seedFile = __DIR__ . DIRECTORY_SEPARATOR . "telugu_seed.txt";
+		$myfile = fopen($seedFile, "r");
+		if ($myfile === false) {
+			return;
+		}
 
 		$lines = [];
 		$word = [];
@@ -1509,7 +1517,9 @@ class wordProcessor
         if($langLower=="english"){
             $myArray=array();
             
-           if(!$fh=fopen("english.txt","r") ){
+		   $englishFile = __DIR__ . DIRECTORY_SEPARATOR . "english.txt";
+
+		   if(!$fh=fopen($englishFile,"r") ){
 			   return "File not found";
 		   }
 		   else{
@@ -1530,7 +1540,9 @@ class wordProcessor
 	}
         elseif($langLower=="telugu"){
             $teluguArray=array();
-            if(!($fh=fopen("telugu.txt","r") or die("Unable to open File"))){
+			$teluguFile = __DIR__ . DIRECTORY_SEPARATOR . "telugu.txt";
+
+			if(!($fh=fopen($teluguFile,"r"))){
 				return "File not found";
 			};
             if ($fh){
