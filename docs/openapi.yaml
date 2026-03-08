@@ -15,12 +15,14 @@ info:
   version: 2.0.0
 
 servers:
-  - url: /ananya/api.php
-    description: Current Environment Server (auto-detect host)
+  - url: ../api.php
+    description: Current Environment Server (auto-detect host and base path)
   - url: http://localhost/ananya/api.php
     description: Local Development Server
   - url: https://jasthi.com/ananya/api.php
     description: Production Server
+  - url: https://ananya.telugupuzzles.com/api.php
+    description: Production Server (root deployment)
 
 tags:
   - name: Character Analysis
