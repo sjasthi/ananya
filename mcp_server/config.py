@@ -14,6 +14,34 @@ load_dotenv(_env_path)
 LLM_PROVIDER = os.getenv('LLM_PROVIDER', 'gemini')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', '')
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
+GROQ_API_KEY = os.getenv('GROQ_API_KEY', '')
+OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
+
+# Set default models based on provider
+LLM_MODEL = os.getenv('LLM_MODEL')
+
+
+# Switch state version of above if statements for clarity and maintainability
+DEFAULT_MODELS = {
+    'ollama': 'mistral',
+    'gemini': 'gemini-2.0-flash',
+    'groq': 'llama-3.3-70b-versatile',
+    'openai': 'gpt-4'
+}
+if not LLM_MODEL:
+    LLM_MODEL = DEFAULT_MODELS.get(LLM_PROVIDER.lower())
+
+LLM_MAX_TOKENS = int(os.getenv('LLM_MAX_TOKENS', '1200'))
+LLM_TEMPERATURE = float(os.getenv('LLM_TEMPERATURE', '0.2'))
+
+# PHP API backend
+API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost/ananya/api.php')
+
+# MCP Server
+MCP_HOST = os.getenv('MCP_HOST', 'localhost')
+MCP_PORT = int(os.getenv('MCP_PORT', '8000'))
+
+
 # Here’s the approach that best fits those goals and is stable across semesters:
 
 # Core idea: deterministic pipeline + LLM only where it adds value.
@@ -45,18 +73,3 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 # LLM is replaceable: if models change, only word suggestion quality shifts, not API correctness.
 # Students can debug in clear stages (LLM → validate → build → render).
 # If you want, I can outline the exact pipeline functions and file layout for the puzzle module so it’s easy for next semester’s team to pick up.
-OLLAMA_URL = os.getenv('OLLAMA_URL', 'http://localhost:11434')
-LLM_MODEL = os.getenv('LLM_MODEL', 'gemini-2.0-flash')
-if LLM_PROVIDER.lower() == 'ollama' and 'LLM_MODEL' not in os.environ:
-    LLM_MODEL = 'mistral'
-elif LLM_PROVIDER.lower() == 'gemini' and 'LLM_MODEL' not in os.environ:
-    LLM_MODEL = 'gemini-2.0-flash'
-LLM_MAX_TOKENS = int(os.getenv('LLM_MAX_TOKENS', '1200'))
-LLM_TEMPERATURE = float(os.getenv('LLM_TEMPERATURE', '0.2'))
-
-# PHP API backend
-API_BASE_URL = os.getenv('API_BASE_URL', 'http://localhost/ananya/ananya_files/api.php')
-
-# MCP Server
-MCP_HOST = os.getenv('MCP_HOST', 'localhost')
-MCP_PORT = int(os.getenv('MCP_PORT', '8000'))
