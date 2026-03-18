@@ -10,7 +10,9 @@ User (chat.php) → chat.js → chat_api.php → MCP Server (/chat)
     → MCP executes tools → calls PHP api.php endpoints
     → Results fed back to LLM → final answer → user
 
-Edit mcp_server/.env and replace with OPENAI_API_KEY
-restart server
-cd c:\xampp\htdocs\ananya\ananya_files\mcp_server
+Edit mcp_server/.env and replace with API_KEY
+
+===============================================
+Start Server
+cd c:\xampp\htdocs\ananya\mcp_server
 .\venv\Scripts\python.exe server.py

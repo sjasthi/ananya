@@ -27,10 +27,7 @@ from starlette.middleware.cors import CORSMiddleware
 import uvicorn
 import openai
 
-from config import (
-    OPENAI_API_KEY, GEMINI_API_KEY, OLLAMA_URL, LLM_PROVIDER, LLM_MODEL, LLM_MAX_TOKENS, LLM_TEMPERATURE,
-    API_BASE_URL, MCP_HOST, MCP_PORT,
-)
+from config import *  # Import all config variables for easy access
 from api_client import AnanyaAPIClient
 
 # ── Logging ─────────────────────────────────────────────────────────────
@@ -724,7 +721,7 @@ async def _execute_tool(name: str, arguments: dict) -> str:
 
 
 def _create_llm_client() -> openai.AsyncOpenAI:
-    """Create an OpenAI-compatible client for Gemini, OpenAI, or Ollama."""
+    """Create an OpenAI-compatible client for Gemini, Groq, OpenAI, or Ollama."""
     provider = LLM_PROVIDER.lower()
     if provider == "gemini":
         return openai.AsyncOpenAI(
@@ -732,6 +729,14 @@ def _create_llm_client() -> openai.AsyncOpenAI:
             base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
             timeout=60.0,
         )
+    
+    if provider == "groq":
+        return openai.AsyncOpenAI(
+            api_key=GROQ_API_KEY,
+            base_url="https://api.groq.com/openai/v1",
+            timeout=60.0,
+        )
+    
     if provider == "ollama":
         base_url = OLLAMA_URL.rstrip("/") + "/v1"
         return openai.AsyncOpenAI(
@@ -739,7 +744,10 @@ def _create_llm_client() -> openai.AsyncOpenAI:
             base_url=base_url,
             timeout=120.0,  # Local Ollama: generous for cold starts + tool calls
         )
-    return openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+    if provider == "openai":
+        return openai.AsyncOpenAI(api_key=OPENAI_API_KEY)
+
+    raise ValueError(f"Unknown LLM_PROVIDER in config: {provider}")
 
 
 def _format_direct_answer(tool_name: str, params: dict, tool_result: str, question: str) -> str:
@@ -833,145 +841,116 @@ Do not show raw JSON to the user unless they specifically ask for it."""
 
 
 async def chat_endpoint(request: Request) -> JSONResponse:
-    """
-    POST /chat
-    Body: {"question": "...", "language": "english"}
-    Returns: {"question": "...", "language": "...", "answer": "..."}
-
-    Three-path orchestration:
-      Stage 1 — LLM identifies intent + specific tool + params (compact prompt, ~3-5s)
-        → "tool"   : fast path — call tool directly, format answer, return (no loop)
-        → "direct" : LLM answers from knowledge with no tools
-        → "multi"  : keyword-filter tools, run orchestration loop (Stage 2)
-    """
+    """Agentic execution loop supporting multi-step tool calling."""
     try:
         body = await request.json()
-    except Exception:
-        return JSONResponse({"error": "Invalid JSON body"}, status_code=400)
-
-    question = (body.get("question") or "").strip()
-    language = body.get("language", "english")
-
-    if not question:
-        return JSONResponse({"error": "Missing question parameter"}, status_code=400)
-
-    provider = LLM_PROVIDER.lower()
-    if provider == "gemini" and not GEMINI_API_KEY:
-        return JSONResponse({
-            "question": question, "language": language,
-            "answer": "Error: GEMINI_API_KEY is not configured. Please set it in mcp_server/.env"
-        })
-    if provider == "openai" and not OPENAI_API_KEY:
-        return JSONResponse({
-            "question": question, "language": language,
-            "answer": "Error: OPENAI_API_KEY is not configured. Please set it in mcp_server/.env"
-        })
-
-    client = _create_llm_client()
-
-    # ── Stage 1: LLM identifies intent + specific tool + extracts params ──────
-    intent = await _identify_intent_and_tool(client, question, language)
-    logger.info(f"Stage 1 → {intent}")
-
-    # ── Fast path: single tool identified ────────────────────────────────────
-    if intent["action"] == "tool":
-        tool_name = intent["tool"]
-        tool_args = intent.get("params", {})
-
-        # Verify all required params are present; if not, drop to multi-path
-        # (Stage 1 sometimes extracts only partial params for multi-arg tools)
-        tool_obj = mcp._tool_manager._tools.get(tool_name)
-        required = tool_obj.parameters.get("required", []) if tool_obj else []
-        missing = [p for p in required if p not in tool_args]
-        if missing:
-            logger.warning(f"Fast path: missing required params {missing} for {tool_name} — falling to multi")
-            intent = {"action": "multi"}
-        else:
-            logger.info(f"Fast path — {tool_name}({tool_args})")
-            tool_result = await _execute_tool(tool_name, tool_args)
-            logger.info(f"Tool result: {tool_result[:200]}")
-            answer = _format_direct_answer(tool_name, tool_args, tool_result, question)
-            return JSONResponse({"question": question, "language": language, "answer": answer})
-
-    # ── Direct path: LLM answers from knowledge, no tools ────────────────────
-    if intent["action"] == "direct":
-        logger.info("Direct LLM response (no tools)")
+        question = body.get("question", "")
+        language = body.get("language", "english").lower()
+        
+        if not question:
+            return JSONResponse({"answer": "No question provided.", "llm_consulted": False}, status_code=400)
+            
+        client = _create_llm_client()
+        
+        # 1. Initialize the conversation history
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": f"[Language: {language}]\n\n{question}"},
+            {
+                "role": "system", 
+                "content": (
+                    "You are an AI assistant for the Ananya word processor. "
+                    "You have access to a suite of text manipulation tools. "
+                    "If a request requires multiple steps (like reversing a word, "
+                    "then appending a character), call the tools one by one in sequence. "
+                    "Wait for the result of the first tool before calling the second. "
+                    f"The user's preferred language is {language}."
+                )
+            },
+            {"role": "user", "content": question}
         ]
-        try:
-            response = await client.chat.completions.create(
-                model=LLM_MODEL, messages=messages,
-                max_tokens=LLM_MAX_TOKENS, temperature=LLM_TEMPERATURE,
-            )
-            answer = (response.choices[0].message.content or "").strip()
-        except openai.APIError as e:
-            answer = f"LLM service error: {str(e)}"
-        return JSONResponse({"question": question, "language": language, "answer": answer})
 
-    # ── Multi path: keyword-filter tools, orchestration loop ─────────────────
-    all_tools = _build_openai_tools()
-    categories = _keyword_match_categories(question)
-    if categories:
-        filtered_tools = _filter_tools_by_categories(all_tools, categories)
-        logger.info(f"Stage 2 multi — {len(filtered_tools)} tools for categories {categories}")
-    else:
-        filtered_tools = all_tools
-        logger.info(f"Stage 2 multi — all {len(all_tools)} tools (no keyword match)")
-
-    messages = [
-        {"role": "system", "content": SYSTEM_PROMPT},
-        {"role": "user", "content": f"[Language: {language}]\n\n{question}"},
-    ]
-
-    max_iterations = 10
-    for iteration in range(max_iterations):
-        try:
+        # 1. Extract the tool schemas from your FastMCP instance dynamically
+        available_tools = []
+        
+        # FastMCP internal storage varies slightly by version. This safely covers the standard paths:
+        if hasattr(mcp, "_tool_manager"):
+            tools_list = mcp._tool_manager.list_tools()
+        else:
+            tools_dict = getattr(mcp, "tools", getattr(mcp, "_tools", {}))
+            tools_list = tools_dict.values() if isinstance(tools_dict, dict) else tools_dict
+            
+        for t in tools_list:
+            available_tools.append({
+                "type": "function",
+                "function": {
+                    "name": getattr(t, "name", getattr(t, "__name__", "unknown")),
+                    "description": getattr(t, "description", getattr(t, "__doc__", "")),
+                    # FastMCP versions map schema data to either 'inputSchema' or 'parameters'
+                    "parameters": getattr(t, "inputSchema", getattr(t, "parameters", {"type": "object", "properties": {}}))
+                }
+            })        
+        # 2. Start the Agentic Loop
+        max_iterations = 5
+        iterations = 0
+        
+        while iterations < max_iterations:
+            iterations += 1
+            logger.info(f"Agent Loop Iteration: {iterations}")
+            
+            # Call the LLM
             response = await client.chat.completions.create(
                 model=LLM_MODEL,
                 messages=messages,
-                tools=filtered_tools if filtered_tools else None,
-                max_tokens=LLM_MAX_TOKENS,
-                temperature=LLM_TEMPERATURE,
+                tools=available_tools,
+                tool_choice="auto",
+                parallel_tool_calls=False,  # Ensure tools are called sequentially, not in parallel
             )
-        except openai.APIError as e:
-            logger.error(f"OpenAI API error: {e}")
-            return JSONResponse({
-                "question": question, "language": language,
-                "answer": f"LLM service error: {str(e)}"
-            })
+            
+            response_message = response.choices[0].message
+            messages.append(response_message)
+            
+            # 3. Check if the LLM decided to call any tools
+            if not response_message.tool_calls:
+                logger.info("LLM provided final text answer. Exiting loop.")
+                return JSONResponse({
+                    "answer": response_message.content,
+                    "llm_consulted": True,
+                    "source": "mcp_agent"
+                })
 
-        choice = response.choices[0]
-        message = choice.message
+            # 4. If tools WERE called, execute them
+            for tool_call in response_message.tool_calls:
+                function_name = tool_call.function.name
+                
+                try:
+                    arguments = json.loads(tool_call.function.arguments)
+                    logger.info(f"Executing Tool: {function_name} with args {arguments}")
+                    
+                    # Execute the PHP API tool
+                    api_result = await mcp.call_tool(function_name, arguments)
+                    result_string = str(api_result)
+                    
+                except Exception as e:
+                    logger.error(f"Tool execution failed: {e}")
+                    result_string = f"Error executing tool: {str(e)}"
+                
+                # 5. Feed the API result BACK to the LLM
+                messages.append({
+                    "role": "tool",
+                    "tool_call_id": tool_call.id,
+                    "name": function_name,
+                    "content": result_string
+                })
+                
+        # If it hits max_iterations
+        return JSONResponse({
+            "answer": "I required too many steps to complete this request and had to stop.",
+            "llm_consulted": True,
+            "source": "mcp_agent_timeout"
+        })
 
-        if choice.finish_reason == "stop" or not message.tool_calls:
-            answer = (message.content or "").strip()
-            logger.info(f"Multi path complete after {iteration + 1} iteration(s)")
-            return JSONResponse({"question": question, "language": language, "answer": answer})
-
-        messages.append(message.model_dump())
-
-        for tool_call in message.tool_calls:
-            fn_name = tool_call.function.name
-            try:
-                fn_args = json.loads(tool_call.function.arguments)
-            except json.JSONDecodeError:
-                fn_args = {}
-            logger.info(f"Executing tool: {fn_name}({fn_args})")
-            tool_result = await _execute_tool(fn_name, fn_args)
-            logger.info(f"Tool result: {tool_result[:200]}")
-            messages.append({
-                "role": "tool",
-                "tool_call_id": tool_call.id,
-                "content": tool_result,
-            })
-
-    return JSONResponse({
-        "question": question, "language": language,
-        "answer": "I processed your request but it required too many steps. Please try a simpler question."
-    })
-
+    except Exception as e:
+        logger.error(f"Chat endpoint error: {e}")
+        return JSONResponse({"answer": f"Server error: {str(e)}", "llm_consulted": False}, status_code=500)
 
 async def health_endpoint(request: Request) -> JSONResponse:
     """GET /health — simple health check."""
