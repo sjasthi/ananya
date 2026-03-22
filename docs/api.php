@@ -625,7 +625,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/filler?count=5&language=english&type=consonant
+                            <?= $apiBase ?>characters/filler?count=5&language=English&type=consonant
                         </div>
 
                         <h6>Example Response</h6>
@@ -1487,7 +1487,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>text/split?string=hello-world&delimiter=-&language=english
+                            <?= $apiBase ?>text/split?string=hello-world&delimiter=-&language=English
                         </div>
 
                         <h6>Example Response</h6>
