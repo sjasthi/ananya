@@ -227,6 +227,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "All words formation check completed"
+                string: "hello"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/can-make-word:
     get:
       tags:
@@ -250,6 +260,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Word formation check completed"
+                string: "hello"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/detect-language:
     get:
       tags:
@@ -276,6 +296,7 @@ paths:
                 success: true
                 result: "English"
                 error: null
+
   /analysis/get-match-id-string:
     get:
       tags:
@@ -299,6 +320,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Match ID string generated"
+                string: "abc"
+                language: "English"
+                data: "115"
+                success: true
+                result: "115"
+                error: null
+
   /analysis/head-tail-words:
     get:
       tags:
@@ -322,6 +353,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Head and tail words check completed"
+                string: "hello"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/intersecting-rank:
     get:
       tags:
@@ -345,6 +386,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Intersecting rank calculated"
+                string: "hello"
+                language: "English"
+                data: 3
+                success: true
+                result: 3
+                error: null
+
   /analysis/is-anagram:
     get:
       tags:
@@ -368,6 +419,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Anagram check completed"
+                string: "listen"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/is-consonant:
     get:
       tags:
@@ -390,6 +451,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Consonant check completed"
+                string: "b"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/is-palindrome:
     get:
       tags:
@@ -406,28 +477,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
-  /validation/is-vowel:
-    get:
-      tags:
-        - Character Validation
-      summary: Check if character is vowel
-      description: Determine if the given character is a vowel (uses the first logical character of the input)
-      parameters:
-        - name: string
-          in: query
-          required: true
-          description: Character to check (first logical character is used)
-          schema:
-            type: string
-            example: "అ"
-        - $ref: '#/components/parameters/languageOptional'
-      responses:
-        '200':
-          description: Successful operation
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Palindrome check completed"
+                string: "racecar"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/ladder-words:
     get:
       tags:
@@ -451,6 +510,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Ladder words check completed"
+                string: "cat"
+                language: "English"
+                data: true
+                success: true
+                result: true
+                error: null
+
   /analysis/word-level:
     get:
       tags:
@@ -467,6 +536,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Word level calculated"
+                string: "hello"
+                language: "English"
+                data: 2
+                success: true
+                result: 2
+                error: null
+
   /analysis/word-strength:
     get:
       tags:
@@ -483,6 +562,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Word strength calculated"
+                string: "America"
+                language: "English"
+                data: 42
+                success: true
+                result: 42
+                error: null
+
   /analysis/word-weight:
     get:
       tags:
@@ -499,6 +588,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Word weight calculated"
+                string: "computer"
+                language: "English"
+                data: 98
+                success: true
+                result: 98
+                error: null
+
   /analysis/parse-to-logical-characters:
     get:
       tags:
@@ -515,6 +614,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Text parsed to logical characters (alternative)"
+                string: "hello"
+                language: "English"
+                data:
+                  - "h"
+                  - "e"
+                  - "l"
+                  - "l"
+                  - "o"
+                success: true
+                result:
+                  - "h"
+                  - "e"
+                  - "l"
+                  - "l"
+                  - "o"
+                error: null
+
   /analysis/role:
     get:
       tags:
@@ -531,6 +650,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Character role analyzed"
+                string: "a"
+                language: "English"
+                data: "vowel"
+                success: true
+                result: "vowel"
+                error: null
+
   /analysis/split-into-chunks:
     get:
       tags:
@@ -547,6 +676,46 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Text split into chunks"
+                string: "hello"
+                language: "English"
+                data:
+                  - "h"
+                  - "e"
+                  - "l"
+                  - "l"
+                  - "o"
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                success: true
+                result:
+                  - "h"
+                  - "e"
+                  - "l"
+                  - "l"
+                  - "o"
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                  - ""
+                error: null
+
   /analysis/unique-intersecting-chars:
     get:
       tags:
@@ -570,6 +739,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Unique intersecting logical characters calculated"
+                string: "hello"
+                language: "English"
+                data:
+                  - "l"
+                  - "o"
+                success: true
+                result:
+                  - "l"
+                  - "o"
+                error: null
+
   /analysis/unique-intersecting-rank:
     get:
       tags:
@@ -586,6 +769,38 @@ paths:
             type: string
             example: "అన్న"
         - $ref: '#/components/parameters/languageRequired'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Unique intersecting rank calculated"
+                string: "hello"
+                language: "English"
+                data: 2
+                success: true
+                result: 2
+                error: null
+
+  /validation/is-vowel:
+    get:
+      tags:
+        - Character Validation
+      summary: Check if character is vowel
+      description: Determine if the given character is a vowel (uses the first logical character of the input)
+      parameters:
+        - name: string
+          in: query
+          required: true
+          description: Character to check (first logical character is used)
+          schema:
+            type: string
+            example: "అ"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1064,7 +1279,7 @@ paths:
       tags:
         - String Comparison
       summary: Compare strings (case-insensitive)
-      description: Compare two strings ignoring case differences
+      description: Compare two strings in dictionary order while ignoring uppercase/lowercase differences. Returns 0 if equal, a negative value if the first string comes before the second, or a positive value if it comes after.
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - name: input2
@@ -1093,7 +1308,7 @@ paths:
       tags:
         - String Comparison
       summary: Compare strings
-      description: Compare two strings and return ordering result
+      description: Compare two strings in dictionary order and return an ordering result. Returns 0 if equal, a negative value if the first string comes before the second, or a positive value if it comes after.
       parameters:
         - $ref: '#/components/parameters/stringRequired'
         - name: input2
@@ -1211,7 +1426,7 @@ paths:
       description: Calculate the length of the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1222,11 +1437,11 @@ paths:
               example:
                 response_code: 200
                 message: "Length calculated"
-                string: "అనన్య"
-                language: "telugu"
-                data: "3"
+                string: "hello"
+                language: "english"
+                data: 5
                 success: true
-                result: "3"
+                result: 5
                 error: null
   /text/randomize:
     get:
@@ -1236,7 +1451,7 @@ paths:
       description: Randomly shuffle the logical characters in the input string
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1244,6 +1459,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Text randomized"
+                string: "hello"
+                language: "english"
+                data: ["l", "o", "e", "l", "h"]
+                success: true
+                result: ["l", "o", "e", "l", "h"]
+                error: null
   /text/replace:
     get:
       tags:
@@ -1266,7 +1490,7 @@ paths:
           schema:
             type: string
             example: "ఆ"
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1274,6 +1498,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Text replaced"
+                string: "hello"
+                language: "english"
+                data: "hio"
+                success: true
+                result: "hio"
+                error: null
         '400':
           description: Missing required parameter (search)
           content:
@@ -1288,7 +1521,7 @@ paths:
       description: Reverse the input string while preserving logical character boundaries
       parameters:
         - $ref: '#/components/parameters/stringRequired'
-        - $ref: '#/components/parameters/languageRequired'
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1296,6 +1529,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Text reversed"
+                string: "hello"
+                language: "english"
+                data: "olleh"
+                success: true
+                result: "olleh"
+                error: null
   /text/split:
     get:
       tags:
@@ -1307,12 +1549,19 @@ paths:
         - name: delimiter
           in: query
           required: false
-          description: "Delimiter to split on (default: -). Can also use input2 parameter."
+          description: "Delimiter to split on (default: -). Preferred parameter for new integrations."
           schema:
             type: string
             default: "-"
             example: "-"
-        - $ref: '#/components/parameters/languageRequired'
+        - name: input2
+          in: query
+          required: false
+          description: "Legacy alias for delimiter. If both delimiter and input2 are provided, delimiter takes precedence."
+          schema:
+            type: string
+            example: "-"
+        - $ref: '#/components/parameters/languageOptional'
       responses:
         '200':
           description: Successful operation
@@ -1320,6 +1569,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Text split"
+                string: "hello-world"
+                language: "english"
+                data: "hello | world"
+                success: true
+                result: "hello | world"
+                error: null
 
   # ===================================================================
   # CHARACTER VALIDATION (requires string; language optional, defaults to telugu)
@@ -1542,6 +1800,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Index found"
+                string: "అమెరికాఆస్ట్రేలియా"
+                language: "telugu"
+                data: 6
+                success: true
+                result: 6
+                error: null
         '400':
           description: Missing required parameters
           content:
@@ -1636,6 +1903,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Length without spaces and commas calculated"
+                string: "hello, world"
+                language: "english"
+                data: 10
+                success: true
+                result: 10
+                error: null
         '400':
           description: Unsupported override or unable to auto-detect english/telugu
           content:
@@ -1658,6 +1934,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApiResponse'
+              example:
+                response_code: 200
+                message: "Length without spaces calculated"
+                string: "hello world"
+                language: "english"
+                data: 10
+                success: true
+                result: 10
+                error: null
         '400':
           description: Unsupported override or unable to auto-detect english/telugu
           content:

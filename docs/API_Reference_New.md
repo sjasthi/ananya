@@ -208,20 +208,12 @@ Checks if two strings are equal.
 GET /comparison/equals?string={text1}&language={lang}&input2={text2}
 ```
 
-#### Check Starts With
+#### Compare Strings (Case-Insensitive)
 
-Checks if string starts with substring.
-
-```text
-GET /comparison/starts-with?string={text}&language={lang}&input2={prefix}
-```
-
-#### Check Ends With
-
-Checks if string ends with substring.
+Compares two strings lexicographically while ignoring case.
 
 ```text
-GET /comparison/ends-with?string={text}&language={lang}&input2={suffix}
+GET /comparison/compare-ignore-case?string={text1}&language={lang}&input2={text2}
 ```
 
 #### Compare Strings
@@ -229,7 +221,23 @@ GET /comparison/ends-with?string={text}&language={lang}&input2={suffix}
 Compares two strings lexicographically.
 
 ```text
-GET /comparison/compare?string={text1}&language={lang}&input2={text2}
+GET /comparison/compare-to?string={text1}&language={lang}&input2={text2}
+```
+
+#### Check Intersecting Characters
+
+Checks whether two strings share any logical characters.
+
+```text
+GET /comparison/is-intersecting?string={text1}&language={lang}&input2={text2}
+```
+
+#### Check Reverse Equality
+
+Checks whether the reverse of the first string equals the second string.
+
+```text
+GET /comparison/reverse-equals?string={text1}&language={lang}&input2={text2}
 ```
 
 ### Validation Operations

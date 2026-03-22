@@ -13,6 +13,8 @@ const apiEndpoints = {
     areLadderWords: "api/analysis/ladder-words.php",
     canMakeAllWords: "api/analysis/can-make-all-words.php",
     canMakeWord: "api/analysis/can-make-word.php",
+    characterRole: "api.php/analysis/role",
+    detectLanguageLegacy: "api.php/analysis/detect-language",
     getIntersectingRank: "api/analysis/intersecting-rank.php",
     getMatchIdString: "api/analysis/get-match-id-string.php",
     getUniqueIntersectingLogicalChars: "api/analysis/unique-intersecting-chars.php",
@@ -51,11 +53,15 @@ const apiEndpoints = {
     parseToLogicalChars: "api/parseToLogicalChars2.php",
 
     // api/text/
+    randomize: "api/text/randomize.php",
+    textRandomize: "api/text/randomize.php",
     replace: "api/text/replace.php",
     reverse: "api/text/reverse.php",
     splitWord: "api/text/split.php",
 
     // api/utility/
+    lengthAlternative: "api.php/utility/length-alternative",
+    utilityLanguage: "api.php/utility/language",
     getLengthNoSpaces: "api/utility/length-no-spaces.php",
     getLengthNoSpacesNoCommas: "api/utility/length-no-spaces-commas.php",
     indexOf: "api/utility/index-of.php",
@@ -139,6 +145,10 @@ function updateInputs() {
     for (var i = 0; i < inputCells.length; i++) {
         // Skip authentication input fields - they have their own test credentials
         if (inputCells[i].classList.contains("auth-input")) {
+            continue;
+        }
+        // Keep count-based endpoints numeric instead of copying universal text.
+        if (inputCells[i].id === "randomLogicalCharsInputText") {
             continue;
         }
         inputCells[i].value = input;
@@ -305,6 +315,22 @@ function formatResponseForDisplay(jsonObj, fallbackRaw) {
     return pretty;
 }
 
+function parseApiJson(rawResponse) {
+    var rawText = typeof rawResponse === "string" ? rawResponse : String(rawResponse || "");
+    var withoutBom = rawText.replace(/^\uFEFF+/, "").trim();
+
+    if (!withoutBom) {
+        throw new Error("Empty response body");
+    }
+
+    var normalized = remove_non_ascii(withoutBom);
+    if (typeof normalized !== "string" || normalized.trim() === "") {
+        throw new Error("Response body became empty after normalization");
+    }
+
+    return JSON.parse(normalized);
+}
+
 /*Async function to run the tests*/
 async function runTests() {
     const submitButton = form.querySelector('input[type="submit"]');
@@ -360,7 +386,7 @@ async function callAPI(methodName) {
 
     const singleInput = [
         // api/analysis/
-        "getWordLevel", "getWordStrength", "getWordWeight", "isPalindrome", "parseToLogicalCharacters", "splitInto15Chunks",
+        "characterRole", "detectLanguageLegacy", "getWordLevel", "getWordStrength", "getWordWeight", "isPalindrome", "parseToLogicalCharacters", "splitInto15Chunks",
         // api/auth/
         "authUserExists",
         // api/characters/
@@ -368,9 +394,9 @@ async function callAPI(methodName) {
         // api/ (legacy root)
         "getLength", "getLength2", "getLogicalChars2", "parseToLogicalChars",
         // api/text/
-        "randomize", "reverse",
+        "textRandomize", "randomize", "reverse",
         // api/utility/
-        "getLengthNoSpaces", "getLengthNoSpacesNoCommas",
+        "getLengthNoSpaces", "getLengthNoSpacesNoCommas", "lengthAlternative", "utilityLanguage",
         // api/validation/
         "charConstant", "charVowel", "containsSpace"
     ];
@@ -411,8 +437,7 @@ async function callAPI(methodName) {
             await fetch(apiURL + endpoint + '?count=' + encodeURIComponent(cellInput) + '&language=' + encodeURIComponent(languageInput) + '&type=' + encodeURIComponent(type))
                 .then(response => response.text())
                 .then(data => result = data);
-            newResult = remove_non_ascii(result);
-            const jsonObj = JSON.parse(newResult);
+            const jsonObj = parseApiJson(result);
 
             jsonElement.textContent = formatResponseForDisplay(jsonObj, result);
             actualCell.innerHTML = jsonObj.data;
@@ -507,8 +532,7 @@ async function callAPI(methodName) {
                 return;
             }
 
-            newResult = remove_non_ascii(result);
-            const jsonObj = JSON.parse(newResult);
+            const jsonObj = parseApiJson(result);
 
             jsonElement.textContent = formatResponseForDisplay(jsonObj, result);
 
@@ -572,12 +596,16 @@ async function callAPI(methodName) {
  * Removes NON-ASCII characters from strings 
  */
 function remove_non_ascii(str) {
-    if ((str === null) || (str === ''))
-        return false;
-    else
-        str = str.toString();
+    if (str === null || str === undefined) {
+        return "";
+    }
 
-    return str.replace(/[^\x20-\x7E\uC00-\u0C7F]/g, '');
+    str = str.toString();
+    if (str === "") {
+        return "";
+    }
+
+    return str.replace(/[^\x20-\x7E\u0C00-\u0C7F]/g, '');
 }
 
 
@@ -613,6 +641,10 @@ function getLanguageValues(language) {
     for (var i = 0; i < inputCells.length; i++) {
         inputCells[i].value = input;
     }
+
+    // Keep count-based endpoint on a numeric default after bulk input propagation.
+    var randomCountEl = document.getElementById("randomLogicalCharsInputText");
+    if (randomCountEl) randomCountEl.value = "5";
     
     // Set specific single-character inputs for character validation tests
     if (language == "English") {
@@ -644,6 +676,7 @@ function getDefaultValues(language) {
         document.getElementById("addCharacterAtEndInputText2").value = "a";
         document.getElementById("isIntersectingInputText2").value = "el";
         document.getElementById("getIntersectingRankInputText2").value = "el";
+        document.getElementById("getMatchIdStringInputText2").value = "hello";
         document.getElementById("getUniqueIntersectingRankInputText2").value = "e,l,i";
         document.getElementById("compareToInputText2").value = "hello";
         document.getElementById("compareToIgnoreCaseInputText2").value = "HEL";
@@ -674,7 +707,10 @@ function getDefaultValues(language) {
         document.getElementById("getWordLevelExpectedText").value = "5";
         document.getElementById("getLengthNoSpacesExpectedText").value = "5";
         document.getElementById("getLengthNoSpacesNoCommasExpectedText").value = "5";
-        document.getElementById("parseToLogicalCharsExpectedText").value = "h,e,l,l,o";
+        document.getElementById("lengthAlternativeExpectedText").value = "5";
+        document.getElementById("utilityLanguageExpectedText").value = "English";
+        var parseToLogicalCharsExpectedEn = document.getElementById("parseToLogicalCharsExpectedText");
+        if (parseToLogicalCharsExpectedEn) parseToLogicalCharsExpectedEn.value = "h,e,l,l,o";
         document.getElementById("parseToLogicalCharactersExpectedText").value = "h,e,l,l,o";
         document.getElementById("isAnagramExpectedText").value = "true";
         document.getElementById("startsWithExpectedText").value = "true";
@@ -691,6 +727,7 @@ function getDefaultValues(language) {
         document.getElementById("addCharacterAtEndExpectedText").value = "helloa";
         document.getElementById("isIntersectingExpectedText").value = "true";
         document.getElementById("getIntersectingRankExpectedText").value = "3";
+        document.getElementById("getMatchIdStringExpectedText").value = "11111";
         document.getElementById("getUniqueIntersectingRankExpectedText").value = "2";
         document.getElementById("compareToExpectedText").value = "0";
         document.getElementById("compareToIgnoreCaseExpectedText").value = "1";
@@ -724,6 +761,7 @@ function getDefaultValues(language) {
         document.getElementById("addCharacterAtEndInputText2").value = "ల్లో";
         document.getElementById("isIntersectingInputText2").value = "ఇటలి";
         document.getElementById("getIntersectingRankInputText2").value = "కాయాలి";
+        document.getElementById("getMatchIdStringInputText2").value = "అమెరికాఆస్ట్రేలియా";
         document.getElementById("getUniqueIntersectingRankInputText2").value = "కా,యా,లి";
         document.getElementById("compareToInputText2").value = "అమెరికాఆస్ట్రేలియా";
         document.getElementById("compareToIgnoreCaseInputText2").value = "ఆస్ట్రేలియా";
@@ -753,7 +791,10 @@ function getDefaultValues(language) {
         document.getElementById("getWordLevelExpectedText").value = "6";
         document.getElementById("getLengthNoSpacesExpectedText").value = "8";
         document.getElementById("getLengthNoSpacesNoCommasExpectedText").value = "8";
-        document.getElementById("parseToLogicalCharsExpectedText").value = "అ,మె,రి,కా,ఆ,స్ట్రే,లి,యా";
+        document.getElementById("lengthAlternativeExpectedText").value = "8";
+        document.getElementById("utilityLanguageExpectedText").value = "Telugu";
+        var parseToLogicalCharsExpectedTe = document.getElementById("parseToLogicalCharsExpectedText");
+        if (parseToLogicalCharsExpectedTe) parseToLogicalCharsExpectedTe.value = "అ,మె,రి,కా,ఆ,స్ట్రే,లి,యా";
         document.getElementById("parseToLogicalCharactersExpectedText").value = "అ,మె,రి,కా,ఆ,స్ట్రే,లి,యా";
         document.getElementById("isAnagramExpectedText").value = "true";
         document.getElementById("startsWithExpectedText").value = "true";
@@ -770,6 +811,7 @@ function getDefaultValues(language) {
         document.getElementById("addCharacterAtEndExpectedText").value = "అమెరికాఆస్ట్రేలియాల్లో";
         document.getElementById("isIntersectingExpectedText").value = "true";
         document.getElementById("getIntersectingRankExpectedText").value = "3";
+        document.getElementById("getMatchIdStringExpectedText").value = "11111111";
         document.getElementById("getUniqueIntersectingRankExpectedText").value = "3";
         document.getElementById("compareToExpectedText").value = "0";
         document.getElementById("compareToIgnoreCaseExpectedText").value = "-1";
