@@ -1,30 +1,34 @@
-# Environment variables
+# Environment & Secrets
 .env
 .env.local
 
-# IDE / Editor
+# Python & Virtual Environments
+venv/
+env/
+mcp_server/mcp_venv
+__pycache__/
+*.pyc
+
+# Dependencies (Node / PHP)
+node_modules/
+vendor/
+
+# Build Outputs & Logs
+dist/
+build/
+*.log
+
+# Local Test Files
+test_ollama.php
+test_llm.php
+
+# IDEs & Editors
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# OS
+# Operating System
 .DS_Store
 Thumbs.db
-
-# Dependencies
-node_modules/
-vendor/
-__pycache__/
-
-# Build outputs
-dist/
-build/
-*.log
-
-# Local test files
-ananya_files/test_ollama.php
-ananya_files/test_llm.php
-ananya_files/mcp_server/mcp_venv
-ananya_files/__pycache__

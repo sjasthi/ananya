@@ -1,13 +1,27 @@
 <?php
 // Load .env file if it exists
-if (file_exists(__DIR__ . '/../.env')) {
-    $lines = file(__DIR__ . '/../.env', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        if (strpos($line, '=') !== false && !str_starts_with($line, '#')) {
-            list($key, $val) = explode('=', $line, 2);
-            putenv(trim($key) . '=' . trim($val));
-        }
+$envPaths = [
+    __DIR__ . '/mcp_server/.env', // first choice
+    __DIR__ . '/.env',     // same folder as chat_api.php
+    __DIR__ . '/../.env',  // parent folder (current behavior fallback)
+    ];
+foreach ($envPaths as $envPath) {
+    if (!file_exists($envPath)) {
+        continue;
     }
+
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || strpos($line, '=') === false) {
+            continue;
+        }
+
+        list($key, $val) = explode('=', $line, 2);
+        putenv(trim($key) . '=' . trim($val));
+    }
+
+    break;
 }
 
 header('Content-Type: application/json; charset=utf-8');
@@ -18,8 +32,8 @@ require_once __DIR__ . '/includes/api_reference.php';
 require_once __DIR__ . '/includes/llm_handler.php';
 
 // MCP Server settings
-$MCP_SERVER_URL = 'http://localhost:8000/chat';
-$MCP_TIMEOUT = 120; // seconds — two-stage filtering keeps it fast, but allow headroom for cold starts
+$MCP_SERVER_URL = getenv('MCP_SERVER_URL') ?: 'http://127.0.0.1:8000/chat';
+$MCP_TIMEOUT = (int)getenv('MCP_TIMEOUT') ?: 120; // seconds — two-stage filtering keeps it fast, but allow headroom for cold starts
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {
@@ -539,7 +553,7 @@ function call_mcp_server($url, $question, $language, $timeout) {
     $err = curl_error($ch);
     // curl_close($ch);
 
-    if($result === false || $httpCode < 200 || $httpCode >= 500) {
+    if($result === false || $httpCode < 200 || $httpCode >= 400) {
         // MCP server is down or errored — trigger fallback
         error_log("MCP server unreachable ($url): $err (HTTP $httpCode)");
         return null;
