@@ -231,7 +231,7 @@ paths:
                 response_code: 200
                 message: "All words formation check completed"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -264,7 +264,7 @@ paths:
                 response_code: 200
                 message: "Word formation check completed"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -324,7 +324,7 @@ paths:
                 response_code: 200
                 message: "Match ID string generated"
                 string: "abc"
-                language: "English"
+                language: "english"
                 data: "115"
                 success: true
                 result: "115"
@@ -357,7 +357,7 @@ paths:
                 response_code: 200
                 message: "Head and tail words check completed"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -390,7 +390,7 @@ paths:
                 response_code: 200
                 message: "Intersecting rank calculated"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: 3
                 success: true
                 result: 3
@@ -423,7 +423,7 @@ paths:
                 response_code: 200
                 message: "Anagram check completed"
                 string: "listen"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -455,7 +455,7 @@ paths:
                 response_code: 200
                 message: "Consonant check completed"
                 string: "b"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -481,7 +481,7 @@ paths:
                 response_code: 200
                 message: "Palindrome check completed"
                 string: "racecar"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -514,7 +514,7 @@ paths:
                 response_code: 200
                 message: "Ladder words check completed"
                 string: "cat"
-                language: "English"
+                language: "english"
                 data: true
                 success: true
                 result: true
@@ -540,7 +540,7 @@ paths:
                 response_code: 200
                 message: "Word level calculated"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: 2
                 success: true
                 result: 2
@@ -566,7 +566,7 @@ paths:
                 response_code: 200
                 message: "Word strength calculated"
                 string: "America"
-                language: "English"
+                language: "english"
                 data: 42
                 success: true
                 result: 42
@@ -592,7 +592,7 @@ paths:
                 response_code: 200
                 message: "Word weight calculated"
                 string: "computer"
-                language: "English"
+                language: "english"
                 data: 98
                 success: true
                 result: 98
@@ -618,7 +618,7 @@ paths:
                 response_code: 200
                 message: "Text parsed to logical characters (alternative)"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data:
                   - "h"
                   - "e"
@@ -654,7 +654,7 @@ paths:
                 response_code: 200
                 message: "Character role analyzed"
                 string: "a"
-                language: "English"
+                language: "english"
                 data: "vowel"
                 success: true
                 result: "vowel"
@@ -680,7 +680,7 @@ paths:
                 response_code: 200
                 message: "Text split into chunks"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data:
                   - "h"
                   - "e"
@@ -743,7 +743,7 @@ paths:
                 response_code: 200
                 message: "Unique intersecting logical characters calculated"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data:
                   - "l"
                   - "o"
@@ -780,7 +780,7 @@ paths:
                 response_code: 200
                 message: "Unique intersecting rank calculated"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: 2
                 success: true
                 result: 2
@@ -932,7 +932,7 @@ paths:
                 response_code: 200
                 message: "Character added at position"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: "heXllo"
                 success: true
                 result: "heXllo"
@@ -970,7 +970,7 @@ paths:
                 response_code: 200
                 message: "Character added at end"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: "hello!"
                 success: true
                 result: "hello!"
@@ -1001,7 +1001,7 @@ paths:
                 response_code: 200
                 message: "Base characters processed"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: ["h", "e", "l", "l", "o"]
                 success: true
                 result: ["h", "e", "l", "l", "o"]
@@ -1039,7 +1039,7 @@ paths:
                 response_code: 200
                 message: "Base consonants calculated"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: ["l"]
                 success: true
                 result: ["l"]
@@ -1070,7 +1070,7 @@ paths:
                 response_code: 200
                 message: "Code points processed"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: [[104], [101], [108], [108], [111]]
                 success: true
                 result: [[104], [101], [108], [108], [111]]
@@ -1101,7 +1101,7 @@ paths:
                 response_code: 200
                 message: "Code point length calculated"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: 5
                 success: true
                 result: 5
@@ -1181,7 +1181,7 @@ paths:
                 response_code: 200
                 message: "Logical characters processed"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: ["h", "e", "l", "l", "o"]
                 success: true
                 result: ["h", "e", "l", "l", "o"]
@@ -1220,7 +1220,7 @@ paths:
                 response_code: 200
                 message: "Logical character at position retrieved"
                 string: "hello"
-                language: "English"
+                language: "english"
                 data: "e"
                 success: true
                 result: "e"
