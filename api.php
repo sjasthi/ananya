@@ -214,6 +214,13 @@ function handleAnalysisAPIs($action) {
             $result = $processor->isAnagram($input2);
             sendResponse(200, "Anagram check completed", $string, $language, $result);
             break;
+        case 'is-consonant':
+            // Use the first logical character from the string for consonant checks.
+            $logical_chars = $processor->getLogicalChars();
+            $char = !empty($logical_chars) ? $logical_chars[0] : $string;
+            $result = $processor->isCharConsonant($char);
+            sendResponse(200, "Consonant check completed", $string, $language, $result);
+            break;
         case 'detect-language':
             $result = $processor->getLangForString();
             sendResponse(200, "Language detected", $string, null, $result);
@@ -229,6 +236,19 @@ function handleAnalysisAPIs($action) {
         case 'split-into-chunks':
             $result = $processor->splitInto15Chunks();
             sendResponse(200, "Text split into chunks", $string, $language, $result);
+            break;
+        case 'role':
+            // Role is derived from the first logical character for consistency.
+            $logical_chars = $processor->getLogicalChars();
+            $char = !empty($logical_chars) ? $logical_chars[0] : $string;
+            if ($processor->isCharVowel($char)) {
+                $result = 'vowel';
+            } elseif ($processor->isCharConsonant($char)) {
+                $result = 'consonant';
+            } else {
+                $result = 'other';
+            }
+            sendResponse(200, "Character role analyzed", $string, $language, $result);
             break;
         case 'can-make-word':
             $input2 = $_GET['input2'] ?? '';
@@ -259,6 +279,7 @@ function handleAnalysisAPIs($action) {
             sendResponse(200, "Unique intersecting rank calculated", $string, $language, $result);
             break;
         case 'unique-intersecting-logical-chars':
+        case 'unique-intersecting-chars':
             $input2 = $_GET['input2'] ?? '';
             // Convert input2 to logical characters array for comparison
             $processor2 = new wordProcessor($input2, $language);
@@ -267,11 +288,13 @@ function handleAnalysisAPIs($action) {
             sendResponse(200, "Unique intersecting logical characters calculated", $string, $language, $result);
             break;
         case 'are-ladder-words':
+        case 'ladder-words':
             $input2 = $_GET['input2'] ?? '';
             $result = $processor->areLadderWords($input2);
             sendResponse(200, "Ladder words check completed", $string, $language, $result);
             break;
         case 'are-head-tail-words':
+        case 'head-tail-words':
             $input2 = $_GET['input2'] ?? '';
             $result = $processor->areHeadAndTailWords($input2);
             sendResponse(200, "Head and tail words check completed", $string, $language, $result);
@@ -312,12 +335,17 @@ function handleComparisonAPIs($action) {
             sendResponse(200, "Ends with check completed", $string, $language, $result);
             break;
         case 'compare':
+        case 'compare-to':
             $result = $processor->compareTo($input2);
             sendResponse(200, "Comparison completed", $string, $language, $result);
             break;
         case 'compare-ignore-case':
             $result = $processor->compareToIgnoreCase($input2);
             sendResponse(200, "Case-insensitive comparison completed", $string, $language, $result);
+            break;
+        case 'is-intersecting':
+            $result = $processor->isIntersecting($input2);
+            sendResponse(200, "Intersection check completed", $string, $language, $result);
             break;
         case 'reverse-equals':
             $result = $processor->reverseEquals($input2);

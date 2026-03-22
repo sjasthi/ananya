@@ -178,20 +178,70 @@ class TeluguAPITester:
         )
     
     def test_text_randomize(self) -> bool:
-        """Test text/randomize API - Randomize Telugu text characters - SKIP (random output)"""
-        print(f"🔧 Testing text/randomize... ⏭️ SKIP (random output)")
+        """Test text/randomize API - Verify shuffled output preserves logical chars"""
+        print(f"🔧 Testing text/randomize... ", end="", flush=True)
         self.total_tests += 1
-        self.passed_tests += 1
-        return True
+
+        response = self.call_api(
+            "text/randomize",
+            {'string': self.primary_word, 'language': self.language}
+        )
+
+        if not response['success']:
+            print("❌ FAIL")
+            self.failed_tests += 1
+            self.test_results.append({
+                'test_name': 'text/randomize',
+                'status': 'FAIL',
+                'error': response.get('error', 'Unknown error'),
+                'status_code': response.get('status_code'),
+                'description': 'Randomized output request failed'
+            })
+            return False
+
+        api_data = response['data']
+        actual_result = api_data.get('data')
+        expected_chars = ['అ', 'మె', 'రి', 'కా', 'ఆ', 'స్ట్రే', 'లి', 'యా']
+
+        # Randomize should return a list containing exactly the same logical characters.
+        is_valid = (
+            api_data.get('response_code') == 200 and
+            isinstance(actual_result, list) and
+            sorted(actual_result) == sorted(expected_chars)
+        )
+
+        if is_valid:
+            print("✅ PASS")
+            self.passed_tests += 1
+            self.test_results.append({
+                'test_name': 'text/randomize',
+                'status': 'PASS',
+                'expected': 'Same logical characters in any order',
+                'actual': actual_result,
+                'description': 'Randomize preserves all original characters'
+            })
+            return True
+
+        print("❌ FAIL")
+        self.failed_tests += 1
+        self.test_results.append({
+            'test_name': 'text/randomize',
+            'status': 'FAIL',
+            'error': 'Randomize output did not preserve expected logical characters',
+            'expected': expected_chars,
+            'actual': actual_result,
+            'description': 'Randomize preserves all original characters'
+        })
+        return False
     
     def test_text_split(self) -> bool:
-        """Test text/split API - Split text into specified columns"""
+        """Test text/split API - Split text by delimiter and join with separator"""
         return self.run_test(
             test_name="text/split",
             api_endpoint="text/split",
-            params={'string': self.primary_word, 'input2': '2', 'language': self.language},
-            expected_result={"0":["అ","మె"],"2":["రి","కా"],"4":["ఆ","స్ట్రే"],"6":["లి","యా"]},  # From api_testing.php
-            test_description="Split అమెరికాఆస్ట్రేలియా into 2 columns"
+            params={'string': 'అమె-రి-కా', 'delimiter': '-', 'language': self.language},
+            expected_result="అమె | రి | కా",
+            test_description="Split అమె-రి-కా by delimiter and join with pipes"
         )
     
     def test_text_replace(self) -> bool:
@@ -356,6 +406,26 @@ class TeluguAPITester:
             expected_result=True,  # From api_testing.php
             test_description="Check if అమెరికాఆస్ట్రేలియా and అఆమెస్ట్రేరిలికాయా are anagrams"
         )
+
+    def test_analysis_detect_language(self) -> bool:
+        """Test analysis/detect-language API - Detect language for input text"""
+        return self.run_test(
+            test_name="analysis/detect-language",
+            api_endpoint="analysis/detect-language",
+            params={'string': 'hello'},
+            expected_result='English',
+            test_description="Detect language for plain English text"
+        )
+
+    def test_analysis_is_consonant(self) -> bool:
+        """Test analysis/is-consonant API - Check if first logical char is consonant"""
+        return self.run_test(
+            test_name="analysis/is-consonant",
+            api_endpoint="analysis/is-consonant",
+            params={'string': 'క', 'language': self.language},
+            expected_result=True,
+            test_description="Check if క is a consonant"
+        )
     
     def test_analysis_is_intersecting(self) -> bool:
         """Test analysis/is-intersecting API - Check if two words share characters"""
@@ -387,11 +457,11 @@ class TeluguAPITester:
             test_description="Get unique intersecting rank for అమెరికాఆస్ట్రేలియా with కా,యా,లి"
         )
     
-    def test_analysis_unique_intersecting_logical_chars(self) -> bool:
-        """Test analysis/unique-intersecting-logical-chars API - Get unique shared logical characters"""
+    def test_analysis_unique_intersecting_chars(self) -> bool:
+        """Test analysis/unique-intersecting-chars API - Get unique shared logical characters"""
         return self.run_test(
-            test_name="analysis/unique-intersecting-logical-chars",
-            api_endpoint="analysis/unique-intersecting-logical-chars",
+            test_name="analysis/unique-intersecting-chars",
+            api_endpoint="analysis/unique-intersecting-chars",
             params={'string': self.primary_word, 'input2': 'కా,యా,లి', 'language': self.language},
             expected_result=['కా', 'లి', 'యా'],  # Array of unique intersecting logical chars
             test_description="Get unique intersecting logical chars for అమెరికాఆస్ట్రేలియా and కా,యా,లి"
@@ -417,21 +487,21 @@ class TeluguAPITester:
             test_description="Check if అమెరికాఆస్ట్రేలియా can make both అమెరికా and ఆస్ట్రేలియా"
         )
     
-    def test_analysis_are_ladder_words(self) -> bool:
-        """Test analysis/are-ladder-words API - Check if words can form a ladder"""
+    def test_analysis_ladder_words(self) -> bool:
+        """Test analysis/ladder-words API - Check if words can form a ladder"""
         return self.run_test(
-            test_name="analysis/are-ladder-words",
-            api_endpoint="analysis/are-ladder-words",
+            test_name="analysis/ladder-words",
+            api_endpoint="analysis/ladder-words",
             params={'string': self.primary_word, 'input2': 'అమ్మరికాఆస్ట్రేలియా', 'language': self.language},
             expected_result=True,  # From api_testing.php
             test_description="Check if అమెరికాఆస్ట్రేలియా and అమ్మరికాఆస్ట్రేలియా are ladder words"
         )
     
-    def test_analysis_are_head_tail_words(self) -> bool:
-        """Test analysis/are-head-tail-words API - Check if words are head-tail related"""
+    def test_analysis_head_tail_words(self) -> bool:
+        """Test analysis/head-tail-words API - Check if words are head-tail related"""
         return self.run_test(
-            test_name="analysis/are-head-tail-words",
-            api_endpoint="analysis/are-head-tail-words",
+            test_name="analysis/head-tail-words",
+            api_endpoint="analysis/head-tail-words",
             params={'string': self.primary_word, 'input2': 'యామాతారాజభానస', 'language': self.language},
             expected_result=True,  # From api_testing.php
             test_description="Check if అమెరికాఆస్ట్రేలియా and యామాతారాజభానస are head-tail words"
@@ -475,6 +545,16 @@ class TeluguAPITester:
             params={'string': self.primary_word, 'language': self.language},
             expected_result=['అ', 'మె', 'రి', 'కా', 'ఆ', 'స్ట్రే', 'లి', 'యా', '', '', '', '', '', '', ''],  # 15 chunks with padding
             test_description="Split అమెరికాఆస్ట్రేలియా into 15-character chunks"
+        )
+
+    def test_analysis_role(self) -> bool:
+        """Test analysis/role API - Determine first character role"""
+        return self.run_test(
+            test_name="analysis/role",
+            api_endpoint="analysis/role",
+            params={'string': 'అ', 'language': self.language},
+            expected_result='vowel',
+            test_description="Determine role for the first logical character అ"
         )
 
     # =================================================================
@@ -604,6 +684,16 @@ class TeluguAPITester:
             expected_result=0,  # From api_testing.php - same strings return 0
             test_description="Compare అమెరికాఆస్ట్రేలియా with itself"
         )
+
+    def test_comparison_compare_to(self) -> bool:
+        """Test comparison/compare-to API - Compare two strings lexicographically"""
+        return self.run_test(
+            test_name="comparison/compare-to",
+            api_endpoint="comparison/compare-to",
+            params={'string': self.primary_word, 'input2': self.primary_word, 'language': self.language},
+            expected_result=0,
+            test_description="Compare అమెరికాఆస్ట్రేలియా with itself via compare-to"
+        )
     
     def test_comparison_compare_ignore_case(self) -> bool:
         """Test comparison/compare-ignore-case API - Compare strings ignoring case"""
@@ -623,6 +713,16 @@ class TeluguAPITester:
             params={'string': self.primary_word, 'input2': 'యాలిస్ట్రేఆకారిమెఅ', 'language': self.language},
             expected_result=True,  # From api_testing.php
             test_description="Check if అమెరికాఆస్ట్రేలియా reverse equals యాలిస్ట్రేఆకారిమెఅ"
+        )
+
+    def test_comparison_is_intersecting(self) -> bool:
+        """Test comparison/is-intersecting API - Check if two strings share logical characters"""
+        return self.run_test(
+            test_name="comparison/is-intersecting",
+            api_endpoint="comparison/is-intersecting",
+            params={'string': self.primary_word, 'input2': 'ఆస్ట్రేలియా', 'language': self.language},
+            expected_result=True,
+            test_description="Check if అమెరికాఆస్ట్రేలియా intersects with ఆస్ట్రేలియా"
         )
     
     def test_comparison_index_of(self) -> bool:
@@ -669,6 +769,26 @@ class TeluguAPITester:
             test_description="Calculate alternative length of అమెరికాఆస్ట్రేలియా"
         )
 
+    def test_utility_index_of(self) -> bool:
+        """Test utility/index-of API - Find index of substring in text"""
+        return self.run_test(
+            test_name="utility/index-of",
+            api_endpoint="utility/index-of",
+            params={'string': self.primary_word, 'input2': 'లి', 'language': self.language},
+            expected_result=6,
+            test_description="Find index of లి in అమెరికాఆస్ట్రేలియా"
+        )
+
+    def test_utility_language(self) -> bool:
+        """Test utility/language API - Detect language from input text"""
+        return self.run_test(
+            test_name="utility/language",
+            api_endpoint="utility/language",
+            params={'string': self.primary_word},
+            expected_result='Telugu',
+            test_description="Detect language for అమెరికాఆస్ట్రేలియా"
+        )
+
 
     # =================================================================
     # TEST RUNNER
@@ -709,18 +829,21 @@ class TeluguAPITester:
             self.test_analysis_is_palindrome,
             self.test_analysis_word_level,
             self.test_analysis_is_anagram,
+            self.test_analysis_detect_language,
+            self.test_analysis_is_consonant,
             self.test_analysis_is_intersecting,
             self.test_analysis_intersecting_rank,
             self.test_analysis_unique_intersecting_rank,
-            self.test_analysis_unique_intersecting_logical_chars,
+            self.test_analysis_unique_intersecting_chars,
             self.test_analysis_can_make_word,
             self.test_analysis_can_make_all_words,
-            self.test_analysis_are_ladder_words,
-            self.test_analysis_are_head_tail_words,
+            self.test_analysis_ladder_words,
+            self.test_analysis_head_tail_words,
             self.test_analysis_get_match_id_string,
             self.test_analysis_parse_to_logical_chars,
             self.test_analysis_parse_to_logical_characters,
             self.test_analysis_split_into_chunks,
+            self.test_analysis_role,
             
             # Validation Operations
             self.test_validation_contains_space,
@@ -737,11 +860,15 @@ class TeluguAPITester:
             self.test_comparison_starts_with,
             self.test_comparison_ends_with,
             self.test_comparison_compare,
+            self.test_comparison_compare_to,
             self.test_comparison_compare_ignore_case,
+            self.test_comparison_is_intersecting,
             self.test_comparison_reverse_equals,
             self.test_comparison_index_of,
             
             # Utility Operations
+            self.test_utility_index_of,
+            self.test_utility_language,
             self.test_utility_length_no_spaces,
             self.test_utility_length_no_spaces_commas,
             self.test_utility_length_alternative

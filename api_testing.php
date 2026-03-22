@@ -336,7 +336,7 @@
                             <tbody id="apiTable">
                                 <?php
                                 $output = '';
-                                $singleInputAPIs = array("authUserExists", "charConstant", "charVowel", "containsSpace", "getBaseCharacters", "getCodePointLength", "getCodePoints", "getLength", "getLength2", "getLengthNoSpaces", "getLengthNoSpacesNoCommas", "getLogicalChars", "getLogicalChars2", "getWordLevel", "getWordStrength", "getWordWeight", "isPalindrome", "parseToLogicalChars", "parseToLogicalCharacters", "randomLogicalChars", "reverse", "splitInto15Chunks");
+                                $singleInputAPIs = array("authUserExists", "charConstant", "charVowel", "characterRole", "containsSpace", "detectLanguageLegacy", "getBaseCharacters", "getCodePointLength", "getCodePoints", "getLength", "getLength2", "getLengthNoSpaces", "getLengthNoSpacesNoCommas", "getLogicalChars", "getLogicalChars2", "getWordLevel", "getWordStrength", "getWordWeight", "isPalindrome", "lengthAlternative", "parseToLogicalChars", "parseToLogicalCharacters", "randomLogicalChars", "reverse", "splitInto15Chunks", "textRandomize", "utilityLanguage");
                                 $doubleInputAPIs = array("addCharacterAtEnd", "areHeadAndTailWords", "areLadderWords", "authLogin", "baseConsonants", "canMakeAllWords", "canMakeWord", "compareTo", "compareToIgnoreCase", "containsAllLogicalChars", "containsChar", "containsLogicalCharSequence", "containsLogicalChars", "containsString", "endsWith", "equals", "getIntersectingRank", "getMatchIdString", "getUniqueIntersectingLogicalChars", "getUniqueIntersectingRank", "indexOf", "isAnagram", "isIntersecting", "logicalCharAt", "reverseEquals", "splitWord", "startsWith");
                                 $tripleInputAPIs = array("addCharacterAt", "replace");
                                 $getFillerChars = array("getFillerCharacters");
@@ -346,11 +346,11 @@
                                 $sections = array(
                                     "Authentication" => array("authLogin", "authUserExists"),
                                     "Character Analysis" => array("addCharacterAt", "addCharacterAtEnd", "baseConsonants", "getBaseCharacters", "getCodePointLength", "getCodePoints", "getFillerCharacters", "getLogicalChars", "logicalCharAt", "randomLogicalChars"),
-                                    "Character Validation" => array("containsAllLogicalChars", "containsChar", "containsLogicalChars", "containsLogicalCharSequence", "containsSpace", "containsString", "endsWith", "charConstant", "charVowel", "startsWith"),
+                                    "Character Validation" => array("charConstant", "charVowel", "containsAllLogicalChars", "containsChar", "containsLogicalCharSequence", "containsLogicalChars", "containsSpace", "containsString", "endsWith", "startsWith"),
                                     "String Comparison" => array("compareTo", "compareToIgnoreCase", "equals", "isIntersecting", "reverseEquals"),
-                                    "Text Operations" => array("getLength", "reverse", "replace", "splitWord", "textRandomize"),
-                                    "Utility" => array("indexOf", "utilityLanguage", "lengthAlternative", "getLength2", "getLengthNoSpaces", "getLengthNoSpacesNoCommas"),
-                                    "Word Analysis" => array("areHeadAndTailWords", "areLadderWords", "canMakeAllWords", "canMakeWord", "charConstant", "detectLanguageLegacy", "getIntersectingRank", "getMatchIdString", "getUniqueIntersectingLogicalChars", "getUniqueIntersectingRank", "getWordLevel", "getWordStrength", "getWordWeight", "isAnagram", "isPalindrome", "parseToLogicalCharacters", "parseToLogicalChars", "characterRole", "getLogicalChars2", "splitInto15Chunks")
+                                    "Text Operations" => array("getLength", "replace", "reverse", "splitWord", "textRandomize"),
+                                    "Utility" => array("getLength2", "getLengthNoSpaces", "getLengthNoSpacesNoCommas", "indexOf", "lengthAlternative", "utilityLanguage"),
+                                    "Word Analysis" => array("areHeadAndTailWords", "areLadderWords", "canMakeAllWords", "canMakeWord", "characterRole", "detectLanguageLegacy", "getIntersectingRank", "getLogicalChars2", "getMatchIdString", "getUniqueIntersectingLogicalChars", "getUniqueIntersectingRank", "getWordLevel", "getWordStrength", "getWordWeight", "isAnagram", "isPalindrome", "parseToLogicalCharacters", "splitInto15Chunks")
                                 );
 
                                 foreach ($sections as $sectionName => $apis) {

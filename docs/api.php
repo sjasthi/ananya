@@ -548,18 +548,18 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/codepoint-length?string=à°…à°®à±†à°°à°¿à°•à°¾&language=Telugu
+                            <?= $apiBase ?>characters/codepoint-length?string=hello&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
     "message": "Code point length calculated",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾",
-  "language": "Telugu",
-    "data": 7,
+    "string": "hello",
+    "language": "English",
+        "data": 5,
     "success": true,
-    "result": 7,
+        "result": 5,
     "error": null
 }</code></pre>
                     </div>
@@ -625,7 +625,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/filler?count=5&language=telugu&type=consonant
+                            <?= $apiBase ?>characters/filler?count=5&language=english&type=consonant
                         </div>
 
                         <h6>Example Response</h6>
@@ -633,10 +633,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
     "message": "Filler characters generated",
     "string": "5 consonant",
-  "language": "Telugu",
-    "data": ["à°•", "à°Ÿ", "à°ª", "à°®", "à°¨"],
+    "language": "English",
+        "data": ["b", "c", "d", "f", "g"],
     "success": true,
-    "result": ["à°•", "à°Ÿ", "à°ª", "à°®", "à°¨"],
+        "result": ["b", "c", "d", "f", "g"],
     "error": null
 }</code></pre>
                     </div>
@@ -663,18 +663,18 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>characters/logical?string=à°…à°®à±†à°°à°¿à°•à°¾&language=Telugu
+                            <?= $apiBase ?>characters/logical?string=hello&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
     "message": "Logical characters processed",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾",
-  "language": "Telugu",
-    "data": ["à°…", "à°®à±†", "à°°à°¿", "à°•à°¾"],
+    "string": "hello",
+    "language": "English",
+        "data": ["h", "e", "l", "l", "o"],
     "success": true,
-    "result": ["à°…", "à°®à±†", "à°°à°¿", "à°•à°¾"],
+        "result": ["h", "e", "l", "l", "o"],
     "error": null
 }</code></pre>
                     </div>
@@ -782,7 +782,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>validation/contains-all-logical-chars?string=à°…à°®à±†à°°à°¿à°•à°¾à°†à°¸à±à°Ÿà±à°°à±‡à°²à°¿à°¯à°¾&input2=à°…,à°®à±†&language=telugu
+                            <?= $apiBase ?>validation/contains-all-logical-chars?string=hello&input2=h,e&language=english
                         </div>
 
                         <h6>Example Response</h6>
@@ -1113,7 +1113,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                     <div id="comparison-compare-ignore-case" class="api-section">
                         <h3>Compare To (Ignore Case)</h3>
-                        <p>Compares two strings lexicographically ignoring case differences.</p>
+                        <p>Compares two strings in dictionary order while ignoring uppercase/lowercase differences. Returns 0 if equal, a negative number if the first string comes before the second, or a positive number if it comes after.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -1143,13 +1143,16 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Case-insensitive comparison completed",
   "string": "Hello",
   "language": "English",
-  "data": 0
+  "data": 0,
+  "success": true,
+  "result": 0,
+  "error": null
 }</code></pre>
                     </div>
 
                     <div id="comparison-compare-to" class="api-section">
                         <h3>Compare To</h3>
-                        <p>Compares two strings lexicographically and returns comparison result.</p>
+                        <p>Compares two strings in dictionary order and returns an ordering number: 0 if equal, a negative number if the first string comes before the second, or a positive number if it comes after.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -1176,10 +1179,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "String comparison completed",
+  "message": "Comparison completed",
   "string": "apple",
   "language": "English",
-  "data": -1
+  "data": -1,
+  "success": true,
+  "result": -1,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1212,10 +1218,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "String comparison completed",
+  "message": "Equality check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1251,7 +1260,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Intersection check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1287,7 +1299,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Reverse equality check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1309,7 +1324,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1325,7 +1340,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Length calculated",
   "string": "hello",
   "language": "English",
-  "data": 5
+  "data": 5,
+  "success": true,
+  "result": 5,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1344,7 +1362,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1360,7 +1378,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Text randomized",
   "string": "hello",
   "language": "English",
-  "data": "loleh"
+  "data": ["l", "o", "e", "l", "h"],
+  "success": true,
+  "result": ["l", "o", "e", "l", "h"],
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1380,8 +1401,8 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Text to find</li>
-                                    <li><code>input3</code> (required) - Replacement text</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>input3</code> (optional) - Replacement text</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1397,7 +1418,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Text replaced",
   "string": "hello",
   "language": "English",
-  "data": "hio"
+  "data": "hio",
+  "success": true,
+  "result": "hio",
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1416,7 +1440,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1432,13 +1456,16 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Text reversed",
   "string": "hello",
   "language": "English",
-  "data": "olleh"
+  "data": "olleh",
+  "success": true,
+  "result": "olleh",
+  "error": null
 }</code></pre>
                     </div>
 
                     <div id="text-split" class="api-section">
                         <h3>Text Split</h3>
-                        <p>Splits text into specified number of columns for display purposes.</p>
+                        <p>Splits text by a delimiter and returns the parts joined with <code> | </code>.</p>
                         
                         <div class="row">
                             <div class="col-md-6">
@@ -1452,7 +1479,8 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>delimiter</code> (optional) - Delimiter to split on (default <code>-</code>)</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>input2</code> (optional) - Alternate delimiter parameter</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1466,9 +1494,12 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "Text split",
-  "string": "hello",
+  "string": "hello-world",
   "language": "English",
-  "data": {"0":["h","e"],"2":["l","l"],"4":["o",null]}
+  "data": "hello | world",
+  "success": true,
+  "result": "hello | world",
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1497,15 +1528,15 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
     <h6>Example Request</h6>
     <div class="api-endpoint">
-        <?= $apiBase ?>utility/index-of?string=à°…à°¨à°¨à±à°¯&input2=à°¨à±à°¯&language=telugu
+        <?= $apiBase ?>utility/index-of?string=hello&input2=ll&language=english
     </div>
 
     <h6>Example Response</h6>
     <pre><code class="language-json">{
   "response_code": 200,
   "message": "Index found",
-  "string": "à°…à°¨à°¨à±à°¯",
-  "language": "telugu",
+    "string": "hello",
+    "language": "english",
   "data": 2,
   "success": true,
   "result": 2,
@@ -1542,11 +1573,11 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
   "message": "Language detected",
   "string": "hello",
-    "language": null,
-    "data": "English",
-    "success": true,
-    "result": "English",
-    "error": null
+  "language": null,
+  "data": "English",
+  "success": true,
+  "result": "English",
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1617,13 +1648,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-    "message": "Length without spaces calculated",
+  "message": "Length without spaces calculated",
   "string": "hello world",
-    "language": "english",
-    "data": 10,
-    "success": true,
-    "result": 10,
-    "error": null
+  "language": "english",
+  "data": 10,
+  "success": true,
+  "result": 10,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1702,16 +1733,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/can-make-all-words?string=à°…à°®à±†à°°à°¿à°•à°¾à°†à°¸à±à°Ÿà±à°°à±‡à°²à°¿à°¯à°¾&input2=à°…à°®à±†à°°à°¿à°•à°¾,à°²à°¿à°¯à°¾&language=telugu
+                            <?= $apiBase ?>analysis/can-make-all-words?string=hello&input2=he,lo&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "All words formation check completed",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾à°†à°¸à±à°Ÿà±à°°à±‡à°²à°¿à°¯à°¾",
-  "language": "telugu",
-  "data": true
+  "string": "hello",
+  "language": "English",
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1747,7 +1781,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Word formation check completed",
   "string": "hello",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1781,7 +1818,11 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "response_code": 200,
   "message": "Language detected",
   "string": "hello",
-  "data": "English"
+  "language": null,
+  "data": "English",
+  "success": true,
+  "result": "English",
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1808,16 +1849,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/get-match-id-string?string=à°…à°®&input2=à°…à°…&language=telugu
+                            <?= $apiBase ?>analysis/get-match-id-string?string=abc&input2=azc&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "Match ID string generated",
-  "string": "à°…à°®",
-  "language": "telugu",
-  "data": "12"
+  "string": "abc",
+  "language": "English",
+  "data": "115",
+  "success": true,
+  "result": "115",
+  "error": null
 }</code></pre>
                         <div class="alert alert-info">
                             <strong>Match ID Legend:</strong>
@@ -1858,11 +1902,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "areHeadAndTailWords() executed",
+  "message": "Head and tail words check completed",
   "string": "hello",
-    "input2": "orange",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1898,7 +1944,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Intersecting rank calculated",
   "string": "hello",
   "language": "English",
-  "data": 3
+  "data": 3,
+  "success": true,
+  "result": 3,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1934,7 +1983,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Anagram check completed",
   "string": "listen",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -1969,7 +2021,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Consonant check completed",
   "string": "b",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2004,7 +2059,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Palindrome check completed",
   "string": "racecar",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2037,11 +2095,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "areLadderWords() executed",
+  "message": "Ladder words check completed",
   "string": "cat",
-    "input2": "bat",
   "language": "English",
-  "data": true
+  "data": true,
+  "success": true,
+  "result": true,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2067,16 +2127,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/parse-to-logical-characters?string=à°…à°®à±†à°°à°¿à°•à°¾&language=telugu
+                            <?= $apiBase ?>analysis/parse-to-logical-characters?string=hello&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "Text parsed to logical characters (alternative)",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾",
-  "language": "telugu",
-  "data": ["à°…", "à°®à±†", "à°°à°¿", "à°•à°¾"]
+  "string": "hello",
+  "language": "English",
+  "data": ["h", "e", "l", "l", "o"],
+  "success": true,
+  "result": ["h", "e", "l", "l", "o"],
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2111,7 +2174,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Character role analyzed",
   "string": "a",
   "language": "English",
-  "data": "vowel"
+  "data": "vowel",
+  "success": true,
+  "result": "vowel",
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2137,16 +2203,19 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
 
                         <h6>Example Request</h6>
                         <div class="api-endpoint">
-                            <?= $apiBase ?>analysis/split-into-chunks?string=à°…à°®à±†à°°à°¿à°•à°¾&language=Telugu
+                            <?= $apiBase ?>analysis/split-into-chunks?string=hello&language=English
                         </div>
 
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Split into 15 chunks calculated",
-  "string": "à°…à°®à±†à°°à°¿à°•à°¾",
-  "language": "Telugu",
-  "data": [["à°…"], ["à°®à±†"], ["à°°à°¿"], ["à°•à°¾"]]
+  "message": "Text split into chunks",
+  "string": "hello",
+  "language": "English",
+  "data": ["h", "e", "l", "l", "o", "", "", "", "", "", "", "", "", "", ""],
+  "success": true,
+  "result": ["h", "e", "l", "l", "o", "", "", "", "", "", "", "", "", "", ""],
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2179,10 +2248,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Unique intersecting characters found",
+  "message": "Unique intersecting logical characters calculated",
   "string": "hello",
   "language": "English",
-  "data": ["l", "o"]
+  "data": ["l", "o"],
+  "success": true,
+  "result": ["l", "o"],
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2218,7 +2290,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Unique intersecting rank calculated",
   "string": "hello",
   "language": "English",
-  "data": 2
+  "data": 2,
+  "success": true,
+  "result": 2,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2250,10 +2325,13 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <h6>Example Response</h6>
                         <pre><code class="language-json">{
   "response_code": 200,
-  "message": "Word level analyzed",
+  "message": "Word level calculated",
   "string": "hello",
   "language": "English",
-  "data": 2
+  "data": 2,
+  "success": true,
+  "result": 2,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2288,7 +2366,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Word strength calculated",
   "string": "America",
   "language": "English",
-  "data": 42
+  "data": 42,
+  "success": true,
+  "result": 42,
+  "error": null
 }</code></pre>
                     </div>
 
@@ -2323,7 +2404,10 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
   "message": "Word weight calculated",
   "string": "computer",
   "language": "English",
-  "data": 98
+  "data": 98,
+  "success": true,
+  "result": 98,
+  "error": null
 }</code></pre>
                     </div>
 
