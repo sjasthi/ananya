@@ -266,6 +266,22 @@ Checks if string contains substring.
 GET /validation/contains-string?string={text}&language={lang}&input2={substring}
 ```
 
+#### Starts With
+
+Checks if string starts with a given prefix.
+
+```text
+GET /validation/starts-with?string={text}&language={lang}&input2={prefix}
+```
+
+#### Ends With
+
+Checks if string ends with a given suffix.
+
+```text
+GET /validation/ends-with?string={text}&language={lang}&input2={suffix}
+```
+
 #### Is Consonant
 
 Checks if character is a consonant.
