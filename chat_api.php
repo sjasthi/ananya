@@ -1,10 +1,20 @@
 <?php
 // Load .env file if it exists
-$envPaths = [
-    __DIR__ . '/mcp_server/.env', // first choice
-    __DIR__ . '/.env',     // same folder as chat_api.php
-    __DIR__ . '/../.env',  // parent folder (current behavior fallback)
-    ];
+$envPaths = [];
+
+// Preferred for shared hosting: absolute env file path set at server level.
+// You can set APP_ENV_PATH or ANANYA_ENV_PATH to something like:
+// /home/yourcpaneluser/.ananya/.env
+$absoluteEnvPath = getenv('APP_ENV_PATH') ?: getenv('ANANYA_ENV_PATH') ?: '';
+if (!empty($absoluteEnvPath)) {
+    $envPaths[] = $absoluteEnvPath;
+}
+
+// Fallbacks for local development.
+$envPaths[] = __DIR__ . '/mcp_server/.env';
+$envPaths[] = __DIR__ . '/.env';
+$envPaths[] = __DIR__ . '/../.env';
+
 foreach ($envPaths as $envPath) {
     if (!file_exists($envPath)) {
         continue;
@@ -25,15 +35,13 @@ foreach ($envPaths as $envPath) {
 }
 
 header('Content-Type: application/json; charset=utf-8');
-// chat_api.php - receives question, proxies to MCP server for LLM + tool orchestration
-// Falls back to direct LLM call if MCP server is unreachable
+// chat_api.php - receives question and performs in-process LLM + tool orchestration
 
 require_once __DIR__ . '/includes/api_reference.php';
 require_once __DIR__ . '/includes/llm_handler.php';
 
-// MCP Server settings
-$MCP_SERVER_URL = getenv('MCP_SERVER_URL') ?: 'http://127.0.0.1:8000/chat';
-$MCP_TIMEOUT = (int)getenv('MCP_TIMEOUT') ?: 120; // seconds — two-stage filtering keeps it fast, but allow headroom for cold starts
+// Tool-loop settings
+$CHAT_MAX_TOOL_ITERS = (int)(getenv('CHAT_MAX_TOOL_ITERS') ?: 5);
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {
@@ -375,6 +383,212 @@ function detect_intent($question, $language) {
     return null;
 }
 
+function chat_system_prompt() {
+    return "You are Ananya, a helpful AI assistant specialized in word and text processing. "
+        . "Use tools for precise text analysis, comparison, validation, and transformations in English and Indic languages. "
+        . "When tools return data, explain results clearly and concisely. "
+        . "Do not output raw JSON unless user explicitly asks for JSON.";
+}
+
+function build_local_api_base_url() {
+    $configured = getenv('API_BASE_URL');
+    if (!empty($configured)) {
+        return rtrim($configured, '/');
+    }
+
+    $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $scriptDir = dirname($_SERVER['SCRIPT_NAME'] ?? '/ananya/chat_api.php');
+    $basePath = rtrim(str_replace('\\', '/', $scriptDir), '/');
+
+    return $protocol . '://' . $host . $basePath . '/api.php';
+}
+
+function get_tool_dispatch_map() {
+    return [
+        'reverse_text' => ['category' => 'text', 'action' => 'reverse', 'params' => ['string' => 'word', 'language' => 'language']],
+        'get_text_length' => ['category' => 'text', 'action' => 'length', 'params' => ['string' => 'word', 'language' => 'language']],
+        'randomize_text' => ['category' => 'text', 'action' => 'randomize', 'params' => ['string' => 'word', 'language' => 'language']],
+        'split_text' => ['category' => 'text', 'action' => 'split', 'params' => ['string' => 'word', 'input2' => 'delimiter', 'language' => 'language']],
+        'replace_in_text' => ['category' => 'text', 'action' => 'replace', 'params' => ['string' => 'word', 'input2' => 'search', 'input3' => 'replace_with', 'language' => 'language']],
+
+        'get_logical_characters' => ['category' => 'characters', 'action' => 'logical', 'params' => ['string' => 'word', 'language' => 'language']],
+        'get_base_characters' => ['category' => 'characters', 'action' => 'base', 'params' => ['string' => 'word', 'language' => 'language']],
+        'get_code_points' => ['category' => 'characters', 'action' => 'codepoints', 'params' => ['string' => 'word', 'language' => 'language']],
+        'get_character_at_position' => ['category' => 'characters', 'action' => 'logical-at', 'params' => ['string' => 'word', 'input2' => 'index', 'language' => 'language']],
+
+        'check_palindrome' => ['category' => 'analysis', 'action' => 'is-palindrome', 'params' => ['string' => 'word', 'language' => 'language']],
+        'check_anagram' => ['category' => 'analysis', 'action' => 'is-anagram', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'can_make_word' => ['category' => 'analysis', 'action' => 'can-make-word', 'params' => ['string' => 'source_word', 'input2' => 'target_word', 'language' => 'language']],
+        'can_make_all_words' => ['category' => 'analysis', 'action' => 'can-make-all-words', 'params' => ['string' => 'source_word', 'input2' => 'words', 'language' => 'language']],
+        'get_word_strength' => ['category' => 'analysis', 'action' => 'word-strength', 'params' => ['string' => 'word', 'language' => 'language']],
+        'get_word_weight' => ['category' => 'analysis', 'action' => 'word-weight', 'params' => ['string' => 'word', 'language' => 'language']],
+        'get_word_level' => ['category' => 'analysis', 'action' => 'word-level', 'params' => ['string' => 'word', 'language' => 'language']],
+        'detect_language' => ['category' => 'analysis', 'action' => 'detect-language', 'params' => ['string' => 'text']],
+        'check_intersecting' => ['category' => 'comparison', 'action' => 'is-intersecting', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'get_intersecting_rank' => ['category' => 'analysis', 'action' => 'intersecting-rank', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'check_ladder_words' => ['category' => 'analysis', 'action' => 'are-ladder-words', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'check_head_tail_words' => ['category' => 'analysis', 'action' => 'are-head-tail-words', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'parse_to_logical_chars' => ['category' => 'analysis', 'action' => 'parse-to-logical-chars', 'params' => ['string' => 'word', 'language' => 'language']],
+
+        'check_starts_with' => ['category' => 'comparison', 'action' => 'starts-with', 'params' => ['string' => 'word', 'input2' => 'prefix', 'language' => 'language']],
+        'check_ends_with' => ['category' => 'comparison', 'action' => 'ends-with', 'params' => ['string' => 'word', 'input2' => 'suffix', 'language' => 'language']],
+        'compare_words' => ['category' => 'comparison', 'action' => 'compare-to', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'check_equals' => ['category' => 'comparison', 'action' => 'equals', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'check_reverse_equals' => ['category' => 'comparison', 'action' => 'reverse-equals', 'params' => ['string' => 'word1', 'input2' => 'word2', 'language' => 'language']],
+        'find_index_of' => ['category' => 'utility', 'action' => 'index-of', 'params' => ['string' => 'word', 'input2' => 'search', 'language' => 'language']],
+
+        'check_contains_char' => ['category' => 'validation', 'action' => 'contains-char', 'params' => ['string' => 'word', 'input2' => 'char', 'language' => 'language']],
+        'check_contains_string' => ['category' => 'validation', 'action' => 'contains-string', 'params' => ['string' => 'word', 'input2' => 'substring', 'language' => 'language']],
+        'check_is_consonant' => ['category' => 'validation', 'action' => 'is-consonant', 'params' => ['string' => 'character', 'language' => 'language']],
+        'check_is_vowel' => ['category' => 'validation', 'action' => 'is-vowel', 'params' => ['string' => 'character', 'language' => 'language']],
+        'check_contains_space' => ['category' => 'validation', 'action' => 'contains-space', 'params' => ['string' => 'word', 'language' => 'language']],
+
+        'get_length_no_spaces' => ['category' => 'utility', 'action' => 'length-no-spaces', 'params' => ['string' => 'word', 'language' => 'language']],
+    ];
+}
+
+function tool_output_from_api_response($decoded) {
+    if (!is_array($decoded)) {
+        return 'Tool execution failed: invalid API JSON response.';
+    }
+
+    if (isset($decoded['success']) && $decoded['success'] === false) {
+        $msg = $decoded['error'] ?? ($decoded['message'] ?? 'Unknown API error');
+        return 'Tool execution failed: ' . $msg;
+    }
+
+    $result = $decoded['result'] ?? ($decoded['data'] ?? $decoded);
+    if (is_string($result) || is_numeric($result) || is_bool($result) || $result === null) {
+        return is_bool($result) ? ($result ? 'true' : 'false') : (string)$result;
+    }
+
+    return json_encode($result, JSON_UNESCAPED_UNICODE);
+}
+
+function execute_chat_tool($toolName, $args, $language, $apiBaseUrl) {
+    $map = get_tool_dispatch_map();
+    if (!isset($map[$toolName])) {
+        return [
+            'ok' => false,
+            'output' => 'Unknown tool: ' . $toolName,
+        ];
+    }
+
+    $conf = $map[$toolName];
+    $query = [];
+    foreach ($conf['params'] as $apiKey => $toolArgName) {
+        if (isset($args[$toolArgName]) && $args[$toolArgName] !== '') {
+            $query[$apiKey] = $args[$toolArgName];
+        }
+    }
+
+    if (!isset($query['language']) && isset($conf['params']['language'])) {
+        $query['language'] = $language ?: 'english';
+    }
+
+    $url = rtrim($apiBaseUrl, '/') . '/' . $conf['category'] . '/' . $conf['action'] . '?' . http_build_query($query);
+    error_log('Tool call [' . $toolName . '] URL: ' . $url);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, (int)(getenv('LOCAL_API_TIMEOUT') ?: 15));
+    curl_setopt($ch, CURLOPT_HEADER, false);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $curlErr = curl_error($ch);
+    curl_close($ch);
+
+    if ($response === false || $httpCode < 200 || $httpCode >= 400) {
+        $message = 'Tool execution failed (HTTP ' . $httpCode . '): ' . ($curlErr ?: 'Request error');
+        return [
+            'ok' => false,
+            'output' => $message,
+        ];
+    }
+
+    $decoded = json_decode($response, true);
+    if (!is_array($decoded)) {
+        return [
+            'ok' => false,
+            'output' => 'Tool execution failed: non-JSON API response.',
+        ];
+    }
+
+    return [
+        'ok' => true,
+        'output' => tool_output_from_api_response($decoded),
+    ];
+}
+
+function run_php_tool_orchestration($question, $language, $maxIters) {
+    $messages = [
+        ['role' => 'system', 'content' => chat_system_prompt()],
+        ['role' => 'user', 'content' => $question],
+    ];
+    $tools = ananya_chat_tools();
+    $apiBaseUrl = build_local_api_base_url();
+
+    for ($i = 0; $i < $maxIters; $i++) {
+        $llm = llm_request_openai_compatible($messages, [
+            'tools' => $tools,
+            'tool_choice' => 'auto',
+            'parallel_tool_calls' => false,
+            'temperature' => (float)(getenv('LLM_TEMPERATURE') ?: 0.2),
+            'max_tokens' => (int)(getenv('LLM_MAX_TOKENS') ?: 1200),
+        ]);
+
+        if (!$llm['ok']) {
+            return [
+                'ok' => false,
+                'error' => $llm['error'] ?? 'LLM orchestration call failed.',
+            ];
+        }
+
+        $assistantMessage = $llm['assistant_message'] ?? ['role' => 'assistant', 'content' => ($llm['content'] ?? '')];
+        $messages[] = $assistantMessage;
+
+        $toolCalls = $llm['tool_calls'] ?? [];
+        if (count($toolCalls) === 0) {
+            $answer = trim($llm['content'] ?? '');
+            if ($answer === '') {
+                $answer = 'I could not generate a response.';
+            }
+
+            return [
+                'ok' => true,
+                'answer' => $answer,
+                'source' => 'mcp',
+                'llm_consulted' => true,
+            ];
+        }
+
+        foreach ($toolCalls as $tc) {
+            $rawArgs = $tc['arguments'] ?? '{}';
+            $decodedArgs = json_decode($rawArgs, true);
+            if (!is_array($decodedArgs)) {
+                $decodedArgs = [];
+            }
+
+            $tool = execute_chat_tool($tc['name'], $decodedArgs, $language, $apiBaseUrl);
+            $messages[] = [
+                'role' => 'tool',
+                'tool_call_id' => $tc['id'],
+                'name' => $tc['name'],
+                'content' => $tool['output'],
+            ];
+        }
+    }
+
+    return [
+        'ok' => true,
+        'answer' => 'I required too many steps to complete this request and had to stop.',
+        'source' => 'mcp',
+        'llm_consulted' => true,
+    ];
+}
+
 $raw = file_get_contents('php://input');
 $data = [];
 if($raw) {
@@ -390,21 +604,20 @@ if(!$question) {
     exit;
 }
 
-// ── Forward to MCP server (intent classification + tool calling handled there) ──
-
-$mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT);
-
-if($mcp_result !== null) {
-    // MCP server responded successfully
-    if (is_array($mcp_result)) {
-        $mcp_result['llm_consulted'] = true;
-        if (!empty($mcp_result['answer']) && stripos($mcp_result['answer'], 'LLM consulted') === false) {
-            $mcp_result['answer'] .= "\n\nLLM consulted - Yes";
-        }
-    }
-    echo json_encode($mcp_result);
+// ── Primary path: in-process tool orchestration (shared-hosting friendly) ──
+$orchestrated = run_php_tool_orchestration($question, $language, $CHAT_MAX_TOOL_ITERS);
+if (!empty($orchestrated['ok'])) {
+    echo json_encode([
+        'question' => $question,
+        'language' => $language,
+        'answer' => $orchestrated['answer'] ?? '',
+        'source' => $orchestrated['source'] ?? 'mcp',
+        'llm_consulted' => true,
+    ]);
     exit;
 }
+
+error_log('PHP tool orchestration failed; falling back to legacy single-shot flow. Error: ' . ($orchestrated['error'] ?? 'unknown'));
 
 // ── Fallback: direct LLM call (no tool execution) ─────────────────
 
@@ -529,43 +742,5 @@ echo json_encode([
     'source' => 'fallback',
     'llm_consulted' => true,
 ]);
-
-// ── Helper: call the Python MCP server ─────────────────────────────
-function call_mcp_server($url, $question, $language, $timeout) {
-    $payload = json_encode([
-        'question' => $question,
-        'language' => $language,
-    ]);
-
-    $ch = curl_init($url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_POST, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, [
-        'Content-Type: application/json',
-        'Accept: application/json',
-    ]);
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
-    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-
-    $result = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $err = curl_error($ch);
-    // curl_close($ch);
-
-    if($result === false || $httpCode < 200 || $httpCode >= 400) {
-        // MCP server is down or errored — trigger fallback
-        error_log("MCP server unreachable ($url): $err (HTTP $httpCode)");
-        return null;
-    }
-
-    $decoded = json_decode($result, true);
-    if(!is_array($decoded)) {
-        error_log("MCP server returned invalid JSON");
-        return null;
-    }
-
-    return $decoded;
-}
 
 // End of file
