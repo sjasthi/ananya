@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 require("word_processor.php");
 
 if(isset($_POST["to_parse"])) {
