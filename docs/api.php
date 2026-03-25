@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <?php
 $root = 'http://' . $_SERVER['HTTP_HOST'] . '/ananya/';
