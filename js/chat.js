@@ -83,8 +83,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function looksLikePuzzleResponse(text) {
         if (!text) return false;
-        const t = String(text).toLowerCase();
-        return (t.includes('word find puzzle') || t.includes('crossword puzzle')) && t.includes('answer key:');
+        const t = String(text);
+        const tl = t.toLowerCase();
+
+        // English puzzle detection
+        const isEnglishPuzzle =
+            (tl.includes('word find puzzle') || tl.includes('crossword puzzle')) &&
+            tl.includes('answer key:');
+
+        // Telugu puzzle detection:
+        // - Common heading examples: "పద శోధన పజిల్" (word search puzzle)
+        // - Answer key headings: "జవాబు సూచిక:" / variants without colon or with synonyms
+        const hasTeluguPuzzleHeading =
+            t.includes('పద శోధన పజిల్') ||
+            t.includes('పదశోధన పజిల్') ||
+            t.includes('పద శోధన');
+
+        const hasTeluguAnswerKeyHeading =
+            t.includes('జవాబు సూచిక:') ||
+            t.includes('జవాబు సూచిక') ||
+            t.includes('సమాధాన సూచిక');
+
+        const isTeluguPuzzle = hasTeluguPuzzleHeading && hasTeluguAnswerKeyHeading;
+
+        return isEnglishPuzzle || isTeluguPuzzle;
     }
 
     function containsTeluguScript(text) {
