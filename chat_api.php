@@ -1269,7 +1269,7 @@ function format_crossword_response($theme, $count, $puzzle, $usedLlmCandidates) 
     return implode("\n", $lines);
 }
 
-function generate_crossword_answer($question, $llm_provider, $llm_model) {
+function generate_crossword_answer($question, $llm_provider, $llm_model, $language = 'english') {
     $req = parse_crossword_request($question);
     if ($req === null) {
         return null;
@@ -1277,20 +1277,36 @@ function generate_crossword_answer($question, $llm_provider, $llm_model) {
 
     $theme = $req['theme'];
     $count = $req['count'];
+    $lang  = strtolower((string)($language ?? 'english')) ?: 'english';
 
-    [$llmWordsRaw, $usedLlm] = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model);
-    $fallbackWordsRaw = fallback_theme_words($theme);
-    $words = sanitize_word_list(array_merge($llmWordsRaw, $fallbackWordsRaw), max($count + 4, 12));
+    // The deterministic crossword builder uses byte-level strlen()/indexing and
+    // only works correctly with ASCII (English) words.  For non-English scripts
+    // (e.g. Telugu) skip the builder and fall through to the LLM fallback so
+    // that characters are handled properly.
+    $useBuilder = ($lang === 'english');
 
-    $candidateWords = array_slice($words, 0, max($count + 4, 12));
-    $puzzle = build_best_crossword_puzzle($candidateWords, $count);
+    [$llmWordsRaw, $usedLlm] = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $lang);
+    $fallbackWordsRaw = fallback_theme_words($theme, $lang);
+    $words = sanitize_word_list(array_merge($llmWordsRaw, $fallbackWordsRaw), max($count + 4, 12), $lang);
+
+    $puzzle = null;
+    if ($useBuilder) {
+        $candidateWords = array_slice($words, 0, max($count + 4, 12));
+        $puzzle = build_best_crossword_puzzle($candidateWords, $count);
+    }
 
     if ($puzzle === null) {
         $opts = [
             'temperature' => 0.3,
             'max_tokens' => 900,
-            'system_prompt' => 'Create a crossword-style response with a blocked grid using # for black squares, plus Across, Down, and Answer key sections. Do not create a word find.',
         ];
+        if ($lang === 'telugu') {
+            $opts['system_prompt'] = 'క్రాస్‌వర్డ్ పజిల్ సృష్టించండి. గ్రిడ్‌లో నిండిన అక్షరాలు, # బ్లాక్ చేయబడిన సెల్‌ల కోసం, అదనంగా Across, Down మరియు Answer key విభాగాలు ఉండాలి. Word find సృష్టించవద్దు.';
+            $prompt = $count . ' పదాలతో ' . $theme . ' అంశంపై క్రాస్‌వర్డ్ పజిల్ సృష్టించండి. Crossword Puzzle, Across, Down మరియు Answer key అనే శీర్షికలు ఉపయోగించండి.';
+        } else {
+            $opts['system_prompt'] = 'Create a crossword-style response with a blocked grid using # for black squares, plus Across, Down, and Answer key sections. Do not create a word find.';
+            $prompt = 'Create a crossword puzzle with ' . $count . ' words about ' . $theme . '. Use the headings Crossword Puzzle, Across, Down, and Answer key.';
+        }
         if ($llm_provider !== '') {
             $opts['provider'] = $llm_provider;
         }
@@ -1298,7 +1314,7 @@ function generate_crossword_answer($question, $llm_provider, $llm_model) {
             $opts['model'] = $llm_model;
         }
 
-        $resp = llm_ask('Create a crossword puzzle with ' . $count . ' words about ' . $theme . '. Use the headings Crossword Puzzle, Across, Down, and Answer key.', $opts);
+        $resp = llm_ask($prompt, $opts);
         return [
             'ok' => true,
             'answer' => trim((string)$resp) . "\n\nLLM consulted - Yes",
@@ -1901,7 +1917,7 @@ if ($effective_llm_model === '' || strtolower($effective_llm_model) === 'auto') 
 
 if (is_generation_request($question)) {
     if (is_crossword_request($question)) {
-        $crossword = generate_crossword_answer($question, $llm_provider, $llm_model);
+        $crossword = generate_crossword_answer($question, $llm_provider, $llm_model, strtolower((string)$language));
         if (is_array($crossword)) {
             echo json_encode([
                 'question' => $question,
