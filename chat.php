@@ -1,15 +1,39 @@
 <?php
 require_once __DIR__ . '/includes/llm_handler.php';
 
-$llmChoices = function_exists('llm_get_configured_models') ? llm_get_configured_models() : [];
-if (empty($llmChoices)) {
-    $llmChoices = [
-        ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile', 'label' => 'Groq - llama-3.3-70b-versatile'],
-        ['provider' => 'gemini', 'model' => 'gemini-2.0-flash', 'label' => 'Gemini - gemini-2.0-flash'],
-        ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'label' => 'OpenAI - gpt-4o-mini'],
-    ];
+// Load local .env similarly to chat_api.php, if vlucas/phpdotenv is available.
+if (class_exists(\Dotenv\Dotenv::class)) {
+    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->safeLoad();
 }
 
+// Define default LLM choices that are known to be supported by chat_api.php.
+$defaultLlms = [
+    ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile', 'label' => 'Groq - llama-3.3-70b-versatile'],
+    ['provider' => 'gemini', 'model' => 'gemini-2.0-flash', 'label' => 'Gemini - gemini-2.0-flash'],
+    ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'label' => 'OpenAI - gpt-4o-mini'],
+];
+
+// Start with configured models if available.
+$llmChoices = function_exists('llm_get_configured_models') ? llm_get_configured_models() : [];
+
+// If no configured models, fall back to the defaults.
+if (empty($llmChoices)) {
+    $llmChoices = $defaultLlms;
+}
+
+// Align the dropdown options with what chat_api.php will honor.
+$allowedProviders = ['groq', 'gemini', 'openai'];
+$llmChoices = array_values(array_filter($llmChoices, function ($choice) use ($allowedProviders) {
+    $provider = strtolower($choice['provider'] ?? '');
+    return in_array($provider, $allowedProviders, true);
+}));
+
+// If filtering removed all entries (e.g., only unsupported providers were configured),
+// fall back to the known-good defaults.
+if (empty($llmChoices)) {
+    $llmChoices = $defaultLlms;
+}
 $defaultProvider = strtolower(getenv('LLM_PROVIDER') ?: '');
 $defaultModel = trim(getenv('LLM_MODEL') ?: '');
 $selectedChoice = '';
