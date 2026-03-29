@@ -42,6 +42,8 @@ require_once __DIR__ . '/includes/llm_handler.php';
 
 // Tool-loop settings
 $CHAT_MAX_TOOL_ITERS = (int)(getenv('CHAT_MAX_TOOL_ITERS') ?: 5);
+$MCP_SERVER_URL = getenv('MCP_SERVER_URL') ?: 'http://localhost:8000/chat';
+$MCP_TIMEOUT = (int)(getenv('MCP_TIMEOUT') ?: 20);
 
 // Helper function to call detected APIs
 function call_detected_api($api_name, $params) {
@@ -383,6 +385,1202 @@ function detect_intent($question, $language) {
     return null;
 }
 
+function is_generation_request($question) {
+    $q = strtolower(trim((string)$question));
+    if ($q === '') return false;
+
+    // Puzzle-generation prompts should not be forced into API-call JSON extraction.
+    if (preg_match('/\b(word\s*find|word\s*search|wordsearch|crossword|puzzle)\b/u', $q)) {
+        return true;
+    }
+
+    if (preg_match('/(క్రాస్[\p{L}\p{M}]*|పజిల్|వర్డ్\s*ఫైండ్|వర్డ్\s*సెర్చ్|రూపొందించండి|సృష్టించండి|తయారు\s*చేయండి)/u', $question)) {
+        return true;
+    }
+
+    if (preg_match('/\b(create|generate|make)\b/u', $q) && preg_match('/\bwords?\b/u', $q)) {
+        return true;
+    }
+
+    return false;
+}
+
+function is_crossword_request($question) {
+    $q = strtolower(trim((string)$question));
+    if ($q === '') {
+        return false;
+    }
+
+    return preg_match('/\bcrossword\b/u', $q) === 1
+        || preg_match('/క్రాస్[\p{L}\p{M}]*/u', $question) === 1;
+}
+
+function is_word_find_request($question) {
+    $q = strtolower(trim((string)$question));
+    if ($q === '') {
+        return false;
+    }
+
+    if (preg_match('/\b(word\s*find|word\s*search|wordsearch)\b/u', $q) === 1) {
+        return true;
+    }
+
+    // A "puzzle" request that is not a crossword is treated as a word find puzzle.
+    if (preg_match('/\bpuzzle\b/u', $q) === 1 && !preg_match('/\bcrossword\b/u', $q)) {
+        return true;
+    }
+
+    return preg_match('/(వర్డ్\s*ఫైండ్|వర్డ్\s*సెర్చ్|పద\s*శోధన|పజిల్)/u', $question) === 1;
+}
+
+function extract_theme_from_question($question) {
+    $q = trim((string)$question);
+    if ($q === '') {
+        return 'general words';
+    }
+
+    $patterns = [
+        '/\b(?:about|related to|on|for)\s+([a-zA-Z\s-]{2,80})/i',
+        '/\bwith\s+(?:an?|the)\s+([a-zA-Z\s-]{2,80})\s+theme\b/i',
+        '/\b([a-zA-Z\s-]{2,80})\s+theme\b/i',
+        '/\bthemed\s+(?:around|on)\s+([a-zA-Z\s-]{2,80})/i',
+        '/([\p{L}\p{M}\s-]{2,80})\s+గురించి/u',
+        '/([\p{L}\p{M}\s-]{2,80})\s+థీమ్/u',
+    ];
+
+    foreach ($patterns as $pattern) {
+        if (preg_match($pattern, $q, $m)) {
+            $theme = trim($m[1]);
+            $theme = preg_replace('/\b(words?|puzzle|crossword|word\s*find)\b/i', '', $theme);
+            $theme = trim(preg_replace('/\s+/', ' ', $theme));
+            if ($theme !== '') {
+                return $theme;
+            }
+        }
+    }
+
+    return 'general words';
+}
+
+function canonicalize_theme($theme) {
+    $t = trim(mb_strtolower($theme, 'UTF-8'));
+    if ($t === '') {
+        return 'general words';
+    }
+
+    $aliases = [
+        'dog' => ['dog', 'dogs', 'canine', 'puppy', 'puppies', 'కుక్క', 'కుక్కలు', 'శునకం', 'శునకాలు'],
+        'cat' => ['cat', 'cats', 'feline', 'kitten', 'kittens', 'పిల్లి', 'పిల్లులు'],
+    ];
+
+    foreach ($aliases as $canonical => $variants) {
+        foreach ($variants as $variant) {
+            if (mb_strpos($t, mb_strtolower($variant, 'UTF-8'), 0, 'UTF-8') !== false) {
+                return $canonical;
+            }
+        }
+    }
+
+    return $theme;
+}
+
+function parse_word_find_request($question) {
+    $q = trim((string)$question);
+    if ($q === '') return null;
+
+    if (is_crossword_request($q) || !is_word_find_request($q)) {
+        return null;
+    }
+
+    $count = 10;
+    if (preg_match('/\b(\d{1,2})\s+words?\b/i', $q, $m)) {
+        $count = (int)$m[1];
+    } elseif (preg_match('/\bwith\s+(\d{1,2})\b/i', $q, $m2)) {
+        $count = (int)$m2[1];
+    } elseif (preg_match('/\bcount\s*[=:]\s*(\d{1,2})\b/i', $q, $m3)) {
+        $count = (int)$m3[1];
+    }
+    $count = max(3, min(20, $count));
+
+    // Parse explicit grid dimensions, e.g. "16 x 12" or "16x12". Default 16 cols x 12 rows.
+    $gridCols = 16;
+    $gridRows = 12;
+    if (preg_match('/\b(\d{1,2})\s*[x×]\s*(\d{1,2})\b/i', $q, $gm)) {
+        $gridCols = max(8, min(30, (int)$gm[1]));
+        $gridRows = max(6, min(30, (int)$gm[2]));
+    }
+
+    $theme = canonicalize_theme(extract_theme_from_question($q));
+
+    return [
+        'count'    => $count,
+        'theme'    => $theme,
+        'gridCols' => $gridCols,
+        'gridRows' => $gridRows,
+    ];
+}
+
+function parse_crossword_request($question) {
+    $q = trim((string)$question);
+    if ($q === '') return null;
+
+    if (!is_crossword_request($q)) {
+        return null;
+    }
+
+    $count = 10;
+    if (preg_match('/\b(\d{1,2})\s+words?\b/i', $q, $m)) {
+        $count = (int)$m[1];
+    } elseif (preg_match('/\bwith\s+(\d{1,2})\b/i', $q, $m2)) {
+        $count = (int)$m2[1];
+    }
+    $count = max(3, min(20, $count));
+
+    $theme = canonicalize_theme(extract_theme_from_question($q));
+
+    return [
+        'count' => $count,
+        'theme' => $theme,
+    ];
+}
+
+function normalize_word_for_grid($word, $language = 'english') {
+    $text = trim((string)$word);
+    if ($language === 'telugu') {
+        $text = preg_replace('/[^\p{L}\p{M}]/u', '', $text);
+        return $text;
+    }
+
+    $upper = strtoupper($text);
+    $upper = preg_replace('/[^A-Z]/', '', $upper);
+    return $upper;
+}
+
+function split_logical_units_via_ananya_api($word, $language = 'english') {
+    static $cache = [];
+
+    $text = trim((string)$word);
+    if ($text === '') {
+        return [];
+    }
+
+    $cacheKey = $language . '|' . $text;
+    if (isset($cache[$cacheKey])) {
+        return $cache[$cacheKey];
+    }
+
+    $baseUrl = build_local_api_base_url();
+    $url = rtrim($baseUrl, '/') . '/analysis/parse-to-logical-chars?' . http_build_query([
+        'string' => $text,
+        'language' => $language,
+    ]);
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => (int)(getenv('LOCAL_API_TIMEOUT') ?: 15),
+        CURLOPT_CONNECTTIMEOUT => 5,
+    ]);
+
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($response === false || $httpCode < 200 || $httpCode >= 400) {
+        return [];
+    }
+
+    $decoded = json_decode($response, true);
+    if (!is_array($decoded)) {
+        return [];
+    }
+
+    $raw = $decoded['result'] ?? ($decoded['data'] ?? null);
+    $units = [];
+
+    if (is_array($raw)) {
+        foreach ($raw as $item) {
+            if (is_string($item) && $item !== '') {
+                $units[] = $item;
+            }
+        }
+    } elseif (is_string($raw) && trim($raw) !== '') {
+        $parts = preg_split('/[\s,|]+/u', trim($raw));
+        foreach ($parts as $part) {
+            if ($part !== '') {
+                $units[] = $part;
+            }
+        }
+    }
+
+    $cache[$cacheKey] = $units;
+    return $units;
+}
+
+function split_word_units($word, $language = 'english') {
+    $text = (string)$word;
+    if ($text === '') {
+        return [];
+    }
+
+    if ($language === 'telugu') {
+        // For Telugu puzzle generation, prefer Ananya API logical-char parsing.
+        $apiUnits = split_logical_units_via_ananya_api($text, $language);
+        if (!empty($apiUnits)) {
+            return $apiUnits;
+        }
+
+        if (preg_match_all('/\X/u', $text, $m) && !empty($m[0])) {
+            return $m[0];
+        }
+        return preg_split('//u', $text, -1, PREG_SPLIT_NO_EMPTY);
+    }
+
+    return str_split($text);
+}
+
+function sanitize_word_list($words, $maxCount, $language = 'english', $maxLen = 16) {
+    $seen = [];
+    $clean = [];
+    foreach ($words as $w) {
+        $nw = normalize_word_for_grid($w, $language);
+        $len = count(split_word_units($nw, $language));
+        if ($len < 3 || $len > $maxLen) {
+            continue;
+        }
+        if (isset($seen[$nw])) {
+            continue;
+        }
+        $seen[$nw] = true;
+        $clean[] = $nw;
+        if (count($clean) >= $maxCount) {
+            break;
+        }
+    }
+    return $clean;
+}
+
+function fallback_theme_words($theme, $language = 'english') {
+    $t = strtolower(canonicalize_theme($theme));
+
+    if ($language === 'telugu') {
+        if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
+            return ['కుక్క', 'పిల్లకుక్క', 'శునకం', 'మొరుగు', 'తోక', 'పంజా', 'కాలర్', 'బెల్ట్', 'కెనెల్', 'వఫ్', 'ముక్కు', 'రోమాలు'];
+        }
+        if (preg_match('/\bcat|cats|feline|kitten\b/', $t)) {
+            return ['పిల్లి', 'పిల్లిపిల్ల', 'మ్యావ్', 'మీసాలు', 'పంజా', 'తోక', 'రోమాలు', 'గోర్లు'];
+        }
+
+        return ['పర్వతం', 'నది', 'మేఘం', 'ఆకాశం', 'పుస్తకం', 'పాట', 'చెట్టు', 'పువ్వు', 'సముద్రం', 'వెలుగు'];
+    }
+
+    if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
+        return ['DOG', 'PUPPY', 'CANINE', 'LEASH', 'PAWS', 'BARK', 'TAIL', 'FUR', 'KENNEL', 'BEAGLE', 'COLLIE', 'RETRIEVER', 'HOUND', 'BONE', 'FETCH', 'WOOF', 'SNOUT', 'WHISKER', 'SHEPHERD', 'TERRIER'];
+    }
+
+    if (preg_match('/\bcat|cats|feline|kitten\b/', $t)) {
+        return ['CAT', 'KITTEN', 'FELINE', 'PAWS', 'MEOW', 'WHISKER', 'LITTER', 'CLAWS', 'PURR', 'TABBY', 'SIAMESE', 'TAIL', 'FUR', 'NAP', 'SCRATCH'];
+    }
+
+    return ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GAMMA', 'HARBOR', 'ISLAND', 'JUNGLE', 'KAPPA', 'LAGOON', 'MEADOW', 'NEBULA', 'ORBIT', 'PLANET', 'QUARTZ', 'RIVER', 'SUMMIT', 'THUNDER'];
+}
+
+function localized_theme_label($theme, $language = 'english') {
+    $canonical = strtolower(canonicalize_theme($theme));
+    if ($language === 'telugu') {
+        if ($canonical === 'dog') return 'కుక్కలు';
+        if ($canonical === 'cat') return 'పిల్లులు';
+    }
+    return $theme;
+}
+
+function parse_words_from_llm_text($text) {
+    $items = [];
+    $lines = preg_split('/\r?\n/', (string)$text);
+    foreach ($lines as $line) {
+        $line = trim($line);
+        if ($line === '') continue;
+        $line = preg_replace('/^[-*\d.\)\s]+/', '', $line);
+        $parts = preg_split('/[,;]+/', $line);
+        foreach ($parts as $p) {
+            $p = trim($p);
+            if ($p !== '') {
+                $items[] = $p;
+            }
+        }
+    }
+    return $items;
+}
+
+function request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $language = 'english') {
+    $opts = [
+        'temperature' => 0.2,
+        'max_tokens' => 220,
+        'system_prompt' => $language === 'telugu'
+            ? 'Return only a plain list of single Telugu words, one per line, no numbering, no punctuation, no extra text.'
+            : 'Return only a plain list of single English words, one per line, no numbering, no punctuation, no extra text.',
+    ];
+
+    if ($llm_provider !== '') {
+        $opts['provider'] = $llm_provider;
+    }
+    if ($llm_model !== '') {
+        $opts['model'] = $llm_model;
+    }
+
+    $prompt = $language === 'telugu'
+        ? ($theme . " అనే థీమ్‌కు సంబంధించిన " . ($count + 8) . " ఒక్కో తెలుగు పదాలు ఇవ్వండి.")
+        : ("Give " . ($count + 8) . " single-word terms related to this theme: " . $theme . ".");
+    $resp = llm_ask($prompt, $opts);
+
+    // llm_ask returns plain text on success and error text on failure.
+    if (!is_string($resp) || trim($resp) === '') {
+        return [[], false];
+    }
+    if (stripos($resp, 'API error') !== false || stripos($resp, 'not configured') !== false || stripos($resp, 'request failed') !== false) {
+        return [[], true];
+    }
+
+    return [parse_words_from_llm_text($resp), true];
+}
+
+function can_place_word($grid, $nRows, $nCols, $units, $row, $col, $dr, $dc) {
+    $len = count($units);
+    for ($i = 0; $i < $len; $i++) {
+        $r = $row + ($dr * $i);
+        $c = $col + ($dc * $i);
+        if ($r < 0 || $r >= $nRows || $c < 0 || $c >= $nCols) {
+            return false;
+        }
+        $cell = $grid[$r][$c];
+        if ($cell !== '' && $cell !== $units[$i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function place_word_in_grid(&$grid, $units, $row, $col, $dr, $dc) {
+    $len = count($units);
+    for ($i = 0; $i < $len; $i++) {
+        $r = $row + ($dr * $i);
+        $c = $col + ($dc * $i);
+        $grid[$r][$c] = $units[$i];
+    }
+}
+
+function crossword_can_place($grid, $size, $word, $row, $col, $orientation) {
+    $len = strlen($word);
+    $dr = $orientation === 'down' ? 1 : 0;
+    $dc = $orientation === 'across' ? 1 : 0;
+    $hasIntersection = false;
+
+    for ($i = 0; $i < $len; $i++) {
+        $r = $row + ($dr * $i);
+        $c = $col + ($dc * $i);
+        if ($r < 0 || $r >= $size || $c < 0 || $c >= $size) {
+            return false;
+        }
+
+        $cell = $grid[$r][$c];
+        if ($cell !== '' && $cell !== $word[$i]) {
+            return false;
+        }
+        if ($cell === $word[$i] && $cell !== '') {
+            $hasIntersection = true;
+        }
+
+        if ($orientation === 'across') {
+            if ($cell === '') {
+                if (($r > 0 && $grid[$r - 1][$c] !== '') || ($r < $size - 1 && $grid[$r + 1][$c] !== '')) {
+                    return false;
+                }
+            }
+        } else {
+            if ($cell === '') {
+                if (($c > 0 && $grid[$r][$c - 1] !== '') || ($c < $size - 1 && $grid[$r][$c + 1] !== '')) {
+                    return false;
+                }
+            }
+        }
+    }
+
+    $beforeR = $row - $dr;
+    $beforeC = $col - $dc;
+    $afterR = $row + ($dr * $len);
+    $afterC = $col + ($dc * $len);
+
+    if ($beforeR >= 0 && $beforeR < $size && $beforeC >= 0 && $beforeC < $size && $grid[$beforeR][$beforeC] !== '') {
+        return false;
+    }
+    if ($afterR >= 0 && $afterR < $size && $afterC >= 0 && $afterC < $size && $grid[$afterR][$afterC] !== '') {
+        return false;
+    }
+
+    // Require intersection for all but the first placed word.
+    $gridHasLetters = false;
+    for ($r = 0; $r < $size && !$gridHasLetters; $r++) {
+        for ($c = 0; $c < $size; $c++) {
+            if ($grid[$r][$c] !== '') {
+                $gridHasLetters = true;
+                break;
+            }
+        }
+    }
+
+    if ($gridHasLetters && !$hasIntersection) {
+        return false;
+    }
+
+    return true;
+}
+
+function crossword_place_word(&$grid, $word, $row, $col, $orientation) {
+    $len = strlen($word);
+    $dr = $orientation === 'down' ? 1 : 0;
+    $dc = $orientation === 'across' ? 1 : 0;
+    for ($i = 0; $i < $len; $i++) {
+        $r = $row + ($dr * $i);
+        $c = $col + ($dc * $i);
+        $grid[$r][$c] = $word[$i];
+    }
+}
+
+function score_crossword_layout($width, $height, $filledCells, $placedCount, $acrossCount, $downCount) {
+    $area = max(1, $width * $height);
+    $density = $filledCells / $area;
+    $shape = min($width, $height) / max($width, $height);
+    $balance = 1 - (abs($acrossCount - $downCount) / max(1, $placedCount));
+
+    return ($placedCount * 1000)
+        + ($density * 250)
+        + ($shape * 150)
+        + ($balance * 75)
+        - ($area * 0.35);
+}
+
+function build_crossword_puzzle($words) {
+    $words = array_values($words);
+    if (count($words) < 3) {
+        return null;
+    }
+
+    usort($words, function($a, $b) {
+        return strlen($b) <=> strlen($a);
+    });
+
+    $longest = 0;
+    foreach ($words as $w) {
+        $longest = max($longest, strlen($w));
+    }
+
+    $baseSize = max(9, min(21, $longest + max(4, (int)ceil(count($words) / 2) + 2)));
+
+    $bestPuzzle = null;
+
+    for ($grow = 0; $grow < 6; $grow++) {
+        $size = min(24, $baseSize + $grow);
+        for ($attempt = 0; $attempt < 60; $attempt++) {
+            $grid = array_fill(0, $size, array_fill(0, $size, ''));
+            $placed = [];
+
+            $first = $words[0];
+            $startRow = intdiv($size, 2);
+            $startCol = max(0, intdiv($size - strlen($first), 2));
+            crossword_place_word($grid, $first, $startRow, $startCol, 'across');
+            $placed[] = ['word' => $first, 'row' => $startRow, 'col' => $startCol, 'orientation' => 'across'];
+
+            for ($wi = 1; $wi < count($words); $wi++) {
+                $word = $words[$wi];
+                $candidates = [];
+
+                foreach ($placed as $pw) {
+                    $existing = $pw['word'];
+                    for ($i = 0; $i < strlen($word); $i++) {
+                        for ($j = 0; $j < strlen($existing); $j++) {
+                            if ($word[$i] !== $existing[$j]) {
+                                continue;
+                            }
+
+                            $orientation = $pw['orientation'] === 'across' ? 'down' : 'across';
+                            if ($orientation === 'down') {
+                                $row = $pw['row'] - $i;
+                                $col = $pw['col'] + $j;
+                            } else {
+                                $row = $pw['row'] + $j;
+                                $col = $pw['col'] - $i;
+                            }
+                            $candidates[] = [$row, $col, $orientation];
+                        }
+                    }
+                }
+
+                shuffle($candidates);
+                $didPlace = false;
+                foreach ($candidates as $cand) {
+                    [$row, $col, $orientation] = $cand;
+                    if (!crossword_can_place($grid, $size, $word, $row, $col, $orientation)) {
+                        continue;
+                    }
+                    crossword_place_word($grid, $word, $row, $col, $orientation);
+                    $placed[] = ['word' => $word, 'row' => $row, 'col' => $col, 'orientation' => $orientation];
+                    $didPlace = true;
+                    break;
+                }
+
+                if (!$didPlace) {
+                    // Try to seed a new crossing backbone only if enough words already placed.
+                    if (count($placed) < max(3, count($words) - 2)) {
+                        continue 2;
+                    }
+                }
+            }
+
+            if (count($placed) < max(3, count($words) - 1)) {
+                continue;
+            }
+
+            $minR = $size; $maxR = 0; $minC = $size; $maxC = 0;
+            for ($r = 0; $r < $size; $r++) {
+                for ($c = 0; $c < $size; $c++) {
+                    if ($grid[$r][$c] !== '') {
+                        $minR = min($minR, $r);
+                        $maxR = max($maxR, $r);
+                        $minC = min($minC, $c);
+                        $maxC = max($maxC, $c);
+                    }
+                }
+            }
+
+            $rows = [];
+            for ($r = $minR; $r <= $maxR; $r++) {
+                $cells = [];
+                for ($c = $minC; $c <= $maxC; $c++) {
+                    $cells[] = $grid[$r][$c] === '' ? '#' : $grid[$r][$c];
+                }
+                $rows[] = implode(' ', $cells);
+            }
+
+            $numberMap = [];
+            $numbers = [];
+            $nextNum = 1;
+            for ($r = $minR; $r <= $maxR; $r++) {
+                for ($c = $minC; $c <= $maxC; $c++) {
+                    if ($grid[$r][$c] === '') continue;
+                    $startsAcross = ($c === $minC || $grid[$r][$c - 1] === '') && ($c < $size - 1 && $grid[$r][$c + 1] !== '');
+                    $startsDown = ($r === $minR || $grid[$r - 1][$c] === '') && ($r < $size - 1 && $grid[$r + 1][$c] !== '');
+                    if ($startsAcross || $startsDown) {
+                        $key = $r . ':' . $c;
+                        $numberMap[$key] = $nextNum;
+                        $nextNum++;
+                    }
+                }
+            }
+
+            $across = [];
+            $down = [];
+            foreach ($placed as $p) {
+                $numKey = $p['row'] . ':' . $p['col'];
+                if (!isset($numberMap[$numKey])) {
+                    continue;
+                }
+                $entry = [
+                    'number' => $numberMap[$numKey],
+                    'word' => $p['word'],
+                    'length' => strlen($p['word']),
+                    'row' => $p['row'] - $minR + 1,
+                    'col' => $p['col'] - $minC + 1,
+                ];
+                if ($p['orientation'] === 'across') {
+                    $across[] = $entry;
+                } else {
+                    $down[] = $entry;
+                }
+            }
+
+            usort($across, fn($a, $b) => $a['number'] <=> $b['number']);
+            usort($down, fn($a, $b) => $a['number'] <=> $b['number']);
+
+            $width = $maxC - $minC + 1;
+            $height = $maxR - $minR + 1;
+            $filledCells = 0;
+            foreach ($rows as $rowText) {
+                foreach (preg_split('/\s+/', trim($rowText)) as $cell) {
+                    if ($cell !== '#') {
+                        $filledCells++;
+                    }
+                }
+            }
+
+            $puzzle = [
+                'rows' => $rows,
+                'width' => $width,
+                'height' => $height,
+                'across' => $across,
+                'down' => $down,
+                'words' => array_map(fn($p) => $p['word'], $placed),
+                'filled_cells' => $filledCells,
+            ];
+
+            $puzzle['score'] = score_crossword_layout(
+                $width,
+                $height,
+                $filledCells,
+                count($puzzle['words']),
+                count($across),
+                count($down)
+            );
+
+            if ($bestPuzzle === null || $puzzle['score'] > $bestPuzzle['score']) {
+                $bestPuzzle = $puzzle;
+            }
+
+            if (count($puzzle['words']) >= count($words)) {
+                return $puzzle;
+            }
+        }
+    }
+
+    return $bestPuzzle;
+}
+
+function word_letter_overlap_score($a, $b) {
+    $seen = [];
+    $score = 0;
+    for ($i = 0; $i < strlen($a); $i++) {
+        $ch = $a[$i];
+        if (strpos($b, $ch) !== false && !isset($seen[$ch])) {
+            $seen[$ch] = true;
+            $score++;
+        }
+    }
+    return $score;
+}
+
+function order_crossword_words($words, $targetCount) {
+    $pool = array_values($words);
+    if (count($pool) <= 1) {
+        return array_slice($pool, 0, $targetCount);
+    }
+
+    $scores = [];
+    foreach ($pool as $i => $word) {
+        $total = 0;
+        foreach ($pool as $j => $other) {
+            if ($i === $j) continue;
+            $total += word_letter_overlap_score($word, $other);
+        }
+        $scores[$i] = $total;
+    }
+
+    arsort($scores);
+    $ordered = [];
+    $used = [];
+
+    $seedIndex = array_key_first($scores);
+    $ordered[] = $pool[$seedIndex];
+    $used[$seedIndex] = true;
+
+    while (count($ordered) < min($targetCount, count($pool))) {
+        $bestIndex = null;
+        $bestScore = -1;
+        foreach ($pool as $i => $word) {
+            if (isset($used[$i])) continue;
+            $score = 0;
+            foreach ($ordered as $picked) {
+                $score += word_letter_overlap_score($word, $picked);
+            }
+            if ($score > $bestScore) {
+                $bestScore = $score;
+                $bestIndex = $i;
+            }
+        }
+
+        if ($bestIndex === null) {
+            break;
+        }
+
+        $ordered[] = $pool[$bestIndex];
+        $used[$bestIndex] = true;
+    }
+
+    return $ordered;
+}
+
+function build_best_crossword_puzzle($words, $requestedCount) {
+    $pool = array_values($words);
+    if (count($pool) < 3) {
+        return null;
+    }
+
+    $best = null;
+    $maxTake = min(count($pool), max($requestedCount, 8));
+    $ordered = order_crossword_words($pool, $maxTake);
+
+    for ($take = min($requestedCount, count($ordered)); $take >= 5; $take--) {
+        $candidates = [];
+        $base = array_slice($ordered, 0, $take);
+        $candidates[] = $base;
+
+        for ($i = 0; $i < 20; $i++) {
+            $shuffled = $base;
+            shuffle($shuffled);
+            usort($shuffled, function ($a, $b) use ($base) {
+                $oa = 0;
+                $ob = 0;
+                foreach ($base as $w) {
+                    if ($w !== $a) $oa += word_letter_overlap_score($a, $w);
+                    if ($w !== $b) $ob += word_letter_overlap_score($b, $w);
+                }
+                return $ob <=> $oa ?: (strlen($b) <=> strlen($a));
+            });
+            $candidates[] = $shuffled;
+        }
+
+        foreach ($candidates as $candidateSet) {
+            $puzzle = build_crossword_puzzle($candidateSet);
+            if ($puzzle === null) {
+                continue;
+            }
+
+            if (
+                $best === null
+                || count($puzzle['words']) > count($best['words'])
+                || (count($puzzle['words']) === count($best['words']) && (($puzzle['score'] ?? 0) > ($best['score'] ?? 0)))
+            ) {
+                $best = $puzzle;
+            }
+
+            if (count($puzzle['words']) >= $take && (($puzzle['score'] ?? 0) > 0)) {
+                return $puzzle;
+            }
+        }
+    }
+
+    return $best;
+}
+
+function format_crossword_clue($theme, $word) {
+    $theme = trim($theme);
+    if ($theme === '') {
+        return 'Related term';
+    }
+    return ucfirst($theme) . ' term';
+}
+
+function crossword_rows_to_cells($rows) {
+    $cells = [];
+    foreach ($rows as $row) {
+        $cells[] = preg_split('/\s+/', trim($row));
+    }
+    return $cells;
+}
+
+function render_crossword_number_grid($puzzle) {
+    $cells = crossword_rows_to_cells($puzzle['rows']);
+    $numberMap = [];
+
+    foreach (array_merge($puzzle['across'], $puzzle['down']) as $entry) {
+        $key = $entry['row'] . ':' . $entry['col'];
+        $numberMap[$key] = $entry['number'];
+    }
+
+    $lines = [];
+    foreach ($cells as $rIdx => $row) {
+        $parts = [];
+        foreach ($row as $cIdx => $cell) {
+            $rowNum = $rIdx + 1;
+            $colNum = $cIdx + 1;
+            $key = $rowNum . ':' . $colNum;
+
+            if ($cell === '#') {
+                $parts[] = '   ';
+            } elseif (isset($numberMap[$key])) {
+                $label = substr(str_pad((string)$numberMap[$key], 2, ' ', STR_PAD_LEFT), -2);
+                $parts[] = '[' . $label . ']';
+            } else {
+                $parts[] = '[ ]';
+            }
+        }
+        $lines[] = implode(' ', $parts);
+    }
+
+    return implode("\n", $lines);
+}
+
+function render_crossword_solution_grid($puzzle) {
+    $cells = crossword_rows_to_cells($puzzle['rows']);
+    if (empty($cells)) {
+        return '';
+    }
+    $lines = [];
+
+    foreach ($cells as $row) {
+        $content = [];
+        foreach ($row as $cell) {
+            $content[] = $cell === '#' ? '   ' : '[' . $cell . ']';
+        }
+        $lines[] = implode(' ', $content);
+    }
+
+    return implode("\n", $lines);
+}
+
+function format_crossword_response($theme, $count, $puzzle, $usedLlmCandidates) {
+    $lines = [];
+    $lines[] = 'Crossword Puzzle';
+    $lines[] = 'Theme: ' . $theme;
+    $lines[] = 'Words: ' . count($puzzle['words']) . ' requested ' . $count;
+    $lines[] = 'Grid: ' . $puzzle['height'] . 'x' . $puzzle['width'];
+    $lines[] = 'Legend: [ ] = fillable cell, [n] = clue start, blank space = blocked cell';
+    $lines[] = '';
+    $lines[] = 'Puzzle Grid:';
+    $lines[] = render_crossword_number_grid($puzzle);
+    $lines[] = '';
+    $lines[] = 'Across:';
+    foreach ($puzzle['across'] as $entry) {
+        $lines[] = '- ' . $entry['number'] . '. ' . format_crossword_clue($theme, $entry['word']) . ' (' . $entry['length'] . ')';
+    }
+
+    $lines[] = '';
+    $lines[] = 'Down:';
+    foreach ($puzzle['down'] as $entry) {
+        $lines[] = '- ' . $entry['number'] . '. ' . format_crossword_clue($theme, $entry['word']) . ' (' . $entry['length'] . ')';
+    }
+
+    $lines[] = '';
+    $lines[] = 'Answer key:';
+    foreach ($puzzle['across'] as $entry) {
+        $lines[] = '- ' . $entry['number'] . ' Across: ' . $entry['word'] . ' at (' . $entry['row'] . ',' . $entry['col'] . ')';
+    }
+    foreach ($puzzle['down'] as $entry) {
+        $lines[] = '- ' . $entry['number'] . ' Down: ' . $entry['word'] . ' at (' . $entry['row'] . ',' . $entry['col'] . ')';
+    }
+
+    $lines[] = '';
+    $lines[] = 'Solution Grid:';
+    $lines[] = render_crossword_solution_grid($puzzle);
+
+    $lines[] = '';
+    $lines[] = 'Generation mode: deterministic crossword builder' . ($usedLlmCandidates ? ' + LLM word suggestions.' : '.');
+    $lines[] = '';
+    $lines[] = 'LLM consulted - Yes';
+
+    return implode("\n", $lines);
+}
+
+function generate_crossword_answer($question, $llm_provider, $llm_model) {
+    $req = parse_crossword_request($question);
+    if ($req === null) {
+        return null;
+    }
+
+    $theme = $req['theme'];
+    $count = $req['count'];
+
+    [$llmWordsRaw, $usedLlm] = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model);
+    $fallbackWordsRaw = fallback_theme_words($theme);
+    $words = sanitize_word_list(array_merge($llmWordsRaw, $fallbackWordsRaw), max($count + 4, 12));
+
+    $candidateWords = array_slice($words, 0, max($count + 4, 12));
+    $puzzle = build_best_crossword_puzzle($candidateWords, $count);
+
+    if ($puzzle === null) {
+        $opts = [
+            'temperature' => 0.3,
+            'max_tokens' => 900,
+            'system_prompt' => 'Create a crossword-style response with a blocked grid using # for black squares, plus Across, Down, and Answer key sections. Do not create a word find.',
+        ];
+        if ($llm_provider !== '') {
+            $opts['provider'] = $llm_provider;
+        }
+        if ($llm_model !== '') {
+            $opts['model'] = $llm_model;
+        }
+
+        $resp = llm_ask('Create a crossword puzzle with ' . $count . ' words about ' . $theme . '. Use the headings Crossword Puzzle, Across, Down, and Answer key.', $opts);
+        return [
+            'ok' => true,
+            'answer' => trim((string)$resp) . "\n\nLLM consulted - Yes",
+        ];
+    }
+
+    return [
+        'ok' => true,
+        'answer' => format_crossword_response($theme, $count, $puzzle, $usedLlm),
+    ];
+}
+
+function fill_empty_cells(&$grid, $nRows, $nCols, $language = 'english') {
+    $teluguPool = ['అ', 'ఆ', 'ఇ', 'ఈ', 'ఉ', 'ఊ', 'ఎ', 'ఏ', 'ఒ', 'ఓ', 'క', 'గ', 'చ', 'జ', 'ట', 'డ', 'త', 'ద', 'న', 'ప', 'బ', 'మ', 'య', 'ర', 'ల', 'వ', 'స', 'హ'];
+    for ($r = 0; $r < $nRows; $r++) {
+        for ($c = 0; $c < $nCols; $c++) {
+            if ($grid[$r][$c] === '') {
+                if ($language === 'telugu') {
+                    $grid[$r][$c] = $teluguPool[random_int(0, count($teluguPool) - 1)];
+                } else {
+                    $grid[$r][$c] = chr(ord('A') + random_int(0, 25));
+                }
+            }
+        }
+    }
+}
+
+function direction_to_label($dr, $dc) {
+    $map = [
+        '0,1' => 'E',
+        '0,-1' => 'W',
+        '1,0' => 'S',
+        '-1,0' => 'N',
+        '1,1' => 'SE',
+        '1,-1' => 'SW',
+        '-1,1' => 'NE',
+        '-1,-1' => 'NW',
+    ];
+    $key = $dr . ',' . $dc;
+    return $map[$key] ?? '?';
+}
+
+function build_word_find_puzzle($words, $language = 'english', $gridCols = 16, $gridRows = 12) {
+    $words = array_values($words);
+    if (count($words) < 3) {
+        return null;
+    }
+
+    usort($words, function($a, $b) use ($language) {
+        return count(split_word_units($b, $language)) <=> count(split_word_units($a, $language));
+    });
+
+    $dirs = [
+        [0, 1], [0, -1], [1, 0], [-1, 0],
+        [1, 1], [1, -1], [-1, 1], [-1, -1],
+    ];
+
+    for ($grow = 0; $grow < 4; $grow++) {
+        $nCols = min(30, $gridCols + $grow);
+        $nRows = min(30, $gridRows + $grow);
+
+        for ($attempt = 0; $attempt < 30; $attempt++) {
+            // Rectangular grid: $nRows rows x $nCols columns.
+            $grid = array_fill(0, $nRows, array_fill(0, $nCols, ''));
+            $placements = [];
+            $ok = true;
+
+            foreach ($words as $word) {
+                $units = split_word_units($word, $language);
+                $placed = false;
+                for ($tries = 0; $tries < 300; $tries++) {
+                    $dir = $dirs[random_int(0, count($dirs) - 1)];
+                    $dr = $dir[0];
+                    $dc = $dir[1];
+                    $row = random_int(0, $nRows - 1);
+                    $col = random_int(0, $nCols - 1);
+
+                    if (!can_place_word($grid, $nRows, $nCols, $units, $row, $col, $dr, $dc)) {
+                        continue;
+                    }
+
+                    place_word_in_grid($grid, $units, $row, $col, $dr, $dc);
+                    $endRow = $row + ($dr * (count($units) - 1));
+                    $endCol = $col + ($dc * (count($units) - 1));
+                    $placements[] = [
+                        'word' => $word,
+                        'start' => [$row + 1, $col + 1],
+                        'end' => [$endRow + 1, $endCol + 1],
+                        'dir' => direction_to_label($dr, $dc),
+                    ];
+                    $placed = true;
+                    break;
+                }
+
+                if (!$placed) {
+                    $ok = false;
+                    break;
+                }
+            }
+
+            if ($ok) {
+                fill_empty_cells($grid, $nRows, $nCols, $language);
+                $rows = [];
+                for ($r = 0; $r < $nRows; $r++) {
+                    $rows[] = implode(' ', $grid[$r]);
+                }
+
+                return [
+                    'size' => max($nCols, $nRows),
+                    'rows' => $rows,
+                    'placements' => $placements,
+                    'words' => $words,
+                ];
+            }
+        }
+    }
+
+    return null;
+}
+
+function text_display_width($text) {
+    if (function_exists('mb_strwidth')) {
+        return mb_strwidth((string)$text, 'UTF-8');
+    }
+    return strlen((string)$text);
+}
+
+function pad_cell_center($text, $width) {
+    $text = (string)$text;
+    $w = text_display_width($text);
+    if ($w >= $width) {
+        return $text;
+    }
+
+    $total = $width - $w;
+    $left = intdiv($total, 2);
+    $right = $total - $left;
+    return str_repeat(' ', $left) . $text . str_repeat(' ', $right);
+}
+
+function render_word_find_grid($rows) {
+    $matrix = [];
+    $cellWidth = 1;
+
+    foreach ($rows as $row) {
+        $cells = preg_split('/\s+/u', trim((string)$row));
+        $cells = array_values(array_filter($cells, fn($c) => $c !== ''));
+        if (empty($cells)) {
+            continue;
+        }
+        foreach ($cells as $c) {
+            $cellWidth = max($cellWidth, text_display_width($c));
+        }
+        $matrix[] = $cells;
+    }
+
+    if (empty($matrix)) {
+        return '';
+    }
+
+    $cols = count($matrix[0]);
+    $lines = [];
+
+    foreach ($matrix as $row) {
+        $parts = [];
+        for ($i = 0; $i < $cols; $i++) {
+            $cell = $row[$i] ?? '';
+            $parts[] = pad_cell_center($cell, $cellWidth);
+        }
+        $lines[] = implode(' ', $parts);
+    }
+
+    return implode("\n", $lines);
+}
+
+function word_find_grid_dimensions($rows) {
+    $height = 0;
+    $width = 0;
+    foreach ($rows as $row) {
+        $cells = preg_split('/\s+/u', trim((string)$row));
+        $cells = array_values(array_filter($cells, fn($c) => $c !== ''));
+        if (empty($cells)) {
+            continue;
+        }
+        $height++;
+        $width = max($width, count($cells));
+    }
+    return [$width, $height];
+}
+
+function format_word_find_response($theme, $count, $puzzle, $usedLlmCandidates, $language = 'english') {
+    $lines = [];
+    [$gridWidth, $gridHeight] = word_find_grid_dimensions($puzzle['rows']);
+    if ($gridWidth <= 0 || $gridHeight <= 0) {
+        $gridWidth = (int)($puzzle['size'] ?? 0);
+        $gridHeight = (int)($puzzle['size'] ?? 0);
+    }
+
+    if ($language === 'telugu') {
+        $lines[] = 'పద శోధన పజిల్';
+        $lines[] = 'థీమ్: ' . $theme;
+        $lines[] = 'పదాలు: ' . count($puzzle['words']) . ' / కోరినవి ' . $count;
+        $lines[] = 'గ్రిడ్: ' . $gridWidth . 'x' . $gridHeight;
+    } else {
+        $lines[] = 'Word Find Puzzle';
+        $lines[] = 'Theme: ' . $theme;
+        $lines[] = 'Words: ' . count($puzzle['words']) . ' requested ' . $count;
+        $lines[] = 'Grid: ' . $gridWidth . 'x' . $gridHeight;
+    }
+    $lines[] = '';
+    $lines[] = render_word_find_grid($puzzle['rows']);
+
+    $lines[] = '';
+    $lines[] = $language === 'telugu' ? 'ఈ పదాలను కనుగొనండి:' : 'Find these words:';
+    foreach ($puzzle['words'] as $w) {
+        $lines[] = '- ' . $w;
+    }
+
+    $lines[] = '';
+    $lines[] = $language === 'telugu' ? 'జవాబు సూచిక:' : 'Answer key:';
+    foreach ($puzzle['placements'] as $p) {
+        $lines[] = '- ' . $p['word'] . ': (' . $p['start'][0] . ',' . $p['start'][1] . ') -> (' . $p['end'][0] . ',' . $p['end'][1] . ') ' . $p['dir'];
+    }
+
+    $lines[] = '';
+    $lines[] = $language === 'telugu'
+        ? ('జనరేషన్ మోడ్: deterministic grid builder' . ($usedLlmCandidates ? ' + LLM word suggestions.' : '.'))
+        : ('Generation mode: deterministic grid builder' . ($usedLlmCandidates ? ' + LLM word suggestions.' : '.'));
+    $lines[] = '';
+    $lines[] = 'LLM consulted - Yes';
+
+    return implode("\n", $lines);
+}
+
+function generate_word_find_answer($question, $llm_provider, $llm_model, $language = 'english') {
+    $req = parse_word_find_request($question);
+    if ($req === null) {
+        return null;
+    }
+
+    $theme = $req['theme'];
+    $count = $req['count'];
+
+    $canonicalTheme = strtolower(canonicalize_theme($theme));
+    $fallbackWordsRaw = fallback_theme_words($theme, $language);
+    $useStrictCuratedTheme = in_array($canonicalTheme, ['dog', 'cat'], true);
+
+    $llmWordsRaw = [];
+    $usedLlm = false;
+    if (!$useStrictCuratedTheme) {
+        [$llmWordsRaw, $usedLlm] = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $language);
+    }
+
+    // For known themes (dog/cat), prioritize curated theme words and then add LLM variety.
+    $preferCurated = $useStrictCuratedTheme;
+    $merged = $preferCurated
+        ? $fallbackWordsRaw
+        : array_merge($llmWordsRaw, $fallbackWordsRaw);
+    $words = sanitize_word_list($merged, $count, $language, $req['gridCols']);
+
+    if (count($words) < $count) {
+        // Add deterministic fillers to reach requested count if needed.
+        $extras = $language === 'telugu'
+            ? ['ఆకాశం', 'పర్వతం', 'పాట', 'చెట్టు', 'పువ్వు', 'నది', 'చంద్రుడు', 'సముద్రం', 'వెలుగు', 'గాలి']
+            : ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GAMMA', 'OMEGA', 'SIGMA', 'THETA'];
+        $words = sanitize_word_list(array_merge($words, $extras), $count, $language, $req['gridCols']);
+    }
+
+    $puzzle = build_word_find_puzzle($words, $language, $req['gridCols'], $req['gridRows']);
+    if ($puzzle === null) {
+        return [
+            'ok' => false,
+            'answer' => 'I could not construct a valid word-find grid for that request. Please try fewer words or a broader theme.\n\nLLM consulted - Yes',
+        ];
+    }
+
+    return [
+        'ok' => true,
+        'answer' => format_word_find_response(localized_theme_label($theme, $language), $count, $puzzle, $usedLlm, $language),
+    ];
+}
+
 function chat_system_prompt() {
     return "You are Ananya, a helpful AI assistant specialized in word and text processing. "
         . "Use tools for precise text analysis, comparison, validation, and transformations in English and Indic languages. "
@@ -598,26 +1796,63 @@ if($raw) {
 
 $question = trim($_POST['question'] ?? ($data['question'] ?? ''));
 $language = $_POST['language'] ?? ($data['language'] ?? 'english');
+$llm_provider = strtolower(trim($_POST['llm_provider'] ?? ($data['llm_provider'] ?? '')));
+$llm_model = trim($_POST['llm_model'] ?? ($data['llm_model'] ?? ''));
+
+if (!in_array($llm_provider, ['gemini', 'openai', 'groq'], true)) {
+    $llm_provider = '';
+}
+
+if ($llm_model !== '' && !preg_match('/^[A-Za-z0-9._:-]{1,120}$/', $llm_model)) {
+    $llm_model = '';
+}
 
 if(!$question) {
     echo json_encode(['error' => 'Missing question parameter']);
     exit;
 }
 
-// ── Primary path: in-process tool orchestration (shared-hosting friendly) ──
-$orchestrated = run_php_tool_orchestration($question, $language, $CHAT_MAX_TOOL_ITERS);
-if (!empty($orchestrated['ok'])) {
-    echo json_encode([
-        'question' => $question,
-        'language' => $language,
-        'answer' => $orchestrated['answer'] ?? '',
-        'source' => $orchestrated['source'] ?? 'mcp',
-        'llm_consulted' => true,
-    ]);
+// ── Forward to MCP server (intent classification + tool calling handled there) ──
+
+// If the user explicitly selected an LLM/provider from the UI, use direct fallback path.
+// MCP server currently uses its own runtime provider configuration.
+$useDirectLlm = ($llm_provider !== '' || $llm_model !== '');
+
+$mcp_result = null;
+if (!$useDirectLlm) {
+    $mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT, $llm_provider, $llm_model);
+}
+
+if($mcp_result !== null) {
+    // MCP server responded successfully
+    if (is_array($mcp_result)) {
+        $mcp_result['llm_consulted'] = true;
+        if (!empty($mcp_result['answer']) && stripos($mcp_result['answer'], 'LLM consulted') === false) {
+            $mcp_result['answer'] .= "\n\nLLM consulted - Yes";
+        }
+
+        $effective_llm_provider = $llm_provider ?: strtolower(getenv('LLM_PROVIDER') ?: 'gemini');
+        $effective_llm_model = $llm_model ?: trim((string)(getenv('LLM_MODEL') ?: ''));
+        if ($effective_llm_model === '' || strtolower($effective_llm_model) === 'auto') {
+            $effective_llm_model = llm_default_model_for_provider($effective_llm_provider);
+        }
+
+        if (empty($mcp_result['llm_provider'])) {
+            $mcp_result['llm_provider'] = $effective_llm_provider;
+        }
+
+        if (empty($mcp_result['llm_model'])) {
+            $mcp_result['llm_model'] = $effective_llm_model;
+        }
+    }
+    echo json_encode($mcp_result);
     exit;
 }
 
-error_log('PHP tool orchestration failed; falling back to legacy single-shot flow. Error: ' . ($orchestrated['error'] ?? 'unknown'));
+$fallbackReason = $useDirectLlm
+    ? 'Direct LLM selected from UI (skipped MCP server).'
+    : 'MCP server unavailable or returned invalid response.';
+error_log('Chat API: falling back to legacy single-shot flow. Reason: ' . $fallbackReason);
 
 // ── Fallback: direct LLM call (no tool execution) ─────────────────
 
@@ -645,11 +1880,91 @@ $prompt .= "Available APIs:\n" . $context . "\n\n";
 $prompt .= "User: '" . $question . "' (language: $language)\n";
 $prompt .= "JSON response: ";
 
-$resp = llm_ask($prompt, [
-    'model' => 'mistral',
+$fallbackOpts = [
     'temperature' => 0.0,
     'system_prompt' => 'You output ONLY valid JSON. No explanations.',
-]);
+];
+
+if ($llm_provider !== '') {
+    $fallbackOpts['provider'] = $llm_provider;
+}
+
+if ($llm_model !== '') {
+    $fallbackOpts['model'] = $llm_model;
+}
+
+$effective_llm_provider = $llm_provider ?: strtolower(getenv('LLM_PROVIDER') ?: 'gemini');
+$effective_llm_model = $llm_model ?: trim((string)(getenv('LLM_MODEL') ?: ''));
+if ($effective_llm_model === '' || strtolower($effective_llm_model) === 'auto') {
+    $effective_llm_model = llm_default_model_for_provider($effective_llm_provider);
+}
+
+if (is_generation_request($question)) {
+    if (is_crossword_request($question)) {
+        $crossword = generate_crossword_answer($question, $llm_provider, $llm_model);
+        if (is_array($crossword)) {
+            echo json_encode([
+                'question' => $question,
+                'language' => $language,
+                'llm_provider' => $effective_llm_provider,
+                'llm_model' => $effective_llm_model,
+                'answer' => $crossword['answer'] ?? 'I could not construct a crossword for that request.\n\nLLM consulted - Yes',
+                'api_doc_name' => null,
+                'source' => 'fallback',
+                'llm_consulted' => true,
+            ]);
+            exit;
+        }
+    }
+
+    $wordFind = generate_word_find_answer($question, $llm_provider, $llm_model, strtolower((string)$language));
+    if (is_array($wordFind) && !empty($wordFind['ok'])) {
+        echo json_encode([
+            'question' => $question,
+            'language' => $language,
+            'llm_provider' => $effective_llm_provider,
+            'llm_model' => $effective_llm_model,
+            'answer' => $wordFind['answer'],
+            'api_doc_name' => null,
+            'source' => 'fallback',
+            'llm_consulted' => true,
+        ]);
+        exit;
+    }
+
+    $generationOpts = [
+        'temperature' => 0.4,
+        'max_tokens' => (int)(getenv('LLM_MAX_TOKENS') ?: 1200),
+        'system_prompt' => 'You are Ananya. For generation requests (word-find/crossword/puzzle/word lists), respond directly with clear, concise content. Do not output API-call JSON unless explicitly asked.',
+    ];
+
+    if ($llm_provider !== '') {
+        $generationOpts['provider'] = $llm_provider;
+    }
+
+    if ($llm_model !== '') {
+        $generationOpts['model'] = $llm_model;
+    }
+
+    $resp = llm_ask($question, $generationOpts);
+    if (stripos($resp, 'LLM consulted') === false) {
+        $resp .= "\n\nLLM consulted - Yes";
+    }
+
+    echo json_encode([
+        'question' => $question,
+        'language' => $language,
+        'llm_provider' => $effective_llm_provider,
+        'llm_model' => $effective_llm_model,
+        'answer' => $resp,
+        'api_doc_name' => null,
+        'source' => 'fallback',
+        'llm_consulted' => true,
+    ]);
+    exit;
+}
+
+$resp = llm_ask($prompt, $fallbackOpts);
 
 error_log("LLM Raw Response:\n" . $resp . "\n---END---");
 
@@ -688,11 +2003,20 @@ if (!$api_name) {
     $strict_prompt .= "Available APIs:\n" . $context . "\n\n";
     $strict_prompt .= "User: '" . $question . "' (language: $language)\n";
 
-    $resp = llm_ask($strict_prompt, [
-        'model' => 'mistral',
+    $strictOpts = [
         'temperature' => 0.0,
         'system_prompt' => 'Output ONLY valid JSON.',
-    ]);
+    ];
+
+    if ($llm_provider !== '') {
+        $strictOpts['provider'] = $llm_provider;
+    }
+
+    if ($llm_model !== '') {
+        $strictOpts['model'] = $llm_model;
+    }
+
+    $resp = llm_ask($strict_prompt, $strictOpts);
 
     error_log("LLM Strict Response:\n" . $resp . "\n---END---");
     
@@ -737,10 +2061,60 @@ if (stripos($resp, 'LLM consulted') === false) {
 echo json_encode([
     'question' => $question,
     'language' => $language,
+    'llm_provider' => $effective_llm_provider,
+    'llm_model' => $effective_llm_model,
     'answer' => $resp,
     'api_doc_name' => $api_doc_label,
     'source' => 'fallback',
     'llm_consulted' => true,
 ]);
+
+// ── Helper: call the Python MCP server ─────────────────────────────
+function call_mcp_server($url, $question, $language, $timeout, $llm_provider = '', $llm_model = '') {
+    $payloadData = [
+        'question' => $question,
+        'language' => $language,
+    ];
+
+    if (!empty($llm_provider)) {
+        $payloadData['llm_provider'] = $llm_provider;
+    }
+
+    if (!empty($llm_model)) {
+        $payloadData['llm_model'] = $llm_model;
+    }
+
+    $payload = json_encode($payloadData);
+
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        'Content-Type: application/json',
+        'Accept: application/json',
+    ]);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
+
+    $result = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    $err = curl_error($ch);
+    // curl_close($ch);
+
+    if($result === false || $httpCode < 200 || $httpCode >= 500) {
+        // MCP server is down or errored — trigger fallback
+        error_log("MCP server unreachable ($url): $err (HTTP $httpCode)");
+        return null;
+    }
+
+    $decoded = json_decode($result, true);
+    if(!is_array($decoded)) {
+        error_log("MCP server returned invalid JSON");
+        return null;
+    }
+
+    return $decoded;
+}
 
 // End of file
