@@ -1264,7 +1264,7 @@ function format_crossword_response($theme, $count, $puzzle, $usedLlmCandidates) 
     $lines[] = '';
     $lines[] = 'Generation mode: deterministic crossword builder' . ($usedLlmCandidates ? ' + LLM word suggestions.' : '.');
     $lines[] = '';
-    $lines[] = 'LLM consulted - Yes';
+    $lines[] = 'LLM consulted - ' . ($usedLlmCandidates ? 'Yes' : 'No');
 
     return implode("\n", $lines);
 }
