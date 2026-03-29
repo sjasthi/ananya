@@ -1,4 +1,60 @@
 <?php
+require_once __DIR__ . '/includes/llm_handler.php';
+
+// Load local .env similarly to chat_api.php, if vlucas/phpdotenv is available.
+if (class_exists(\Dotenv\Dotenv::class)) {
+    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
+    $dotenv->safeLoad();
+}
+
+// Define default LLM choices that are known to be supported by chat_api.php.
+$defaultLlms = [
+    ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile', 'label' => 'Groq - llama-3.3-70b-versatile'],
+    ['provider' => 'gemini', 'model' => 'gemini-2.0-flash', 'label' => 'Gemini - gemini-2.0-flash'],
+    ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'label' => 'OpenAI - gpt-4o-mini'],
+];
+
+// Start with configured models if available.
+$llmChoices = function_exists('llm_get_configured_models') ? llm_get_configured_models() : [];
+
+// If no configured models, fall back to the defaults.
+if (empty($llmChoices)) {
+    $llmChoices = $defaultLlms;
+}
+
+// Align the dropdown options with what chat_api.php will honor.
+$allowedProviders = ['groq', 'gemini', 'openai'];
+$llmChoices = array_values(array_filter($llmChoices, function ($choice) use ($allowedProviders) {
+    $provider = strtolower($choice['provider'] ?? '');
+    return in_array($provider, $allowedProviders, true);
+}));
+
+// If filtering removed all entries (e.g., only unsupported providers were configured),
+// fall back to the known-good defaults.
+if (empty($llmChoices)) {
+    $llmChoices = $defaultLlms;
+}
+$defaultProvider = strtolower(getenv('LLM_PROVIDER') ?: '');
+$defaultModel = trim(getenv('LLM_MODEL') ?: '');
+$selectedChoice = '';
+
+foreach ($llmChoices as $choice) {
+    $provider = strtolower($choice['provider'] ?? '');
+    $model = trim($choice['model'] ?? '');
+
+    if ($defaultModel !== '' && $defaultProvider !== '' && $provider === $defaultProvider && $model === $defaultModel) {
+        $selectedChoice = $provider . ':' . $model;
+        break;
+    }
+
+    if ($selectedChoice === '' && $defaultProvider !== '' && $provider === $defaultProvider) {
+        $selectedChoice = $provider . ':' . $model;
+    }
+}
+
+if ($selectedChoice === '' && !empty($llmChoices[0])) {
+    $selectedChoice = strtolower($llmChoices[0]['provider']) . ':' . $llmChoices[0]['model'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -96,6 +152,11 @@
                 max-width: 100%;
             }
 
+            .required-indicator {
+                color: #dc3545;
+                font-weight: 700;
+            }
+
             #chat-window {
                 height: 320px;
                 overflow: auto;
@@ -125,6 +186,25 @@
                 border-bottom-left-radius: 4px;
             }
 
+            /* Puzzle bubbles expand to fill the chat window so the grid doesn't need to scroll. */
+            .chat-bubble.assistant:has(.puzzle-output) {
+                max-width: 100%;
+            }
+
+            .chat-bubble.assistant .puzzle-output {
+                margin: 0;
+                font-family: "Noto Sans Mono", Consolas, "Courier New", monospace;
+                font-size: 0.92rem;
+                line-height: 1.25;
+                letter-spacing: 0;
+                white-space: pre;
+                overflow-x: auto;
+            }
+
+            .chat-bubble.assistant .puzzle-output.puzzle-output-telugu {
+                font-family: "Noto Sans Telugu", "Noto Sans Mono", Consolas, "Courier New", monospace;
+            }
+
             .source-badge {
                 font-size: 0.75rem;
                 margin-top: 6px;
@@ -141,6 +221,12 @@
             .source-badge.fallback {
                 background: #fff3e0;
                 color: #ef6c00;
+            }
+
+            .llm-meta {
+                margin-top: 4px;
+                font-size: 0.75rem;
+                color: #6b7280;
             }
 
             .chat-typing span {
@@ -203,27 +289,60 @@
                 </div>
                 
                 <div class="input-section">
-                    <div class="mb-3">
-                        <label for="language-select" class="form-label">
-                            <i class="fas fa-language me-2"></i>Language
-                        </label>
-                        <select id="language-select" class="form-select language-select">
-                            <option value="english" selected>English</option>
-                            <option value="telugu">Telugu (తెలుగు)</option>
-                        </select>
-                    </div>
-
-                    <div class="input-group mt-2">
-                        <input id="chat-input" class="form-control" placeholder="How can I help you today?" />
+                    <div class="input-group mt-2 mb-3">
+                        <input id="chat-input" class="form-control" placeholder="Describe the puzzle you want..." />
                         <button id="chat-send" class="btn btn-primary process-btn">
                             <i class="fas fa-paper-plane me-2"></i>Send
                         </button>
                     </div>
 
-                    <small class="form-text text-muted mt-2">
+                    <small class="form-text text-muted mt-2 d-block mb-3">
                         <i class="fas fa-info-circle me-1"></i>
-                        You can ask questions, seek information, or have a conversation in either English or Telugu. Just type your message and click "Send" to see the response.
+                        Tip: Ask for puzzle generation with a theme and size, like "Create a word find with 12 words about animals" or "Create a crossword puzzle with a dog theme".
                     </small>
+
+                    <div class="mb-3">
+                        <a class="btn btn-outline-secondary btn-sm" href="bulk_puzzles.php">
+                            <i class="fas fa-layer-group me-1"></i>Bulk Puzzle Generator
+                        </a>
+                    </div>
+
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label for="language-select" class="form-label">
+                                <i class="fas fa-language me-2"></i>Output Language
+                                <span class="required-indicator ms-1" aria-hidden="true">*</span>
+                                <span class="visually-hidden">required</span>
+                            </label>
+                            <select id="language-select" class="form-select language-select" required aria-required="true">
+                                <option value="" selected disabled>Select output language</option>
+                                <option value="english">English</option>
+                                <option value="telugu">Telugu (తెలుగు)</option>
+                            </select>
+                            <div id="language-feedback" class="invalid-feedback">
+                                Output language is required. Please select a language.
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="llm-select" class="form-label">
+                                <i class="fas fa-robot me-2"></i>LLM
+                            </label>
+                            <select id="llm-select" class="form-select language-select">
+                                <?php foreach ($llmChoices as $choice): ?>
+                                    <?php
+                                        $provider = strtolower($choice['provider'] ?? '');
+                                        $model = $choice['model'] ?? '';
+                                        $value = $provider . ':' . $model;
+                                        $label = $choice['label'] ?? ($provider . ' - ' . $model);
+                                    ?>
+                                    <option value="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>" <?php echo ($value === $selectedChoice ? 'selected' : ''); ?>>
+                                        <?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                    </div>
 
                     <div class="mt-3">
                         <div id="chat-window"></div>

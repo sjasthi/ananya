@@ -4,7 +4,6 @@
 
 function llm_default_model_for_provider($provider) {
     $defaults = [
-        'ollama' => 'mistral',
         'gemini' => 'gemini-2.0-flash',
         'groq' => 'llama-3.3-70b-versatile',
         'openai' => 'gpt-4o-mini',
@@ -59,23 +58,19 @@ function llm_get_provider_config($opts = []) {
         ];
     }
 
+    // Unknown provider — fall back to Groq
+    $key = getenv('GROQ_API_KEY') ?: '';
     return [
-        'provider' => 'ollama',
-        'model' => $model,
-        'url' => (getenv('OLLAMA_URL') ?: 'http://localhost:11434') . '/api/generate',
-        'api_key' => '',
-        'timeout' => 300,
+        'provider' => 'groq',
+        'model' => llm_default_model_for_provider('groq'),
+        'url' => 'https://api.groq.com/openai/v1/chat/completions',
+        'api_key' => $key,
+        'timeout' => $timeout,
     ];
 }
 
 function llm_request_openai_compatible($messages, $opts = []) {
     $cfg = llm_get_provider_config($opts);
-    if ($cfg['provider'] === 'ollama') {
-        return [
-            'ok' => false,
-            'error' => 'Tool calling is not supported for ollama in this PHP path. Use OpenAI, Gemini, or Groq.',
-        ];
-    }
 
     if (!$cfg['api_key']) {
         return [
@@ -205,12 +200,38 @@ function llm_extract_message_text($content) {
     return trim(implode("\n", $parts));
 }
 
-function llm_ask($prompt, $opts = []) {
-    $provider = strtolower(getenv('LLM_PROVIDER') ?: 'gemini');
+function llm_get_configured_models() {
+    $configured = [
+        ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile', 'label' => 'Groq - llama-3.3-70b-versatile'],
+        ['provider' => 'gemini', 'model' => 'gemini-2.0-flash', 'label' => 'Gemini - gemini-2.0-flash'],
+        ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'label' => 'OpenAI - gpt-4o-mini'],
+    ];
 
-    if ($provider === 'ollama') {
-        return llm_ask_ollama($prompt, $opts);
+    $provider = strtolower(getenv('LLM_PROVIDER') ?: '');
+    $model = trim(getenv('LLM_MODEL') ?: '');
+    if ($provider !== '' && $model !== '') {
+        $exists = false;
+        foreach ($configured as $choice) {
+            if (strtolower($choice['provider']) === $provider && $choice['model'] === $model) {
+                $exists = true;
+                break;
+            }
+        }
+
+        if (!$exists) {
+            array_unshift($configured, [
+                'provider' => $provider,
+                'model' => $model,
+                'label' => strtoupper($provider) . ' - ' . $model . ' (configured)',
+            ]);
+        }
     }
+
+    return $configured;
+}
+
+function llm_ask($prompt, $opts = []) {
+    $provider = strtolower($opts['provider'] ?? (getenv('LLM_PROVIDER') ?: 'gemini'));
 
     $messages = [];
     $systemPrompt = $opts['system_prompt'] ?? null;
@@ -234,44 +255,6 @@ function llm_ask($prompt, $opts = []) {
     return $res['content'] ?? '';
 }
 
-function llm_ask_ollama($prompt, $opts = []) {
-    $ollamaUrl = getenv('OLLAMA_URL') ?: 'http://localhost:11434';
-    $model = $opts['model'] ?? 'mistral';
-    $temperature = $opts['temperature'] ?? 0.2;
-    $systemPrompt = $opts['system_prompt'] ?? 'You are a helpful assistant. Provide concise, accurate answers.';
-
-    $payload = [
-        'model' => $model,
-        'prompt' => $prompt,
-        'system' => $systemPrompt,
-        'stream' => false,
-        'options' => ['temperature' => $temperature, 'top_k' => 40, 'top_p' => 0.9],
-    ];
-
-    $ch = curl_init($ollamaUrl . '/api/generate');
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_POST => true,
-        CURLOPT_POSTFIELDS => json_encode($payload),
-        CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-        CURLOPT_TIMEOUT => 300,
-    ]);
-
-    $result = curl_exec($ch);
-    if ($result === false) {
-        $err = curl_error($ch);
-        curl_close($ch);
-        return 'Ollama request failed: ' . $err . '. Make sure Ollama is running (ollama serve)';
-    }
-    curl_close($ch);
-
-    $decoded = json_decode($result, true);
-    if (!$decoded) {
-        return 'Invalid response from Ollama.';
-    }
-
-    return trim($decoded['response'] ?? 'No response from model. Check Ollama is running.');
-}
 
 function ananya_tool_schema($name, $description, $properties, $required = []) {
     return [
