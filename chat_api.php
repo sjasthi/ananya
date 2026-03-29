@@ -1528,7 +1528,7 @@ function format_word_find_response($theme, $count, $puzzle, $usedLlmCandidates, 
         ? ('జనరేషన్ మోడ్: deterministic grid builder' . ($usedLlmCandidates ? ' + LLM word suggestions.' : '.'))
         : ('Generation mode: deterministic grid builder' . ($usedLlmCandidates ? ' + LLM word suggestions.' : '.'));
     $lines[] = '';
-    $lines[] = 'LLM consulted - Yes';
+    $lines[] = $usedLlmCandidates ? 'LLM consulted - Yes' : 'LLM consulted - No';
 
     return implode("\n", $lines);
 }
