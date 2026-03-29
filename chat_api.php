@@ -2100,20 +2100,22 @@ function call_mcp_server($url, $question, $language, $timeout, $llm_provider = '
     $result = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err = curl_error($ch);
-    // curl_close($ch);
 
     if($result === false || $httpCode < 200 || $httpCode >= 500) {
         // MCP server is down or errored — trigger fallback
         error_log("MCP server unreachable ($url): $err (HTTP $httpCode)");
+        curl_close($ch);
         return null;
     }
 
     $decoded = json_decode($result, true);
     if(!is_array($decoded)) {
         error_log("MCP server returned invalid JSON");
+        curl_close($ch);
         return null;
     }
 
+    curl_close($ch);
     return $decoded;
 }
 
