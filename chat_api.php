@@ -440,6 +440,8 @@ function extract_theme_from_question($question) {
     }
 
     $patterns = [
+        '/\b(?:a|an)\s+([a-zA-Z][a-zA-Z-]{1,40})\s+themed\b/i',
+        '/\b([a-zA-Z][a-zA-Z-]{1,40})\s+themed\b/i',
         '/\b(?:about|related to|on|for)\s+([a-zA-Z\s-]{2,80})/i',
         '/\bwith\s+(?:an?|the)\s+([a-zA-Z\s-]{2,80})\s+theme\b/i',
         '/\b([a-zA-Z\s-]{2,80})\s+theme\b/i',
@@ -452,6 +454,7 @@ function extract_theme_from_question($question) {
         if (preg_match($pattern, $q, $m)) {
             $theme = trim($m[1]);
             $theme = preg_replace('/\b(words?|puzzle|crossword|word\s*find)\b/i', '', $theme);
+            $theme = preg_replace('/\b(i|want|need|make|create|generate|a|an|the|themed)\b/i', '', $theme);
             $theme = trim(preg_replace('/\s+/', ' ', $theme));
             if ($theme !== '') {
                 return $theme;
@@ -471,6 +474,7 @@ function canonicalize_theme($theme) {
     $aliases = [
         'dog' => ['dog', 'dogs', 'canine', 'puppy', 'puppies', 'కుక్క', 'కుక్కలు', 'శునకం', 'శునకాలు'],
         'cat' => ['cat', 'cats', 'feline', 'kitten', 'kittens', 'పిల్లి', 'పిల్లులు'],
+        'fruit' => ['fruit', 'fruits', 'apple', 'banana', 'orange', 'mango', 'grape', 'grapes', 'pineapple', 'papaya', 'melon', 'kiwi', 'pear', 'peach', 'plum', 'పండు', 'పండ్లు', 'మామిడి', 'సేపు', 'అరటి', 'ద్రాక్ష'],
     ];
 
     foreach ($aliases as $canonical => $variants) {
@@ -584,7 +588,7 @@ function split_logical_units_via_ananya_api($word, $language = 'english') {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+    // curl_close($ch);
 
     if ($response === false || $httpCode < 200 || $httpCode >= 400) {
         return [];
@@ -664,6 +668,9 @@ function fallback_theme_words($theme, $language = 'english') {
     $t = strtolower(canonicalize_theme($theme));
 
     if ($language === 'telugu') {
+        if ($t === 'fruit') {
+            return ['మామిడి', 'సేపు', 'అరటి', 'ద్రాక్ష', 'నారింజ', 'పపయా', 'జామ', 'పుచ్చకాయ', 'దానిమ్మ', 'పెరు', 'బత్తాయి', 'సీతాఫలం'];
+        }
         if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
             return ['కుక్క', 'పిల్లకుక్క', 'శునకం', 'మొరుగు', 'తోక', 'పంజా', 'కాలర్', 'బెల్ట్', 'కెనెల్', 'వఫ్', 'ముక్కు', 'రోమాలు'];
         }
@@ -672,6 +679,10 @@ function fallback_theme_words($theme, $language = 'english') {
         }
 
         return ['పర్వతం', 'నది', 'మేఘం', 'ఆకాశం', 'పుస్తకం', 'పాట', 'చెట్టు', 'పువ్వు', 'సముద్రం', 'వెలుగు'];
+    }
+
+    if ($t === 'fruit') {
+        return ['APPLE', 'BANANA', 'MANGO', 'ORANGE', 'GRAPE', 'PAPAYA', 'PEACH', 'PEAR', 'PLUM', 'MELON', 'KIWI', 'BERRY', 'CHERRY', 'GUAVA', 'LEMON', 'LIME', 'FIG', 'DATE', 'APRICOT', 'PINEAPPLE'];
     }
 
     if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
@@ -690,6 +701,7 @@ function localized_theme_label($theme, $language = 'english') {
     if ($language === 'telugu') {
         if ($canonical === 'dog') return 'కుక్కలు';
         if ($canonical === 'cat') return 'పిల్లులు';
+        if ($canonical === 'fruit') return 'పండ్లు';
     }
     return $theme;
 }
@@ -1226,11 +1238,28 @@ function render_crossword_solution_grid($puzzle) {
     return implode("\n", $lines);
 }
 
+function format_puzzle_word_count_line($actual, $requested, $language = 'english') {
+    $actual = (int)$actual;
+    $requested = (int)$requested;
+
+    if ($language === 'telugu') {
+        if ($actual === $requested) {
+            return 'పదాలు: ' . $actual;
+        }
+        return 'పదాలు: ' . $actual . ' / కోరినవి ' . $requested;
+    }
+
+    if ($actual === $requested) {
+        return 'Words: ' . $actual;
+    }
+    return 'Words: ' . $actual . ' of ' . $requested . ' requested';
+}
+
 function format_crossword_response($theme, $count, $puzzle, $usedLlmCandidates) {
     $lines = [];
     $lines[] = 'Crossword Puzzle';
     $lines[] = 'Theme: ' . $theme;
-    $lines[] = 'Words: ' . count($puzzle['words']) . ' requested ' . $count;
+    $lines[] = format_puzzle_word_count_line(count($puzzle['words']), $count, 'english');
     $lines[] = 'Grid: ' . $puzzle['height'] . 'x' . $puzzle['width'];
     $lines[] = 'Legend: [ ] = fillable cell, [n] = clue start, blank space = blocked cell';
     $lines[] = '';
@@ -1516,12 +1545,12 @@ function format_word_find_response($theme, $count, $puzzle, $usedLlmCandidates, 
     if ($language === 'telugu') {
         $lines[] = 'పద శోధన పజిల్';
         $lines[] = 'థీమ్: ' . $theme;
-        $lines[] = 'పదాలు: ' . count($puzzle['words']) . ' / కోరినవి ' . $count;
+        $lines[] = format_puzzle_word_count_line(count($puzzle['words']), $count, 'telugu');
         $lines[] = 'గ్రిడ్: ' . $gridWidth . 'x' . $gridHeight;
     } else {
         $lines[] = 'Word Find Puzzle';
         $lines[] = 'Theme: ' . $theme;
-        $lines[] = 'Words: ' . count($puzzle['words']) . ' requested ' . $count;
+        $lines[] = format_puzzle_word_count_line(count($puzzle['words']), $count, 'english');
         $lines[] = 'Grid: ' . $gridWidth . 'x' . $gridHeight;
     }
     $lines[] = '';
@@ -1712,7 +1741,7 @@ function execute_chat_tool($toolName, $args, $language, $apiBaseUrl) {
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
-    curl_close($ch);
+    // curl_close($ch);
 
     if ($response === false || $httpCode < 200 || $httpCode >= 400) {
         $message = 'Tool execution failed (HTTP ' . $httpCode . '): ' . ($curlErr ?: 'Request error');
@@ -2120,18 +2149,18 @@ function call_mcp_server($url, $question, $language, $timeout, $llm_provider = '
     if($result === false || $httpCode < 200 || $httpCode >= 500) {
         // MCP server is down or errored — trigger fallback
         error_log("MCP server unreachable ($url): $err (HTTP $httpCode)");
-        curl_close($ch);
+        // curl_close($ch);
         return null;
     }
 
     $decoded = json_decode($result, true);
     if(!is_array($decoded)) {
         error_log("MCP server returned invalid JSON");
-        curl_close($ch);
+        // curl_close($ch);
         return null;
     }
 
-    curl_close($ch);
+    // curl_close($ch);
     return $decoded;
 }
 

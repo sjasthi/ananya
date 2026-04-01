@@ -48,7 +48,7 @@ processButton.addEventListener("click", async () => {
     
     processButton.disabled = true;
     processButton.textContent = "Processing...";
-    finderMatches.value = "Starting debug process...\n";
+    finderMatches.value = "Starting search...\n";
     updateStatus("Starting search...");
     
     //getting text values of input box and text area
@@ -75,17 +75,18 @@ processButton.addEventListener("click", async () => {
     try {
         //getting base chars and length of input for comparison
         updateStatus(`Getting base characters for "${inputTextValue}"...`);
-        finderMatches.value += "=== GETTING BASE CHARACTERS FOR SEARCH TERM ===\n";
+        finderMatches.value += "Getting base characters for search term...\n";
         
         console.log('=== CALLING API FOR SEARCH TERM ===');
-        const inputTextBaseCharacters = await getBaseCharacters(inputTextValue);
+        const normalizedInputTerm = normalizeForComparison(sanitizeWord(inputTextValue));
+        const inputTextBaseCharacters = await getBaseCharacters(normalizedInputTerm);
         
         console.log('=== SEARCH TERM RESULTS ===');
         console.log('Base characters received:', inputTextBaseCharacters);
         console.log('Type:', typeof inputTextBaseCharacters);
         console.log('Is array:', Array.isArray(inputTextBaseCharacters));
         
-        finderMatches.value += `Search term "${inputTextValue}" base characters: [${inputTextBaseCharacters.join(', ')}]\n`;
+        finderMatches.value += `Search term base characters: [${inputTextBaseCharacters.join(', ')}]\n`;
         finderMatches.value += `Count: ${inputTextBaseCharacters.length}\n\n`;
 
         if (!inputTextBaseCharacters || inputTextBaseCharacters.length === 0) {
@@ -97,60 +98,94 @@ processButton.addEventListener("click", async () => {
             return;
         }
 
-        //splitting text into words (not just lines) for better matching
+        // Split text into words and count occurrences for display.
         const words = textToCompareValue.split(/\s+/).filter(word => word.trim() !== '');
         console.log('=== WORD PROCESSING ===');
         console.log('Total words found:', words.length);
         console.log('First 10 words:', words.slice(0, 10));
         
-        finderMatches.value += `=== PROCESSING ${words.length} WORDS ===\n`;
-        updateStatus(`Searching through ${words.length} words...`);
-
-        let matchCount = 0;
-        let processedCount = 0;
-
-        //check each word for matches
-        for (const word of words) {
-            const cleanWord = word.replace(/[^\u0C00-\u0C7F\u0020-\u007E]/g, '').trim();
-            if (cleanWord && cleanWord.length > 1) { // Skip single characters
-                processedCount++;
-                
-                console.log(`=== PROCESSING WORD ${processedCount}: "${cleanWord}" ===`);
-                finderMatches.value += `Checking word ${processedCount}: "${cleanWord}"\n`;
-                
-                if (processedCount % 5 === 0) {
-                    updateStatus(`Processed ${processedCount}/${words.length} words... Found ${matchCount} matches so far.`);
+        const occurrenceMap = new Map();
+        const positionMap = new Map();
+        const displayWordMap = new Map();
+        for (let index = 0; index < words.length; index++) {
+            const cleanWord = sanitizeWord(words[index]);
+            const normalizedWord = normalizeForComparison(cleanWord);
+            if (normalizedWord.length > 1) {
+                occurrenceMap.set(normalizedWord, (occurrenceMap.get(normalizedWord) || 0) + 1);
+                if (!positionMap.has(normalizedWord)) {
+                    positionMap.set(normalizedWord, []);
                 }
-                
-                const baseChars = await getBaseCharacters(cleanWord);
-                console.log('Base characters for "' + cleanWord + '":', baseChars);
-                finderMatches.value += `  Base chars: [${baseChars.join(', ')}]\n`;
-                
-                const isMatch = compareArrays(inputTextBaseCharacters, baseChars);
-                console.log('Is match?', isMatch);
-                finderMatches.value += `  Match: ${isMatch}\n`;
-                
-                if (isMatch) {
-                    finderMatches.value += `  *** MATCH FOUND: "${cleanWord}" ***\n`;
-                    matchCount++;
-                    console.log('=== MATCH FOUND ===:', cleanWord);
+                if (!displayWordMap.has(normalizedWord)) {
+                    displayWordMap.set(normalizedWord, cleanWord);
                 }
-                
-                finderMatches.value += `\n`;
-                
-                // Only process first 10 words for debugging
-                if (processedCount >= 10) {
-                    finderMatches.value += `\n=== STOPPING AFTER 10 WORDS FOR DEBUGGING ===\n`;
-                    break;
-                }
+                positionMap.get(normalizedWord).push(index + 1);
             }
         }
-        
-        if (matchCount === 0) {
+
+        const uniqueWords = Array.from(occurrenceMap.keys());
+        finderMatches.value += `Processing ${uniqueWords.length} unique words...\n`;
+        updateStatus(`Searching through ${uniqueWords.length} unique words...`);
+
+        const baseCharCache = new Map();
+        const matchingUniqueWords = [];
+        const inputSignature = getArraySignature(inputTextBaseCharacters);
+        const CHUNK_SIZE = 6;
+        const CHUNK_PAUSE_MS = 40;
+        let processedUniqueWords = 0;
+
+        for (let i = 0; i < uniqueWords.length; i += CHUNK_SIZE) {
+            const chunk = uniqueWords.slice(i, i + CHUNK_SIZE);
+
+            const chunkResults = await Promise.all(
+                chunk.map(async (word) => {
+                    const baseChars = await getBaseCharactersCached(word, baseCharCache);
+                    const isMatch = getArraySignature(baseChars) === inputSignature;
+                    return { word, isMatch };
+                })
+            );
+
+            for (const result of chunkResults) {
+                if (result.isMatch) {
+                    matchingUniqueWords.push(result.word);
+                }
+            }
+
+            processedUniqueWords += chunk.length;
+            updateStatus(`Processed ${processedUniqueWords}/${uniqueWords.length} unique words... Found ${matchingUniqueWords.length} unique matches.`);
+
+            // Brief pause between chunks to avoid overloading the backend.
+            if (i + CHUNK_SIZE < uniqueWords.length) {
+                await delay(CHUNK_PAUSE_MS);
+            }
+        }
+
+        if (matchingUniqueWords.length === 0) {
             finderMatches.value = "No matches found. Try a different search term.";
             updateStatus("Search completed - no matches found.");
         } else {
-            updateStatus(`Search completed - found ${matchCount} matching words!`);
+            matchingUniqueWords.sort((a, b) => (occurrenceMap.get(b) || 0) - (occurrenceMap.get(a) || 0));
+
+            let totalMatches = 0;
+            const lines = [
+                `Found ${matchingUniqueWords.length} unique matching words.`,
+                ""
+            ];
+
+            for (const word of matchingUniqueWords) {
+                const count = occurrenceMap.get(word) || 0;
+                const positions = positionMap.get(word) || [];
+                const displayWord = displayWordMap.get(word) || word;
+                totalMatches += count;
+                lines.push(`${displayWord} (occurrences: ${count})`);
+                lines.push(`${formatWordPositions(positions)}`);
+                lines.push("");
+            }
+
+            lines.push("");
+            lines.push(`Total matching occurrences: ${totalMatches}`);
+            finderMatches.value = lines.join("\n");
+
+            updateStatus(`Search completed - found ${totalMatches} matching occurrences across ${matchingUniqueWords.length} unique words.`);
         }
         
     } catch (error) {
@@ -162,6 +197,72 @@ processButton.addEventListener("click", async () => {
     processButton.disabled = false;
     processButton.textContent = "Process";
 })
+
+function sanitizeWord(word) {
+    return word.replace(/[^\u0C00-\u0C7F\u0020-\u007E]/g, '').trim();
+}
+
+function normalizeForComparison(word) {
+    return word.toLocaleLowerCase();
+}
+
+function toOrdinal(number) {
+    const mod10 = number % 10;
+    const mod100 = number % 100;
+
+    if (mod10 === 1 && mod100 !== 11) {
+        return `${number}st`;
+    }
+    if (mod10 === 2 && mod100 !== 12) {
+        return `${number}nd`;
+    }
+    if (mod10 === 3 && mod100 !== 13) {
+        return `${number}rd`;
+    }
+    return `${number}th`;
+}
+
+function formatWordPositions(positions) {
+    if (!positions || positions.length === 0) {
+        return "Position in entry unavailable.";
+    }
+
+    const ordinalPositions = positions.map(position => toOrdinal(position));
+
+    if (ordinalPositions.length === 1) {
+        return `At the ${ordinalPositions[0]} word in the entry.`;
+    }
+
+    if (ordinalPositions.length === 2) {
+        return `At the ${ordinalPositions[0]} and ${ordinalPositions[1]} words in the entry.`;
+    }
+
+    const allButLast = ordinalPositions.slice(0, -1).join(', ');
+    const last = ordinalPositions[ordinalPositions.length - 1];
+    return `At the ${allButLast}, and ${last} words in the entry.`;
+}
+
+function delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function getArraySignature(array) {
+    if (!Array.isArray(array) || array.length === 0) {
+        return "";
+    }
+
+    return [...array].sort().join('|');
+}
+
+async function getBaseCharactersCached(string, cache) {
+    if (cache.has(string)) {
+        return cache.get(string);
+    }
+
+    const baseChars = await getBaseCharacters(string);
+    cache.set(string, baseChars);
+    return baseChars;
+}
 
 //compares if the arrays have the same contents
 function compareArrays (array1, array2) {

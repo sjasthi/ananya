@@ -58,9 +58,9 @@
             <div id="status" class="container mb-3 text-center">
                 <small class="text-muted">Ready to search. Example: "కండలు" should match "క్రీడలు" (same base characters)</small>
             </div>
-            <p class="h6 text-center">Matches Found:</p>
-            <div id="table-container" class="container">
-                <textarea id="finder-matches" class="form-control" rows="10" disabled></textarea>
+            <p class="h6 text-center mb-3">Matches Found:</p>
+            <div id="table-container" class="container mb-5 pb-3">
+                <textarea id="finder-matches" class="form-control mb-2" rows="10" disabled></textarea>
             </div>
         </div>
     </div>

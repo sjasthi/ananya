@@ -158,12 +158,15 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
             }
 
             #chat-window {
+                min-height: 320px;
                 height: 320px;
+                max-height: 78vh;
                 overflow: auto;
                 padding: 12px;
                 background: #ffffff;
                 border: 1px solid #e9ecef;
                 border-radius: 8px;
+                transition: height 0.2s ease;
             }
 
             .chat-bubble {
@@ -191,6 +194,10 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
                 max-width: 100%;
             }
 
+            .chat-bubble.assistant:has(.crossword-render) {
+                max-width: 100%;
+            }
+
             .chat-bubble.assistant .puzzle-output {
                 margin: 0;
                 font-family: "Noto Sans Mono", Consolas, "Courier New", monospace;
@@ -203,6 +210,193 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
 
             .chat-bubble.assistant .puzzle-output.puzzle-output-telugu {
                 font-family: "Noto Sans Telugu", "Noto Sans Mono", Consolas, "Courier New", monospace;
+            }
+
+            .crossword-render {
+                width: 100%;
+                background: #ffffff;
+                border: 1px solid #dee2e6;
+                border-radius: 10px;
+                padding: 12px;
+            }
+
+            .crossword-header h5 {
+                margin: 0 0 6px;
+                font-size: 1.05rem;
+                font-weight: 700;
+            }
+
+            .crossword-meta {
+                font-size: 0.85rem;
+                color: #4b5563;
+                line-height: 1.35;
+            }
+
+            .crossword-toolbar {
+                margin: 10px 0;
+            }
+
+            .crossword-grid-wrap {
+                overflow: auto;
+                margin-bottom: 12px;
+            }
+
+            .crossword-grid {
+                border-collapse: collapse;
+                margin: 0;
+            }
+
+            .crossword-grid td {
+                width: 30px;
+                height: 30px;
+                border: 1px solid #1f2937;
+                position: relative;
+            }
+
+            .crossword-grid td.blocked {
+                background: #111827;
+                border-color: #111827;
+            }
+
+            .crossword-grid td.open {
+                background: #ffffff;
+            }
+
+            .crossword-grid .cell-number {
+                position: absolute;
+                top: 1px;
+                left: 2px;
+                font-size: 9px;
+                font-weight: 700;
+                color: #111827;
+                line-height: 1;
+            }
+
+            .crossword-clues h6 {
+                margin-bottom: 4px;
+                font-weight: 700;
+            }
+
+            .crossword-clues ol {
+                margin-bottom: 0;
+                padding-left: 1.1rem;
+                font-size: 0.86rem;
+                line-height: 1.35;
+            }
+
+            .crossword-clues .clue-list {
+                list-style: none;
+                margin-bottom: 0;
+                padding-left: 0;
+                font-size: 0.86rem;
+                line-height: 1.35;
+            }
+
+            .crossword-clues .clue-list li {
+                margin-bottom: 2px;
+            }
+
+            .crossword-clues .clue-num {
+                font-weight: 700;
+            }
+
+            .crossword-answer-key {
+                margin-top: 10px;
+                font-size: 0.84rem;
+                border-top: 1px dashed #cfd4da;
+                padding-top: 8px;
+            }
+
+            .crossword-answer-key summary {
+                cursor: pointer;
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .crossword-answer-key ul {
+                margin: 8px 0 0;
+                padding-left: 1.1rem;
+            }
+
+            .chat-bubble.assistant:has(.wordfind-render) {
+                max-width: 100%;
+            }
+
+            .wordfind-render {
+                width: 100%;
+                background: #ffffff;
+                border: 1px solid #dee2e6;
+                border-radius: 10px;
+                padding: 12px;
+            }
+
+            .wordfind-header h5 {
+                margin: 0 0 6px;
+                font-size: 1.05rem;
+                font-weight: 700;
+            }
+
+            .wordfind-meta {
+                font-size: 0.85rem;
+                color: #4b5563;
+                line-height: 1.35;
+            }
+
+            .wordfind-toolbar {
+                margin: 10px 0;
+            }
+
+            .wordfind-grid-wrap {
+                overflow: auto;
+                margin-bottom: 12px;
+            }
+
+            .wordfind-grid {
+                border-collapse: collapse;
+                margin: 0;
+            }
+
+            .wordfind-grid td {
+                width: 30px;
+                height: 30px;
+                border: 1px solid #1f2937;
+                text-align: center;
+                vertical-align: middle;
+                font-size: 0.9rem;
+                font-weight: 700;
+                color: #111827;
+            }
+
+            .wordfind-words h6 {
+                margin-bottom: 4px;
+                font-weight: 700;
+            }
+
+            .wordfind-words ul {
+                margin: 0;
+                padding-left: 1.1rem;
+                columns: 2;
+                column-gap: 18px;
+                font-size: 0.86rem;
+                line-height: 1.35;
+            }
+
+            .wordfind-answer-key {
+                margin-top: 10px;
+                font-size: 0.84rem;
+                border-top: 1px dashed #cfd4da;
+                padding-top: 8px;
+            }
+
+            .wordfind-answer-key summary {
+                cursor: pointer;
+                font-weight: 600;
+                color: #374151;
+            }
+
+            .wordfind-answer-key ul {
+                margin: 8px 0 0;
+                padding-left: 1.1rem;
             }
 
             .source-badge {
