@@ -38,6 +38,9 @@
                     <select id="language-select" class="form-select mt-3">
                         <option value="english">English</option>
                         <option value="telugu" selected>Telugu</option>
+                        <option value="hindi">Hindi</option>
+                        <option value="gujarati">Gujarati</option>
+                        <option value="malayalam">Malayalam</option>
                     </select>
                 </div>
                 <div class="col-auto">

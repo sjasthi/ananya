@@ -6,8 +6,8 @@
 
 // for unicode reference : http://www.unicode.org/charts/
 
-function stripSpacesGujarati($log_chars) {
-    $code_points = parseToCodePoints(implode($log_chars));
+function gujarati_stripSpaces($log_chars) {
+    $code_points = gujarati_parseToCodePoints(implode($log_chars));
     $build = array();
     $build_i = 0;
     for($i=0; $i < count($code_points); $i++) {
@@ -15,7 +15,7 @@ function stripSpacesGujarati($log_chars) {
             continue;
         else {
             $build[$build_i++] = $log_chars[$i];
-            if(isHalant(end($code_points[$i]) && $i + 1 < count($code_points))) {
+            if(gujarati_isHalant(end($code_points[$i])) && $i + 1 < count($code_points)) {
                 if($code_points[$i+1] == 32) { // if the next character is a space...
                     $build[$build_i][count($build[$build_i])] = json_decode("\u200c");
                 }
@@ -27,8 +27,8 @@ function stripSpacesGujarati($log_chars) {
 
 // $word expects a single utf-8 encoded word
 // returns a 2 dimensional array, representing the unicoded logical characters of the word
-function parseToCodePoints($word) {
-    $word_array = explode_gujarati(json_encode($word));
+function gujarati_parseToCodePoints($word) {
+    $word_array = gujarati_explode($word);
     $i = 0;
     $logical_chars = array();
     $ch_buffer = array();
@@ -41,15 +41,15 @@ function parseToCodePoints($word) {
             continue;
         }
         $next_ch = $word_array[$i];
-        if(isDependent($next_ch)) {
+        if(gujarati_isDependent($next_ch)) {
             $ch_buffer[count($ch_buffer)] = $next_ch;
             $i++;
             $logical_chars[count($logical_chars)] = $ch_buffer;
             $ch_buffer = array();
             continue;
         }
-        if(isHalant($current_ch)) {
-            if(isConsonant($next_ch)) {
+        if(gujarati_isHalant($current_ch)) {
+            if(gujarati_isConsonant($next_ch)) {
                 if($i < count($word_array)) {
                     continue;
                 }
@@ -58,8 +58,8 @@ function parseToCodePoints($word) {
             $logical_chars[count($logical_chars)] = $ch_buffer;
             $ch_buffer = array();
             continue;
-        } else if(isConsonant($current_ch)) {
-            if(isHalant($next_ch) || isDependentVowel($next_ch)) {
+        } else if(gujarati_isConsonant($current_ch)) {
+            if(gujarati_isHalant($next_ch) || gujarati_isDependentVowel($next_ch)) {
                 if($i < count($word_array)) {
                     continue;
                 }
@@ -68,8 +68,8 @@ function parseToCodePoints($word) {
             $logical_chars[count($logical_chars)] = $ch_buffer;
             $ch_buffer = array();
             continue;
-        } else if(isVowel($current_ch)) {
-            if(isDependentVowel($next_ch)) {
+        } else if(gujarati_isVowel($current_ch)) {
+            if(gujarati_isDependentVowel($next_ch)) {
                 $ch_buffer[count($ch_buffer)] = $next_ch;
                 $i++;
             }
@@ -85,25 +85,26 @@ function parseToCodePoints($word) {
 
 
 // returns a 2d array of the logical characters, but using Gujarati characters
-function parseToLogicalCharacters($word) {
+function gujarati_parseToLogicalCharacters($word) {
     if(is_array($word)) {
         for($i=0; $i < count($word); $i++)
-            $word[$i] = parseToCharacter($word[$i]);
+            $word[$i] = gujarati_parseToCharacter($word[$i]);
         return $word;
     }
-    else return parseToLogicalCharacters(parseToCodePoints($word));
+    else return gujarati_parseToLogicalCharacters(gujarati_parseToCodePoints($word));
 }
 
-function parseToCharacter($logical_char) {
+function gujarati_parseToCharacter($logical_char) {
     $gujarati_char = "";
     foreach($logical_char as $char) {
-        if(isGujarati($char))	$gujarati_char .= sprintf("\\u%'04s", dechex($char));
+        if(gujarati_isChar($char))	$gujarati_char .= sprintf("\\u%'04s", dechex($char));
         else return chr($char);
     }
     return json_decode('"'.$gujarati_char.'"');
 }
 
-function explode_gujarati($to_explode) {
+function gujarati_explode($word) {
+    $to_explode = json_encode($word);
     $pos=0;
     $e_pos=0;
     $exploded = array();
@@ -115,7 +116,7 @@ function explode_gujarati($to_explode) {
         if(strcmp($to_explode[$pos], "\\") == 0) { // if the the character in question is a slash...
             if(strcmp($to_explode[$pos + 1], "u") == 0) { // ...followed by a u...
                 $char = intval(substr($to_explode, $pos + 2, 4), 16); // convert to a number
-                if(isGujarati($char)) {
+                if(gujarati_isChar($char)) {
                     // if it matches, add it as a character, bump the counter up by six, and continue
                     $exploded[$e_pos++] = $char;
                     $pos += 6;
@@ -128,27 +129,27 @@ function explode_gujarati($to_explode) {
     return $exploded;
 }
 
-function isConsonant($ch) {
+function gujarati_isConsonant($ch) {
     return ( $ch >= 0x0a95 && $ch <= 0xab9 );
 }
 
-function isDependentVowel($ch) {
+function gujarati_isDependentVowel($ch) {
     return ( $ch >= 0x0abe && $ch <= 0x0acc );
 }
 
-function isDependent($ch) {
+function gujarati_isDependent($ch) {
     return ( ($ch == 0x0a81) || ($ch == 0x0a82) || ($ch == 0x0a83) );
 }
 
-function isVowel($ch) {
+function gujarati_isVowel($ch) {
     return ($ch >= 0x0a85 && $ch <= 0x0a94);
 }
 //0c4d
-function isHalant($ch) {
+function gujarati_isHalant($ch) {
     return $ch == 0x0acd;
 }
 
-function isGujaratiNumber($ch) {
+function gujarati_isNumber($ch) {
     return ($ch >= 0x0ae6 && $ch <= 0x0aef);
 }
 
@@ -157,11 +158,11 @@ function isGujaratiNumber($ch) {
 // intentionally feeding this function bad data, there's no practical way to get
 // that false positive, and nothing harmful would happen if you did
 // Gujarati Range: 0A80–0AFF
-function isGujarati($ch) {
+function gujarati_isChar($ch) {
     return ( $ch >= 0x0a80 && $ch <= 0x0aff ) || ( $ch == 0x200c );
 }
 
-function is_blank_Gujarati($hexVal){
+function gujarati_is_blank($hexVal){
     {
         $is_blank = false;
         $blankArray = array("a8e","a92","aa9","ab1","ab4","ac6","aca","aba","abb","a84");

@@ -512,6 +512,9 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
                                 <option value="" selected disabled>Select output language</option>
                                 <option value="english">English</option>
                                 <option value="telugu">Telugu (తెలుగు)</option>
+                                <option value="hindi">Hindi (हिन्दी)</option>
+                                <option value="gujarati">Gujarati (ગુજરાતી)</option>
+                                <option value="malayalam">Malayalam (മലയാളം)</option>
                             </select>
                             <div id="language-feedback" class="invalid-feedback">
                                 Output language is required. Please select a language.

@@ -165,6 +165,9 @@
                         <select id="languageSelect" class="form-select">
                             <option value="telugu" selected>telugu</option>
                             <option value="english">english</option>
+                            <option value="hindi">hindi</option>
+                            <option value="gujarati">gujarati</option>
+                            <option value="malayalam">malayalam</option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -387,6 +390,8 @@
         function renderOperationForm() {
             const operation = getCurrentOperation();
             paramsContainer.innerHTML = '';
+            runOperationBtn.title = '';
+            runOperationBtn.disabled = false;
 
             if (!operation) {
                 endpointChip.textContent = 'Endpoint: -';
@@ -467,7 +472,8 @@
                 const payload = await response.json();
                 const statusLine = `HTTP ${response.status} ${response.ok ? 'OK' : 'ERROR'}`;
                 const messageLine = payload.message ? `Message: ${payload.message}` : '';
-                const resultLine = `Result:\n${stringifyResult(payload.result)}`;
+                const resultData = payload.data !== undefined ? payload.data : payload.result;
+                const resultLine = `Result:\n${stringifyResult(resultData)}`;
 
                 resultPanel.textContent = [statusLine, messageLine, '', resultLine].filter(Boolean).join('\n');
 
@@ -493,6 +499,7 @@
 
         categorySelect.addEventListener('change', populateOperations);
         operationSelect.addEventListener('change', renderOperationForm);
+        languageSelect.addEventListener('change', populateOperations);
         runOperationBtn.addEventListener('click', runSelectedOperation);
         clearBtn.addEventListener('click', clearForm);
 

@@ -158,7 +158,7 @@ function updateInputs() {
     // For custom fixture inputs, switch to status-only checks by clearing expected fields.
     // Strict expected-value checks remain available when using default fixture inputs.
     var defaultInput = getDefaultUniversalInput(language);
-    if (input === defaultInput) {
+    if (isStrictExpectationLanguage(language) && input === defaultInput) {
         getDefaultValues(language);
         setExpectationModeNotice("strict");
     } else {
@@ -174,7 +174,20 @@ function getDefaultUniversalInput(language) {
     if (language === "Telugu") {
         return "అమెరికాఆస్ట్రేలియా";
     }
+    if (language === "Hindi") {
+        return "भारतदेश";
+    }
+    if (language === "Gujarati") {
+        return "ગુજરાતદેશ";
+    }
+    if (language === "Malayalam") {
+        return "കേരളംഭാരതം";
+    }
     return "";
+}
+
+function isStrictExpectationLanguage(language) {
+    return language === "English" || language === "Telugu";
 }
 
 function clearExpectedValues() {
@@ -651,14 +664,20 @@ function remove_non_ascii(str) {
         return "";
     }
 
-    return str.replace(/[^\x20-\x7E\u0C00-\u0C7F]/g, '');
+    return str.replace(/[^\x20-\x7E\u0900-\u097F\u0A80-\u0AFF\u0C00-\u0C7F\u0D00-\u0D7F]/g, '');
 }
 
 
 window.onload = function () {
     var language = document.getElementById("languageInput").value;
     getLanguageValues(language);
-    getDefaultValues(language);
+    if (isStrictExpectationLanguage(language)) {
+        getDefaultValues(language);
+        setExpectationModeNotice("strict");
+    } else {
+        clearExpectedValues();
+        setExpectationModeNotice("status-only");
+    }
     runTests();
 
 }
@@ -669,7 +688,13 @@ window.onload = function () {
 $('#languageInput').on('change', function (e) {
     var language = document.getElementById("languageInput").value;
     getLanguageValues(language);
-    getDefaultValues(language);
+    if (isStrictExpectationLanguage(language)) {
+        getDefaultValues(language);
+        setExpectationModeNotice("strict");
+    } else {
+        clearExpectedValues();
+        setExpectationModeNotice("status-only");
+    }
     runTests();
 })
 
@@ -681,6 +706,14 @@ function getLanguageValues(language) {
         input = "hello";
     } else if (language == "Telugu") {
         input = "అమెరికాఆస్ట్రేలియా";
+    } else if (language == "Hindi") {
+        input = "भारतदेश";
+    } else if (language == "Gujarati") {
+        input = "ગુજરાતદેશ";
+    } else if (language == "Malayalam") {
+        input = "കേരളംഭാരതം";
+    } else {
+        input = "hello";
     }
     document.getElementById("universalInput").value = input;
     var inputCells = document.getElementsByClassName("inputText");
@@ -703,6 +736,21 @@ function getLanguageValues(language) {
         var charConstantEl = document.getElementById("charConstantInputText");
         if (charVowelEl) charVowelEl.value = "అ";
         if (charConstantEl) charConstantEl.value = "క";
+    } else if (language == "Hindi") {
+        var charVowelEl = document.getElementById("charVowelInputText");
+        var charConstantEl = document.getElementById("charConstantInputText");
+        if (charVowelEl) charVowelEl.value = "अ";
+        if (charConstantEl) charConstantEl.value = "क";
+    } else if (language == "Gujarati") {
+        var charVowelEl = document.getElementById("charVowelInputText");
+        var charConstantEl = document.getElementById("charConstantInputText");
+        if (charVowelEl) charVowelEl.value = "અ";
+        if (charConstantEl) charConstantEl.value = "ક";
+    } else if (language == "Malayalam") {
+        var charVowelEl = document.getElementById("charVowelInputText");
+        var charConstantEl = document.getElementById("charConstantInputText");
+        if (charVowelEl) charVowelEl.value = "അ";
+        if (charConstantEl) charConstantEl.value = "ക";
     }
 }
 

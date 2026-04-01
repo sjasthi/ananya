@@ -38,8 +38,270 @@ class wordProcessor
 	// constructor
 	function __construct($word, $language)
 	{
-		$this->language = $language;
+		$this->language = $this->normalizeLanguage($language);
 		if (is_string($word)) return $this->setWord($word);
+	}
+
+	private function normalizeLanguage($language)
+	{
+		if (!is_string($language)) {
+			return 'telugu';
+		}
+
+		$lang = strtolower(trim($language));
+		if ($lang === '') {
+			return 'telugu';
+		}
+
+		$aliases = array(
+			'english' => 'english',
+			'telugu' => 'telugu',
+			'hindi' => 'hindi',
+			'gujarati' => 'gujarati',
+			'malayalam' => 'malayalam'
+		);
+
+		return $aliases[$lang] ?? 'telugu';
+	}
+
+	private function includeParserForLanguage($language = null)
+	{
+		$lang = $this->normalizeLanguage($language ?? $this->language);
+
+		switch ($lang) {
+			case 'hindi':
+				include_once 'hindi_parser.php';
+				break;
+			case 'gujarati':
+				include_once 'gujarati_parser.php';
+				break;
+			case 'malayalam':
+				include_once 'malayalam_parser.php';
+				break;
+			default:
+				include_once 'telugu_parser.php';
+				break;
+		}
+	}
+
+	private function parserParseToCodePoints($word, $language = null)
+	{
+		$lang = $this->normalizeLanguage($language ?? $this->language);
+		$this->includeParserForLanguage($lang);
+
+		switch ($lang) {
+			case 'hindi':
+				if (function_exists('hindi_parseToCodePoints')) return hindi_parseToCodePoints($word);
+				break;
+			case 'gujarati':
+				if (function_exists('gujarati_parseToCodePoints')) return gujarati_parseToCodePoints($word);
+				break;
+			case 'malayalam':
+				if (function_exists('malayalam_parseToCodePoints')) return malayalam_parseToCodePoints($word);
+				break;
+			default:
+				if (function_exists('parseToCodePoints')) return parseToCodePoints($word);
+				break;
+		}
+
+		if (!is_string($word)) {
+			return array();
+		}
+
+		$chars = preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY);
+		$fallback = array();
+		foreach ($chars as $char) {
+			$fallback[] = array(ord($char));
+		}
+		return $fallback;
+	}
+
+	private function parserParseToLogicalCharacters($word, $language = null)
+	{
+		$lang = $this->normalizeLanguage($language ?? $this->language);
+		$this->includeParserForLanguage($lang);
+
+		switch ($lang) {
+			case 'hindi':
+				if (function_exists('hindi_parseToLogicalCharacters')) return hindi_parseToLogicalCharacters($word);
+				break;
+			case 'gujarati':
+				if (function_exists('gujarati_parseToLogicalCharacters')) return gujarati_parseToLogicalCharacters($word);
+				break;
+			case 'malayalam':
+				if (function_exists('malayalam_parseToLogicalCharacters')) return malayalam_parseToLogicalCharacters($word);
+				break;
+			default:
+				if (function_exists('parseToLogicalCharacters')) return parseToLogicalCharacters($word);
+				break;
+		}
+
+		if (is_array($word)) {
+			return $word;
+		}
+
+		if (!is_string($word)) {
+			return array();
+		}
+
+		return preg_split('//u', $word, -1, PREG_SPLIT_NO_EMPTY);
+	}
+
+	private function parserStripSpaces($logicalChars, $language = null)
+	{
+		$lang = $this->normalizeLanguage($language ?? $this->language);
+		$this->includeParserForLanguage($lang);
+
+		switch ($lang) {
+			case 'hindi':
+				if (function_exists('hindi_stripSpaces')) return hindi_stripSpaces($logicalChars);
+				break;
+			case 'gujarati':
+				if (function_exists('gujarati_stripSpaces')) return gujarati_stripSpaces($logicalChars);
+				break;
+			case 'malayalam':
+				if (function_exists('malayalam_stripSpaces')) return malayalam_stripSpaces($logicalChars);
+				break;
+			default:
+				if (function_exists('stripSpacesTelugu')) return stripSpacesTelugu($logicalChars);
+				break;
+		}
+
+		return array_values(array_filter($logicalChars, function ($char) {
+			return trim((string)$char) !== '';
+		}));
+	}
+
+	private function parserIsBlankHex($hexVal, $language = null)
+	{
+		$lang = $this->normalizeLanguage($language ?? $this->language);
+		$this->includeParserForLanguage($lang);
+
+		switch ($lang) {
+			case 'gujarati':
+				return function_exists('gujarati_is_blank') ? gujarati_is_blank($hexVal) : false;
+			case 'malayalam':
+				return function_exists('malayalam_is_blank') ? malayalam_is_blank($hexVal) : false;
+			case 'telugu':
+				return function_exists('is_blank_Telugu') ? is_blank_Telugu($hexVal) : false;
+			default:
+				return false;
+		}
+	}
+
+	private function getSeedFilePath($language)
+	{
+		$lang = $this->normalizeLanguage($language);
+		if (!in_array($lang, array('telugu', 'hindi', 'gujarati', 'malayalam'))) {
+			return null;
+		}
+
+		return __DIR__ . DIRECTORY_SEPARATOR . $lang . '_seed.txt';
+	}
+
+	private function getCorpusFilePath($language)
+	{
+		$lang = $this->normalizeLanguage($language);
+		$map = array(
+			'english' => 'english.txt',
+			'telugu' => 'telugu.txt',
+			'hindi' => 'hindi.txt',
+			'gujarati' => 'gujarati.txt',
+			'malayalam' => 'malayalam.txt',
+		);
+
+		if (!isset($map[$lang])) {
+			return null;
+		}
+
+		return __DIR__ . DIRECTORY_SEPARATOR . $map[$lang];
+	}
+
+	private function getMissingSeedFilesMessage($language)
+	{
+		$lang = $this->normalizeLanguage($language);
+		if (!in_array($lang, array('telugu', 'hindi', 'gujarati', 'malayalam'))) {
+			return 'Seed files are not required for this language.';
+		}
+
+		return 'Missing dataset files for ' . $lang . '. Please provide ' . $lang . '_seed.txt and ' . $lang . '_seed_words.txt.';
+	}
+
+	private function getRandomFromPool($pool)
+	{
+		if (!is_array($pool) || empty($pool)) {
+			return null;
+		}
+
+		return $pool[array_rand($pool)];
+	}
+
+	private function loadIndicSeedPools($language)
+	{
+		$seedFile = $this->getSeedFilePath($language);
+		if ($seedFile === null || !file_exists($seedFile)) {
+			return array(
+				'ok' => false,
+				'message' => $this->getMissingSeedFilesMessage($language),
+			);
+		}
+
+		$lines = @file($seedFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		if ($lines === false) {
+			return array(
+				'ok' => false,
+				'message' => 'Unable to read ' . basename($seedFile),
+			);
+		}
+
+		$pools = array(
+			'constants' => array(),
+			'vowels' => array(),
+			'vowelMixers' => array(),
+			'singleConstantBlends' => array(),
+			'doubleConstantBlends' => array(),
+			'tripleConstantBlends' => array(),
+			'constantBlendsAndVowels' => array(),
+		);
+
+		foreach ($lines as $line) {
+			$word = preg_split('/\s+/', trim($line));
+			if (count($word) < 2) {
+				continue;
+			}
+
+			$tag = strtoupper($word[0]);
+			$value = $word[1];
+
+			switch ($tag) {
+				case 'CONSONANTS':
+					$pools['constants'][] = $value;
+					break;
+				case 'VOWELS':
+					$pools['vowels'][] = $value;
+					break;
+				case 'VOWELMIXERS':
+					$pools['vowelMixers'][] = $value;
+					break;
+				case 'SINGLECONSONANTBLENDS':
+					$pools['singleConstantBlends'][] = $value;
+					break;
+				case 'DOUBLECONSONANTBLENDS':
+					$pools['doubleConstantBlends'][] = $value;
+					break;
+				case 'TRIPLECONSONANTBLENDS':
+					$pools['tripleConstantBlends'][] = $value;
+					break;
+				case 'CONSONANTBLENDSANDVOWELS':
+					$pools['constantBlendsAndVowels'][] = $value;
+					break;
+			}
+		}
+
+		return array(
+			'ok' => true,
+			'pools' => $pools,
+		);
 	}
 
 	// setter for the word
@@ -61,33 +323,15 @@ class wordProcessor
 	// all mutators need to call this, since it keeps all three properties in sync
 	function parseToLogicalChars($word)
 	{
-		if ($this->language == "Hindi") {
-			include_once 'hindi_parser.php';
-			$this->code_points = parseToCodePoints($word);
-			$this->logical_chars = parseToLogicalCharacters($this->getCodePoints());
-			return $this->getLogicalChars();
-		} elseif ($this->language == "Gujarati") {
-			include_once 'gujarati_parser.php';
-			$this->code_points = parseToCodePoints($word);
-			$this->logical_chars = parseToLogicalCharacters($this->getCodePoints());
-			return $this->getLogicalChars();
-		} elseif ($this->language == "Malayalam") {
-			include_once 'malayalam_parser.php';
-			$this->code_points = parseToCodePoints($word);
-			$this->logical_chars = parseToLogicalCharacters($this->getCodePoints());
-			return $this->getLogicalChars();
-		} else {
-			include_once 'telugu_parser.php';
-			$this->code_points = parseToCodePoints($this->getWord());
-			$this->logical_chars = parseToLogicalCharacters($this->getCodePoints());
-			return $this->getLogicalChars();
-		}
+		$this->code_points = $this->parserParseToCodePoints($word, $this->language);
+		$this->logical_chars = $this->parserParseToLogicalCharacters($this->getCodePoints(), $this->language);
+		return $this->getLogicalChars();
 	}
 
 	// a wrapper for the underlying telugu_parser version with the same name
 	function parseToLogicalCharacters($word)
 	{
-		return parseToLogicalCharacters($word);
+		return $this->parserParseToLogicalCharacters($word, $this->language);
 	}
 
 	// accepts an array of logical characters and sets the word to the value of chars
@@ -259,7 +503,8 @@ class wordProcessor
 
 	function stripSpaces()
 	{
-		$this->setLogicalChars(stripSpacesTelugu($this->getLogicalChars()));
+		$this->setLogicalChars($this->parserStripSpaces($this->getLogicalChars(), $this->language));
+
 		return $this->getWord();
 	}
 
@@ -322,7 +567,7 @@ class wordProcessor
 
 	function getIntersectingRank($word_2)
 	{
-		return count(array_intersect($this->getLogicalChars(), parseToLogicalCharacters($word_2)));
+		return count(array_intersect($this->getLogicalChars(), $this->parserParseToLogicalCharacters($word_2, $this->language)));
 	}
 
 	function isIntersecting($word_2)
@@ -485,20 +730,20 @@ class wordProcessor
 
 			case "hindi":
 				$HindiChar = mb_ord($char, 'UTF-8');
-				if ($HindiChar < $HindiVstart || $HindiChar > $HindiVend) {
+				if ($HindiChar >= $HindiVstart && $HindiChar <= $HindiVend) {
 					$retVal = false;
 				}
 				break;
 
 			case "gujarati":
 				$GujaratiChar = mb_ord($char, 'UTF-8');
-				if ($GujaratiChar < $GujaratiVstart || $GujaratiChar > $GujaratiVend) {
+				if ($GujaratiChar >= $GujaratiVstart && $GujaratiChar <= $GujaratiVend) {
 					$retVal = false;
 				}
 				break;
 			case "malayalam":
 				$MalayalamChar = mb_ord($char, 'UTF-8');
-				if ($MalayalamChar < $MalayalamVstart || $MalayalamChar > $MalayalamVend) {
+				if ($MalayalamChar >= $MalayalamVstart && $MalayalamChar <= $MalayalamVend) {
 					$retVal = false;
 				}
 				break;
@@ -585,11 +830,9 @@ class wordProcessor
 	*/
 	function getFillerCharacters($logicalCharCount, $type)
 	{
-
-		$language = $this->language;
+		$language = $this->normalizeLanguage($this->language);
 		$logicalCharCount = intval($logicalCharCount);
 		$type = strtolower($type);
-		$myfile = "";
 		$any = [];
 		$vowels = [];
 		$constants = [];
@@ -633,41 +876,21 @@ class wordProcessor
 				array_push($vowels, "0x0041", "0x0045", "0x0049", "0x004f", "0x0055");
 				break;
 			case "telugu":
-				// live version, uncomment for live site
-				//$myfile = fopen("/home2/icsbinco/public_html/indic-wp/telugu_seed.txt", "r") or die("Unable to open file!");
-				// local version, comment out for live site
-				$seedFile = __DIR__ . DIRECTORY_SEPARATOR . "telugu_seed.txt";
-				$myfile = fopen($seedFile, "r");
-				if ($myfile === false) {
-					return ["Unable to open telugu_seed.txt"];
+			case "hindi":
+			case "gujarati":
+			case "malayalam":
+				$seedLoadResult = $this->loadIndicSeedPools($language);
+				if (!$seedLoadResult['ok']) {
+					return [$seedLoadResult['message']];
 				}
 
-				$lines = [];
-				$word = [];
-				while (!feof($myfile)) {
-					$line = fgets($myfile);
-					$lines[] = $line;
-				}
-
-				foreach ($lines as $w) {
-					$word = explode(" ", trim($w));
-					if (in_array("CONSONANTS", $word)) {
-						array_push($constants, $word[1]);
-					} elseif (in_array("VOWELS", $word)) {
-						array_push($vowels, $word[1]);
-					} elseif (in_array("VOWELMIXERS", $word)) {
-						array_push($vowelMixers, $word[1]);
-					} elseif (in_array("SINGLECONSONANTBLENDS", $word)) {
-						array_push($singleConstantBlends, $word[1]);
-					} elseif (in_array("DOUBLECONSONANTBLENDS", $word)) {
-						array_push($doubleConstantBlends, $word[1]);
-					} elseif (in_array("TRIPLECONSONANTBLENDS", $word)) {
-						array_push($tripleConstantBlends, $word[1]);
-					} elseif (in_array("CONSONANTBLENDSANDVOWELS", $word)) {
-						array_push($constantBlendsAndVowels, $word[1]);
-					}
-				}
-				fclose($myfile);
+				$constants = $seedLoadResult['pools']['constants'];
+				$vowels = $seedLoadResult['pools']['vowels'];
+				$vowelMixers = $seedLoadResult['pools']['vowelMixers'];
+				$singleConstantBlends = $seedLoadResult['pools']['singleConstantBlends'];
+				$doubleConstantBlends = $seedLoadResult['pools']['doubleConstantBlends'];
+				$tripleConstantBlends = $seedLoadResult['pools']['tripleConstantBlends'];
+				$constantBlendsAndVowels = $seedLoadResult['pools']['constantBlendsAndVowels'];
 				break;
 			default:
 				return ["Unsupported language"];
@@ -692,6 +915,10 @@ class wordProcessor
 			array_slice($constantBlendsAndVowels, 0, $n)
 		);
 
+		if (empty($constants) && empty($vowels) && empty($any)) {
+			return ["No characters found in configured seed data for " . $language . "."];
+		}
+
 		switch (strtolower($language)) {
 			case "english":
 				for ($i = 0; $i < $logicalCharCount; $i++) {
@@ -713,27 +940,34 @@ class wordProcessor
 					array_push($result, $english_char);
 				}
 				break;
-			case "telugu":
+				case "telugu":
+				case "hindi":
+				case "gujarati":
+				case "malayalam":
 				for ($i = 0; $i < $logicalCharCount; $i++) {
-					$telugu_char = "";
+						$indic_char = "";
 
 					if ($type == "consonants" || $type == "consonant") {
-						$telugu_char = $constants[array_rand($constants)];
+							$indic_char = $this->getRandomFromPool($constants);
 					} else if ($type == "vowels" || $type == "vowel") {
-						$telugu_char = $vowels[array_rand($vowels)];
+							$indic_char = $this->getRandomFromPool($vowels);
 					} else if ($type == "scb") {
-						$telugu_char = $singleConstantBlends[array_rand($singleConstantBlends)];
+							$indic_char = $this->getRandomFromPool($singleConstantBlends);
 					} else if ($type == "dcb") {
-						$telugu_char = $doubleConstantBlends[array_rand($doubleConstantBlends)];
+							$indic_char = $this->getRandomFromPool($doubleConstantBlends);
 					} else if ($type == "tcb") {
-						$telugu_char = $tripleConstantBlends[array_rand($tripleConstantBlends)];
+							$indic_char = $this->getRandomFromPool($tripleConstantBlends);
 					} else if ($type == "cdv") {
-						$telugu_char = $constantBlendsAndVowels[array_rand($constantBlendsAndVowels)];
+							$indic_char = $this->getRandomFromPool($constantBlendsAndVowels);
 					} else {
-						$telugu_char = $any[array_rand($any)];
+							$indic_char = $this->getRandomFromPool($any);
 					}
 
-					array_push($result, $telugu_char);
+						if ($indic_char === null) {
+							return ["Seed data does not contain enough values for type '" . $type . "' in language '" . $language . "'."];
+						}
+
+						array_push($result, $indic_char);
 				}
 				break;
 			default:
@@ -995,7 +1229,7 @@ class wordProcessor
 								$num = rand(hexdec($startHex), hexdec($endHex));
 								$hexcode = dechex($num);
 								$number = (20 * $row) + $col;
-								if (is_blank_Gujarati($hexcode)) {
+								if ($this->parserIsBlankHex($hexcode, 'gujarati')) {
 									continue;
 								} elseif ($fillerChars == "Consonants") {
 									if ($this->isCharVowel($hexcode, $language)) {
@@ -1038,7 +1272,7 @@ class wordProcessor
 								$endHex = "0x0d3a";
 								$num = rand(hexdec($startHex), hexdec($endHex));
 								$hexcode = dechex($num);
-								if (is_blank_Malayalam($hexcode)) {
+								if ($this->parserIsBlankHex($hexcode, 'malayalam')) {
 									continue;
 								} elseif ($fillerChars == "Consonants") {
 									if ($this->isCharVowel($hexcode, $language)) {
@@ -1089,210 +1323,138 @@ class wordProcessor
 		return count($this->getLogicalChars()) - substr_count($word, ' ') - substr_count($word, ',');
 	}
 
+	private function getCodePointsForWord($word)
+	{
+		$processor = new wordProcessor($word, $this->language);
+		return $processor->getCodePoints();
+	}
+
+	private function getLogicalCharsForWord($word)
+	{
+		$processor = new wordProcessor($word, $this->language);
+		return $processor->getLogicalChars2();
+	}
+
+	private function getBaseCharactersForWord($word)
+	{
+		$processor = new wordProcessor($word, $this->language);
+		return $processor->getBaseCharacters();
+	}
+
+	private function getConsonantFrequencyMap($baseChars)
+	{
+		$lang = strtolower($this->normalizeLanguage($this->language));
+		$freq = array();
+
+		foreach ($baseChars as $char) {
+			$value = $lang === 'english' ? strtolower((string)$char) : $char;
+			if ($lang === 'english' && !preg_match('/^[a-z]$/', $value)) {
+				continue;
+			}
+			if (!$this->isCharConsonant($value)) {
+				continue;
+			}
+			$freq[$value] = ($freq[$value] ?? 0) + 1;
+		}
+
+		ksort($freq);
+		return $freq;
+	}
+
 	//Uses word instantiated with class and takes the second word as an argument
 	//It compares the inconsistencies within two given words to see if they are ladder words.
 	function areLadderWords($string2)
 	{
-        if (strtolower($this->language) == "english")
-        {
-            $string = strtolower($this->word);
-            $string2 = strtolower($string2);
-            if (strlen($string) != strlen($string2))
-            {
-                return false;
-            }
-            $stringArray = str_split($string);
-            $stringArray2 = str_split($string2);
-            $inconsistencyCount = 0;
-            for ($i = 0; $i < sizeof($stringArray); $i++)
-            {
-                if ($stringArray[$i] != $stringArray2[$i])
-                {
-                    $inconsistencyCount++;
-                }
-            }
-            if ($inconsistencyCount == 1)
-            {
-                return true;
-            }
-        }
+		$lang = strtolower($this->normalizeLanguage($this->language));
 
-        if (strtolower($this->language) == "telugu")
-        {
-            $length = $this->getLength();
-            $wordCodePoints = $this->getCodePoints();
-            $this->setWord($string2);
-            $length2 = $this->getLength();
-            $wordCodePoints2 = $this->getCodePoints();
+		if ($lang == "english") {
+			$string = strtolower($this->word);
+			$string2 = strtolower($string2);
+			if (strlen($string) != strlen($string2)) {
+				return false;
+			}
+			$stringArray = str_split($string);
+			$stringArray2 = str_split($string2);
+			$inconsistencyCount = 0;
+			for ($i = 0; $i < sizeof($stringArray); $i++) {
+				if ($stringArray[$i] != $stringArray2[$i]) {
+					$inconsistencyCount++;
+					if ($inconsistencyCount > 1) {
+						return false;
+					}
+				}
+			}
+			return $inconsistencyCount == 1;
+		}
 
-            if ($length != $length2)
-            {
-                return false;
-            }
-            $differenceArray = array();
-            for ($i = 0; $i < $length; $i++)
-            {
-                //this will return an array of size 0 if there is no difference between arrays
-                $differenceResult = array_diff($wordCodePoints[$i], $wordCodePoints2[$i]);
-                if (sizeof($differenceResult) != 0)
-                {
-                    array_push($differenceArray, $differenceResult);
-                }
-            }
-            if (sizeof($differenceArray) == 1)
-            {
-                return true;
-            }
-        }
-		return false;
+		$wordCodePoints = $this->getCodePoints();
+		$wordCodePoints2 = $this->getCodePointsForWord($string2);
+		if (count($wordCodePoints) != count($wordCodePoints2)) {
+			return false;
+		}
+
+		$differenceCount = 0;
+		for ($i = 0; $i < count($wordCodePoints); $i++) {
+			if ($wordCodePoints[$i] != $wordCodePoints2[$i]) {
+				$differenceCount++;
+				if ($differenceCount > 1) {
+					return false;
+				}
+			}
+		}
+
+		return $differenceCount == 1;
 	}
 
 	//Compares the last letter of the first word and the first letter of the last word.
 	function areHeadAndTailWords($string2)
 	{
-        if (strtolower($this->language) == "english")
-        {
-            $string = strtolower($this->word);
-            $string2 = strtolower($string2);
-            $length = $this->getLength();
-            $this->setWord($string2);
-            $length2 = $this->getLength();
-            if ($length != $length2) {
-                return false;
-            }
-            $stringArray = str_split($string);
-            $stringArray2 = str_split($string2);
-            if ($stringArray[strlen($string) - 1] == $stringArray2[0]) {
-                return true;
-            }
-        }
+		$lang = strtolower($this->normalizeLanguage($this->language));
 
-        if (strtolower($this->language) == "telugu")
-        {
-            $length = $this->getLength();
-            $wordCodePoints = $this->getCodePoints();
-            $this->setWord($string2);
-            $length2 = $this->getLength();
-            $wordCodePoints2 = $this->getCodePoints();
-            if ($length != $length2)
-            {
-                return false;
-            }
-            //sees if theres a difference between the last index of the first word
-            //and the first index of the last word.
-            $differenceResult = array_diff($wordCodePoints[$length2 - 1], $wordCodePoints2[0]);
-            if (sizeof($differenceResult) == 0)
-            {
-                return true;
-            }
-        }
-            return false;
+		if ($lang == "english") {
+			$string = strtolower($this->word);
+			$string2 = strtolower($string2);
+			if (strlen($string) != strlen($string2)) {
+				return false;
+			}
+			if ($string === '' || $string2 === '') {
+				return false;
+			}
+			$stringArray = str_split($string);
+			$stringArray2 = str_split($string2);
+			return $stringArray[strlen($string) - 1] == $stringArray2[0];
+		}
+
+		$wordCodePoints = $this->getCodePoints();
+		$wordCodePoints2 = $this->getCodePointsForWord($string2);
+		$length = count($wordCodePoints);
+		if ($length != count($wordCodePoints2) || $length === 0) {
+			return false;
+		}
+
+		return $wordCodePoints[$length - 1] == $wordCodePoints2[0];
 	}
 
 	function baseConsonants($firstWord, $secondWord)
 	{
-		$TeluguVstart = hexdec("0x0C05");
-		$TeluguVend = hexdec("0x0C14");
-		$result = false;
-		$englishVowels = array("041", "045", "049", "4f", "055");
-
-		if (strtolower($this->language) == "english") {
-			$secondWord = strtoupper($secondWord);
-			$firstWord = strtoupper($firstWord);
-		}
-		if (strtolower($this->language) == "english") {
-			$this->setWord($firstWord);
-			$firstWordLength = $this->getLength();
-			$this->setWord($secondWord);
-			$secondWordLength = $this->getLength();
-
-
-
-			if ($firstWordLength == $secondWordLength) {
-				$secondWordArray = parseToLogicalCharacters($secondWord);
-				$firstWordArray = parseToLogicalCharacters($firstWord);
-				foreach ($secondWordArray as $char) {
-					if (!in_array(strval(dechex(ord($char))), $englishVowels)) {
-						if (strpos($firstWord, $char) !== false) {
-							$result = true;
-						} else {
-							$result = false;
-							break;
-						}
-					}
-				}
-			}
+		$lang = strtolower($this->normalizeLanguage($this->language));
+		if ($lang === 'english') {
+			$firstWord = strtolower((string)$firstWord);
+			$secondWord = strtolower((string)$secondWord);
 		}
 
-		if (strtolower($this->language) == "telugu") {
-			$teluguCon1 = "3093";  //"?"
-			$teluguCon2 = "3120";       //"?"
-			$teluguCon = array($teluguCon1, $teluguCon2);
-			$this->setWord($firstWord);
-			$firstWordLength = $this->getLength();
-			$this->setWord($secondWord);
-			$secondWordLength = $this->getLength();
-			if ($firstWordLength == $secondWordLength) {
-
-				$firstWordArray = $this->getCodePoints();
-				$this->setWord($secondWord);
-				$secondWordArray = $this->getCodePoints();
-				$newFirstWordArray = array();
-				$newsecondWordArray = array();
-				for ($i = 0; $i < count($firstWordArray); $i++) {
-					for ($j = 0; $j < count($firstWordArray[$i]); $j++) {
-						array_push($newFirstWordArray, $firstWordArray[$i][$j]);
-					}
-				}
-
-				for ($i = 0; $i < count($secondWordArray); $i++) {
-					for ($j = 0; $j < count($secondWordArray[$i]); $j++) {
-						array_push($newsecondWordArray, $secondWordArray[$i][$j]);
-					}
-				}
-
-				foreach ($newsecondWordArray as $char) {
-					if (in_array($char, $teluguCon)) {
-						if (in_array($char, $newFirstWordArray)) {
-							$result = true;
-						} else {
-							$result = false;
-							break;
-						}
-					}
-				}
-			}
+		$firstChars = $this->getLogicalCharsForWord($firstWord);
+		$secondChars = $this->getLogicalCharsForWord($secondWord);
+		if (count($firstChars) != count($secondChars)) {
+			return false;
 		}
 
-		if ($result == true && $this->language == "English") {
-			foreach ($secondWordArray as $char) {
-				$count1 = 0;
-				$count2 = 0;
-				if (!in_array(strval(dechex(ord($char))), $englishVowels)) {
-					$count2 = substr_count($secondWord, $char);
-					$count1 = substr_count($firstWord, $char);
-					if ($count1 != $count2) {
-						$result = false;
-					}
-				}
-			}
-		}
+		$firstBase = $this->getBaseCharactersForWord($firstWord);
+		$secondBase = $this->getBaseCharactersForWord($secondWord);
+		$firstFreq = $this->getConsonantFrequencyMap($firstBase);
+		$secondFreq = $this->getConsonantFrequencyMap($secondBase);
 
-		if ($result == true && $this->language == "Telugu") {
-			foreach ($newsecondWordArray as $char) {
-				if ($char == $teluguCon1 || $char == $teluguCon2) {
-					if (!in_array($char, $newFirstWordArray)) {
-						$result = false;
-					} elseif (!in_array($char, $newsecondWordArray)) {
-						$result = false;
-					}
-					$count2 = count(array_keys($newsecondWordArray, $char));
-					$count1 = count(array_keys($newFirstWordArray, $char));
-				}
-			}
-		}
-
-		return $result;
+		return $firstFreq == $secondFreq;
 	}
 
 	//gets base characters of a string stripping spaces and special characters
@@ -1356,86 +1518,68 @@ class wordProcessor
     }
 	//a certain string will be returned if the characters are matched in the same position.
 	function get_match_id_string($string1,$string2){
-		if(strtolower($this->language)=="english"){
-			$firstString=strtolower($string1);
-			$this->setWord($firstString);
-			$firstArray= $this->getLogicalChars2();
-			$secondString=strtolower($string2);
-			$this->setWord($secondString);
-			$secondArray= $this->getLogicalChars2();
+		$lang = strtolower($this->normalizeLanguage($this->language));
 
-			
-			if(count($firstArray)!= count($secondArray)){
+		if($lang == "english"){
+			$firstString = strtolower((string)$string1);
+			$secondString = strtolower((string)$string2);
+			$firstArray = $this->getLogicalCharsForWord($firstString);
+			$secondArray = $this->getLogicalCharsForWord($secondString);
+
+			if(count($firstArray) != count($secondArray)){
 				return "Cannot Solve inputs are different lengths";
 			}
-			else{
-				$returnString='';
-				for ($i=0;$i < count($firstArray);$i++){
-					if(strcmp($firstArray[$i],($secondArray[$i]))==0){
-						$returnString=$returnString.'1';
-					}
-					else{
-						if(in_array($secondArray[$i],$firstArray)){
-							$returnString=$returnString.'2';
-						}
-						else{
-							$returnString=$returnString.'5';
-						}
-					}
-				}
-				return $returnString;
-				
-			}
-			
-		}
-		else if(strtolower($this->language)=="telugu"){
-			$this->setWord($string1);
-			$firstArray= $this->getLogicalChars2();
-			$firstBase=$this->getBaseCharacters();
-			
-			$this->setWord($string2);
-			$secondArray= $this->getLogicalChars2();
-			$secondBase=$this->getBaseCharacters();
 
-			if(count($firstArray)!= count($secondArray ) && (count($firstBase)!= count($secondBase ))){
-				return "Cannot solve Inputs are different Lengths";
-			}
-			$returnString="";
-			for ($i=0;$i < count($firstArray);$i++){
-			switch (true){
-				case (in_array($secondBase[$i],$firstBase)):
-					if(strcmp($firstArray[$i],($secondArray[$i]))==0){
-						if(strcmp($firstBase[$i],($secondBase[$i]))==0){
-							$returnString= $returnString.'1';
-						}
-					else{
-						$returnString= $returnString.'3';
-					}
-					}
-					else{
-						if(strcmp($firstBase[$i],($secondBase[$i]))==0){
-							$returnString= $returnString.'3';
-						}
-						else if(in_array($secondArray[$i],$firstArray)){
-							$returnString= $returnString.'2';
-						}
-						else{
-						$returnString= $returnString.'4';
-					}
-					}
-					break;
-				
-				case(!in_array($secondArray[$i],$firstArray)):
-					$returnString= $returnString.'5';
-					break;
+			$returnString = '';
+			for ($i = 0; $i < count($firstArray); $i++) {
+				if(strcmp($firstArray[$i], ($secondArray[$i])) == 0){
+					$returnString .= '1';
+				} else {
+					$returnString .= in_array($secondArray[$i], $firstArray) ? '2' : '5';
 				}
 			}
 			return $returnString;
-
 		}
-		else{
-			return "Not valid Langugage";
-		} 
+
+		$firstArray = $this->getLogicalCharsForWord($string1);
+		$firstBase = $this->getBaseCharactersForWord($string1);
+		$secondArray = $this->getLogicalCharsForWord($string2);
+		$secondBase = $this->getBaseCharactersForWord($string2);
+
+		if(count($firstArray) != count($secondArray) || count($firstBase) != count($secondBase)){
+			return "Cannot solve Inputs are different Lengths";
+		}
+
+		$returnString = "";
+		for ($i = 0; $i < count($firstArray); $i++) {
+			switch (true) {
+				case (in_array($secondBase[$i], $firstBase)):
+					if(strcmp($firstArray[$i], ($secondArray[$i])) == 0){
+						if(strcmp($firstBase[$i], ($secondBase[$i])) == 0){
+							$returnString .= '1';
+						} else {
+							$returnString .= '3';
+						}
+					} else {
+						if(strcmp($firstBase[$i], ($secondBase[$i])) == 0){
+							$returnString .= '3';
+						} else if(in_array($secondArray[$i], $firstArray)){
+							$returnString .= '2';
+						} else {
+							$returnString .= '4';
+						}
+					}
+					break;
+				case (!in_array($secondArray[$i], $firstArray)):
+					$returnString .= '5';
+					break;
+				default:
+					$returnString .= '2';
+					break;
+			}
+		}
+
+		return $returnString;
 	}
 	function getLangForString(){
         // Get Unicode code points of the string
@@ -1508,59 +1652,48 @@ class wordProcessor
         }
 	}
 	function getRandomLogicalChars($n){
-        $langLower=strtolower($this->language);
-        $int_val=(int) $n;
-   
-        if($int_val <= 0){
-            return "invalid Input please enter a number > 0 and no strings allowed";
-        }
-        if($langLower=="english"){
-            $myArray=array();
-            
-		   $englishFile = __DIR__ . DIRECTORY_SEPARATOR . "english.txt";
+		$langLower = $this->normalizeLanguage($this->language);
+		$int_val = (int)$n;
 
-		   if(!$fh=fopen($englishFile,"r") ){
-			   return "File not found";
-		   }
-		   else{
-            if ($fh){
-                while (!feof($fh)){
-                   
-                     $this->setWord(fgets($fh));
-					$filtered = $this->filterRandomLogicalCharsByLanguage($this->getLogicalChars2(), "english");
-					$myArray=array_merge($myArray,$filtered);
-                }
-            }
-			shuffle($myArray);
-            if($int_val > count($myArray)){
-                return "Not enough Logical characters in file. Lower N";
-            }
-            return array_slice($myArray,0,$int_val);
-        }
-	}
-        elseif($langLower=="telugu"){
-            $teluguArray=array();
-			$teluguFile = __DIR__ . DIRECTORY_SEPARATOR . "telugu.txt";
+		if ($int_val <= 0) {
+			return "invalid Input please enter a number > 0 and no strings allowed";
+		}
 
-			if(!($fh=fopen($teluguFile,"r"))){
-				return "File not found";
-			};
-            if ($fh){
-                while (!feof($fh)){
-                    $this->setWord(fgets($fh));
-					$filtered = $this->filterRandomLogicalCharsByLanguage($this->getLogicalChars2(), "telugu");
-					$teluguArray=array_merge($teluguArray,$filtered);
-                }
-            }
-			shuffle($teluguArray);
-            if($int_val > count($teluguArray)){
-                return "Not enough characters. Lower N";
-            }
-            return array_slice($teluguArray,0,$int_val);
-        }
-        else{
-            return "Language has not yet been implemented";
-        }
+		$corpusFile = $this->getCorpusFilePath($langLower);
+		if ($corpusFile === null) {
+			return "Language has not yet been implemented";
+		}
+
+		if (!file_exists($corpusFile)) {
+			if (in_array($langLower, array('hindi', 'gujarati', 'malayalam'))) {
+				return "Missing corpus file for " . $langLower . ". Please provide " . $langLower . ".txt and also " . $langLower . "_seed.txt and " . $langLower . "_seed_words.txt.";
+			}
+			return "File not found";
+		}
+
+		$fh = fopen($corpusFile, "r");
+		if (!$fh) {
+			return "Unable to open " . basename($corpusFile);
+		}
+
+		$allChars = array();
+		while (!feof($fh)) {
+			$line = fgets($fh);
+			if ($line === false) {
+				continue;
+			}
+			$this->setWord($line);
+			$filtered = $this->filterRandomLogicalCharsByLanguage($this->getLogicalChars2(), $langLower);
+			$allChars = array_merge($allChars, $filtered);
+		}
+		fclose($fh);
+
+		shuffle($allChars);
+		if ($int_val > count($allChars)) {
+			return "Not enough characters in file. Lower N";
+		}
+
+		return array_slice($allChars, 0, $int_val);
        
     }
 
@@ -1589,6 +1722,18 @@ class wordProcessor
 
 			if ($language === "telugu") {
 				if (!preg_match('/[\x{0C00}-\x{0C7F}]/u', $char)) {
+					continue;
+				}
+			} elseif ($language === "hindi") {
+				if (!preg_match('/[\x{0900}-\x{097F}]/u', $char)) {
+					continue;
+				}
+			} elseif ($language === "gujarati") {
+				if (!preg_match('/[\x{0A80}-\x{0AFF}]/u', $char)) {
+					continue;
+				}
+			} elseif ($language === "malayalam") {
+				if (!preg_match('/[\x{0D00}-\x{0D7F}]/u', $char)) {
 					continue;
 				}
 			} elseif ($language === "english") {
