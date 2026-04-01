@@ -310,13 +310,7 @@
                                     <th><i class="fas fa-chart-bar me-1"></i>Frequency</th>
                                 </tr>
                             </thead>
-                            <tbody id="word-entries">
-                                <tr>
-                                    <td colspan="3" class="text-center text-muted">
-                                        <i class="fas fa-arrow-up me-2"></i>Enter some text above and click "Process Text" to see results
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="word-entries"></tbody>
                         </table>
                     </div>
                 </div>
