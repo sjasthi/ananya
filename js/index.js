@@ -141,6 +141,7 @@ function changeTheme(objButton) {
  */
 function updateInputs() {
     var input = document.getElementById("universalInput").value;
+    var language = document.getElementById("languageInput").value;
     var inputCells = document.getElementsByClassName("inputText");
     for (var i = 0; i < inputCells.length; i++) {
         // Skip authentication input fields - they have their own test credentials
@@ -153,6 +154,51 @@ function updateInputs() {
         }
         inputCells[i].value = input;
     }
+
+    // For custom fixture inputs, switch to status-only checks by clearing expected fields.
+    // Strict expected-value checks remain available when using default fixture inputs.
+    var defaultInput = getDefaultUniversalInput(language);
+    if (input === defaultInput) {
+        getDefaultValues(language);
+        setExpectationModeNotice("strict");
+    } else {
+        clearExpectedValues();
+        setExpectationModeNotice("status-only");
+    }
+}
+
+function getDefaultUniversalInput(language) {
+    if (language === "English") {
+        return "hello";
+    }
+    if (language === "Telugu") {
+        return "అమెరికాఆస్ట్రేలియా";
+    }
+    return "";
+}
+
+function clearExpectedValues() {
+    var expectedInputs = document.querySelectorAll("#apiTable input.expectedText");
+    expectedInputs.forEach(function (input) {
+        input.value = "";
+    });
+}
+
+function setExpectationModeNotice(mode) {
+    var summaryEl = document.getElementById("testRunSummary");
+    if (!summaryEl) {
+        return;
+    }
+
+    summaryEl.classList.remove("alert-secondary", "alert-info", "alert-success", "alert-danger", "alert-warning");
+    if (mode === "strict") {
+        summaryEl.classList.add("alert-secondary");
+        summaryEl.textContent = "Status: Strict expected-value checks active (default fixture input).";
+        return;
+    }
+
+    summaryEl.classList.add("alert-warning");
+    summaryEl.textContent = "Status: Custom input detected. Expected values cleared; tests now validate successful API execution (HTTP 200).";
 }
 
 
