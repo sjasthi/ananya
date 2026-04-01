@@ -46,7 +46,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
     async function fetchPuzzle(theme, count, gridLabel, language) {
         const lang = String(language || 'telugu').toLowerCase();
-        const langLabel = lang === 'english' ? 'English' : 'Telugu';
+        const langLabels = {
+            english: 'English',
+            telugu: 'Telugu',
+            hindi: 'Hindi',
+            gujarati: 'Gujarati',
+            malayalam: 'Malayalam'
+        };
+        const langLabel = langLabels[lang] || 'English';
         const question = `Give me a ${langLabel} puzzle on ${theme} (default count = ${count}, grid size ${gridLabel})`;
         const res = await fetch('chat_api.php', {
             method: 'POST',

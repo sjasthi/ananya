@@ -290,6 +290,9 @@
                                         <select name="languageInput" class="form-control" id="languageInput">
                                             <option value="English">English</option>
                                             <option selected value="Telugu">Telugu</option>
+                                            <option value="Hindi">Hindi</option>
+                                            <option value="Gujarati">Gujarati</option>
+                                            <option value="Malayalam">Malayalam</option>
                                         </select>
                                     </div>
                                     <div class="form-group col-md-2">

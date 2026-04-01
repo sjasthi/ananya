@@ -301,6 +301,21 @@ function updateLanguageSelection(e) {
             parsingInput.placeholder = "మీ తెలుగు వచనాన్ని ఇక్కడ విశ్లేషణ కోసం నమోదు చేయండి...";
             console.log(language + ' selected');
             break;
+        case 'hindi':
+            language = value;
+            parsingInput.placeholder = "विश्लेषण के लिए यहां हिंदी पाठ दर्ज करें...";
+            console.log(language + ' selected');
+            break;
+        case 'gujarati':
+            language = value;
+            parsingInput.placeholder = "વિશ્લેષણ માટે અહીં ગુજરાતી લખાણ દાખલ કરો...";
+            console.log(language + ' selected');
+            break;
+        case 'malayalam':
+            language = value;
+            parsingInput.placeholder = "വിശകലനത്തിനായി ഇവിടെ മലയാളം എഴുതുക...";
+            console.log(language + ' selected');
+            break;
         default:
             console.log('Unknown language selected');
     }
@@ -545,5 +560,5 @@ function remove_non_ascii(str) {
         return false;
     else
         str = str.toString();
-    return str.replace(/[^\x20-\x7E\uC00-\u0C7F]/g, '');
+    return str.replace(/[^\x20-\x7E\u0900-\u097F\u0A80-\u0AFF\u0C00-\u0C7F\u0D00-\u0D7F]/g, '');
 }

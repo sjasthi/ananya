@@ -548,9 +548,33 @@ function parse_crossword_request($question) {
     ];
 }
 
+function normalize_supported_language($language) {
+    $lang = strtolower(trim((string)$language));
+    $supported = ['english', 'telugu', 'hindi', 'gujarati', 'malayalam'];
+    return in_array($lang, $supported, true) ? $lang : 'english';
+}
+
+function is_indic_language($language) {
+    return in_array(normalize_supported_language($language), ['telugu', 'hindi', 'gujarati', 'malayalam'], true);
+}
+
+function language_name_for_prompt($language) {
+    $lang = normalize_supported_language($language);
+    $names = [
+        'english' => 'English',
+        'telugu' => 'Telugu',
+        'hindi' => 'Hindi',
+        'gujarati' => 'Gujarati',
+        'malayalam' => 'Malayalam',
+    ];
+
+    return $names[$lang] ?? 'English';
+}
+
 function normalize_word_for_grid($word, $language = 'english') {
+    $language = normalize_supported_language($language);
     $text = trim((string)$word);
-    if ($language === 'telugu') {
+    if ($language !== 'english') {
         $text = preg_replace('/[^\p{L}\p{M}]/u', '', $text);
         return $text;
     }
@@ -622,13 +646,14 @@ function split_logical_units_via_ananya_api($word, $language = 'english') {
 }
 
 function split_word_units($word, $language = 'english') {
+    $language = normalize_supported_language($language);
     $text = (string)$word;
     if ($text === '') {
         return [];
     }
 
-    if ($language === 'telugu') {
-        // For Telugu puzzle generation, prefer Ananya API logical-char parsing.
+    if ($language !== 'english') {
+        // For Indic puzzle generation, prefer Ananya API logical-char parsing.
         $apiUnits = split_logical_units_via_ananya_api($text, $language);
         if (!empty($apiUnits)) {
             return $apiUnits;
@@ -665,6 +690,7 @@ function sanitize_word_list($words, $maxCount, $language = 'english', $maxLen = 
 }
 
 function fallback_theme_words($theme, $language = 'english') {
+    $language = normalize_supported_language($language);
     $t = strtolower(canonicalize_theme($theme));
 
     if ($language === 'telugu') {
@@ -679,6 +705,45 @@ function fallback_theme_words($theme, $language = 'english') {
         }
 
         return ['పర్వతం', 'నది', 'మేఘం', 'ఆకాశం', 'పుస్తకం', 'పాట', 'చెట్టు', 'పువ్వు', 'సముద్రం', 'వెలుగు'];
+    }
+
+    if ($language === 'hindi') {
+        if ($t === 'fruit') {
+            return ['सेब', 'केला', 'आम', 'अंगूर', 'संतरा', 'अनार', 'पपीता', 'अमरूद', 'नाशपाती', 'तरबूज'];
+        }
+        if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
+            return ['कुत्ता', 'पिल्ला', 'भौंक', 'पूंछ', 'पंजा', 'कालर', 'घर', 'मित्र'];
+        }
+        if (preg_match('/\bcat|cats|feline|kitten\b/', $t)) {
+            return ['बिल्ली', 'बच्चा', 'म्याऊँ', 'पंजा', 'मूंछ', 'पूंछ', 'नींद', 'नाखून'];
+        }
+        return ['पर्वत', 'नदी', 'बादल', 'आकाश', 'पुस्तक', 'पेड़', 'फूल', 'समुद्र', 'रोशनी', 'हवा'];
+    }
+
+    if ($language === 'gujarati') {
+        if ($t === 'fruit') {
+            return ['સફરજન', 'કેળું', 'કેરી', 'દ્રાક્ષ', 'સંતરો', 'દાડમ', 'પપૈયું', 'જામફળ', 'નાશપતી', 'તરબૂચ'];
+        }
+        if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
+            return ['કૂતરો', 'પિલ્લું', 'ભૂંક', 'પૂંછડી', 'પંજો', 'કોલર', 'ઘર', 'મિત્ર'];
+        }
+        if (preg_match('/\bcat|cats|feline|kitten\b/', $t)) {
+            return ['બિલાડી', 'બચ્ચું', 'મિયાંઉ', 'પંજો', 'મૂછ', 'પૂંછડી', 'ઊંઘ', 'નખ'];
+        }
+        return ['પર્વત', 'નદી', 'વાદળ', 'આકાશ', 'પુસ્તક', 'ઝાડ', 'ફૂલ', 'સમુદ્ર', 'પ્રકાશ', 'પવન'];
+    }
+
+    if ($language === 'malayalam') {
+        if ($t === 'fruit') {
+            return ['ആപ്പിൾ', 'വാഴപ്പഴം', 'മാമ്പഴം', 'മുന്തിരി', 'ഓറഞ്ച്', 'മാതളം', 'പപ്പായ', 'പേര', 'നാഷ്പതി', 'തണ്ണിമത്തൻ'];
+        }
+        if (preg_match('/\bdog|dogs|canine|puppy|puppies\b/', $t)) {
+            return ['നായ', 'കുഞ്ഞ്', 'കുരയ്‌ക്കുക', 'വാൽ', 'കാൽപ്പാദം', 'കോളർ', 'വീട്', 'സുഹൃത്ത്'];
+        }
+        if (preg_match('/\bcat|cats|feline|kitten\b/', $t)) {
+            return ['പൂച്ച', 'കുഞ്ഞ്', 'മ്യാവ്', 'കാൽപ്പാദം', 'മീശ', 'വാൽ', 'ഉറക്കം', 'നഖം'];
+        }
+        return ['പർവ്വതം', 'നദി', 'മേഘം', 'ആകാശം', 'പുസ്തകം', 'മരം', 'പൂവ്', 'സമുദ്രം', 'വെളിച്ചം', 'കാറ്റ്'];
     }
 
     if ($t === 'fruit') {
@@ -697,11 +762,24 @@ function fallback_theme_words($theme, $language = 'english') {
 }
 
 function localized_theme_label($theme, $language = 'english') {
+    $language = normalize_supported_language($language);
     $canonical = strtolower(canonicalize_theme($theme));
     if ($language === 'telugu') {
         if ($canonical === 'dog') return 'కుక్కలు';
         if ($canonical === 'cat') return 'పిల్లులు';
         if ($canonical === 'fruit') return 'పండ్లు';
+    } elseif ($language === 'hindi') {
+        if ($canonical === 'dog') return 'कुत्ते';
+        if ($canonical === 'cat') return 'बिल्लियाँ';
+        if ($canonical === 'fruit') return 'फल';
+    } elseif ($language === 'gujarati') {
+        if ($canonical === 'dog') return 'કૂતરા';
+        if ($canonical === 'cat') return 'બિલાડીઓ';
+        if ($canonical === 'fruit') return 'ફળો';
+    } elseif ($language === 'malayalam') {
+        if ($canonical === 'dog') return 'നായകൾ';
+        if ($canonical === 'cat') return 'പൂച്ചകൾ';
+        if ($canonical === 'fruit') return 'ഫലങ്ങൾ';
     }
     return $theme;
 }
@@ -725,12 +803,13 @@ function parse_words_from_llm_text($text) {
 }
 
 function request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $language = 'english') {
+    $language = normalize_supported_language($language);
+    $languageName = language_name_for_prompt($language);
+
     $opts = [
         'temperature' => 0.2,
         'max_tokens' => 220,
-        'system_prompt' => $language === 'telugu'
-            ? 'Return only a plain list of single Telugu words, one per line, no numbering, no punctuation, no extra text.'
-            : 'Return only a plain list of single English words, one per line, no numbering, no punctuation, no extra text.',
+        'system_prompt' => 'Return only a plain list of single ' . $languageName . ' words, one per line, no numbering, no punctuation, no extra text.',
     ];
 
     if ($llm_provider !== '') {
@@ -740,9 +819,11 @@ function request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model,
         $opts['model'] = $llm_model;
     }
 
-    $prompt = $language === 'telugu'
-        ? ($theme . " అనే థీమ్‌కు సంబంధించిన " . ($count + 8) . " ఒక్కో తెలుగు పదాలు ఇవ్వండి.")
-        : ("Give " . ($count + 8) . " single-word terms related to this theme: " . $theme . ".");
+    if ($language === 'telugu') {
+        $prompt = $theme . " అనే థీమ్‌కు సంబంధించిన " . ($count + 8) . " ఒక్కో తెలుగు పదాలు ఇవ్వండి.";
+    } else {
+        $prompt = "Give " . ($count + 8) . " single-word " . $languageName . " terms related to this theme: " . $theme . ".";
+    }
     $resp = llm_ask($prompt, $opts);
 
     // llm_ask returns plain text on success and error text on failure.
@@ -1357,12 +1438,25 @@ function generate_crossword_answer($question, $llm_provider, $llm_model, $langua
 }
 
 function fill_empty_cells(&$grid, $nRows, $nCols, $language = 'english') {
+    $language = normalize_supported_language($language);
     $teluguPool = ['అ', 'ఆ', 'ఇ', 'ఈ', 'ఉ', 'ఊ', 'ఎ', 'ఏ', 'ఒ', 'ఓ', 'క', 'గ', 'చ', 'జ', 'ట', 'డ', 'త', 'ద', 'న', 'ప', 'బ', 'మ', 'య', 'ర', 'ల', 'వ', 'స', 'హ'];
+    $hindiPool = ['अ', 'आ', 'इ', 'ई', 'उ', 'ए', 'ओ', 'क', 'ग', 'च', 'ज', 'ट', 'ड', 'त', 'द', 'न', 'प', 'ब', 'म', 'य', 'र', 'ल', 'व', 'स', 'ह'];
+    $gujaratiPool = ['અ', 'આ', 'ઇ', 'ઈ', 'ઉ', 'એ', 'ઓ', 'ક', 'ગ', 'ચ', 'જ', 'ટ', 'ડ', 'ત', 'દ', 'ન', 'પ', 'બ', 'મ', 'ય', 'ર', 'લ', 'વ', 'સ', 'હ'];
+    $malayalamPool = ['അ', 'ആ', 'ഇ', 'ഈ', 'ഉ', 'ഏ', 'ഓ', 'ക', 'ഗ', 'ച', 'ജ', 'ട', 'ഡ', 'ത', 'ദ', 'ന', 'പ', 'ബ', 'മ', 'യ', 'ര', 'ല', 'വ', 'സ', 'ഹ'];
+
+    $poolByLanguage = [
+        'telugu' => $teluguPool,
+        'hindi' => $hindiPool,
+        'gujarati' => $gujaratiPool,
+        'malayalam' => $malayalamPool,
+    ];
+
     for ($r = 0; $r < $nRows; $r++) {
         for ($c = 0; $c < $nCols; $c++) {
             if ($grid[$r][$c] === '') {
-                if ($language === 'telugu') {
-                    $grid[$r][$c] = $teluguPool[random_int(0, count($teluguPool) - 1)];
+                if (isset($poolByLanguage[$language])) {
+                    $pool = $poolByLanguage[$language];
+                    $grid[$r][$c] = $pool[random_int(0, count($pool) - 1)];
                 } else {
                     $grid[$r][$c] = chr(ord('A') + random_int(0, 25));
                 }
@@ -1579,6 +1673,7 @@ function format_word_find_response($theme, $count, $puzzle, $usedLlmCandidates, 
 }
 
 function generate_word_find_answer($question, $llm_provider, $llm_model, $language = 'english') {
+    $language = normalize_supported_language($language);
     $req = parse_word_find_request($question);
     if ($req === null) {
         return null;
@@ -1606,9 +1701,17 @@ function generate_word_find_answer($question, $llm_provider, $llm_model, $langua
 
     if (count($words) < $count) {
         // Add deterministic fillers to reach requested count if needed.
-        $extras = $language === 'telugu'
-            ? ['ఆకాశం', 'పర్వతం', 'పాట', 'చెట్టు', 'పువ్వు', 'నది', 'చంద్రుడు', 'సముద్రం', 'వెలుగు', 'గాలి']
-            : ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GAMMA', 'OMEGA', 'SIGMA', 'THETA'];
+        if ($language === 'telugu') {
+            $extras = ['ఆకాశం', 'పర్వతం', 'పాట', 'చెట్టు', 'పువ్వు', 'నది', 'చంద్రుడు', 'సముద్రం', 'వెలుగు', 'గాలి'];
+        } elseif ($language === 'hindi') {
+            $extras = ['आकाश', 'पर्वत', 'गीत', 'पेड़', 'फूल', 'नदी', 'चाँद', 'समुद्र', 'प्रकाश', 'हवा'];
+        } elseif ($language === 'gujarati') {
+            $extras = ['આકાશ', 'પર્વત', 'ગીત', 'ઝાડ', 'ફૂલ', 'નદી', 'ચંદ્ર', 'સમુદ્ર', 'પ્રકાશ', 'પવન'];
+        } elseif ($language === 'malayalam') {
+            $extras = ['ആകാശം', 'പർവ്വതം', 'ഗാനം', 'മരം', 'പൂവ്', 'നദി', 'ചന്ദ്രൻ', 'സമുദ്രം', 'വെളിച്ചം', 'കാറ്റ്'];
+        } else {
+            $extras = ['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA', 'ECHO', 'FOXTROT', 'GAMMA', 'OMEGA', 'SIGMA', 'THETA'];
+        }
         $words = sanitize_word_list(array_merge($words, $extras), $count, $language, $req['gridCols']);
     }
 
@@ -1840,7 +1943,7 @@ if($raw) {
 }
 
 $question = trim($_POST['question'] ?? ($data['question'] ?? ''));
-$language = $_POST['language'] ?? ($data['language'] ?? 'english');
+$language = normalize_supported_language($_POST['language'] ?? ($data['language'] ?? 'english'));
 $llm_provider = strtolower(trim($_POST['llm_provider'] ?? ($data['llm_provider'] ?? '')));
 $llm_model = trim($_POST['llm_model'] ?? ($data['llm_model'] ?? ''));
 

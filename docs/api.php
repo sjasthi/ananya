@@ -387,7 +387,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Position (0-based index)</li>
                                     <li><code>input3</code> (required) - Character/string to add</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -426,7 +426,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Character/string to add</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -464,7 +464,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -503,7 +503,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Second string to compare</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -541,7 +541,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -579,7 +579,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -618,7 +618,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>count</code> (optional) - Number of characters to generate (default 3)</li>
                                     <li><code>type</code> (optional) - Type of filler characters (default <code>consonant</code>)</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -656,7 +656,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -695,7 +695,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (optional) - Position (0-based index, default 0)</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -733,7 +733,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>count</code> (optional) - Number of characters to generate (default 5)</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -775,7 +775,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Comma-separated logical characters to check</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -789,7 +789,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                         <pre><code class="language-json">{
   "response_code": 200,
   "message": "All logical characters check completed",
-  "string": "అనన్య",
+    "string": "అనన్య",
   "language": "telugu",
   "data": true,
   "success": true,
@@ -814,7 +814,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Character to search for</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -853,7 +853,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Comma-separated logical characters to check</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -892,7 +892,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Logical character sequence (not comma-separated)</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -930,7 +930,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -969,7 +969,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Substring to search for</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1008,7 +1008,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Suffix to check</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1046,7 +1046,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1085,7 +1085,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Prefix to check</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu, defaults to Telugu)</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam, defaults to Telugu)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1127,7 +1127,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1166,7 +1166,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1205,7 +1205,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1244,7 +1244,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1283,7 +1283,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1324,7 +1324,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1362,7 +1362,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1402,7 +1402,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>input2</code> (required) - Text to find</li>
                                     <li><code>input3</code> (optional) - Replacement text</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1440,7 +1440,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1480,7 +1480,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                     <li><code>string</code> (required) - Input string</li>
                                     <li><code>delimiter</code> (optional) - Delimiter to split on (default <code>-</code>)</li>
                                     <li><code>input2</code> (optional) - Alternate delimiter parameter</li>
-                                    <li><code>language</code> (optional) - Language (English/Telugu), defaults to Telugu</li>
+                                    <li><code>language</code> (optional) - Language (English/Telugu/Hindi/Gujarati/Malayalam), defaults to Telugu</li>
                                 </ul>
                             </div>
                         </div>
@@ -1596,7 +1596,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional override) - Language (english/telugu). If omitted, auto-detected.</li>
+                                    <li><code>language</code> (optional override) - Language (English/Telugu/Hindi/Gujarati/Malayalam). If omitted, auto-detected.</li>
                                 </ul>
                             </div>
                         </div>
@@ -1635,7 +1635,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional override) - Language (english/telugu). If omitted, auto-detected.</li>
+                                    <li><code>language</code> (optional override) - Language (English/Telugu/Hindi/Gujarati/Malayalam). If omitted, auto-detected.</li>
                                 </ul>
                             </div>
                         </div>
@@ -1673,7 +1673,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (optional override) - Language (english/telugu). If omitted, auto-detected.</li>
+                                    <li><code>language</code> (optional override) - Language (English/Telugu/Hindi/Gujarati/Malayalam). If omitted, auto-detected.</li>
                                 </ul>
                             </div>
                         </div>
@@ -1726,7 +1726,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Source string</li>
                                     <li><code>input2</code> (required) - Comma-separated list of words</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1765,7 +1765,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - Source string</li>
                                     <li><code>input2</code> (required) - Target word to make</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1842,7 +1842,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1889,7 +1889,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First word</li>
                                     <li><code>input2</code> (required) - Second word</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1928,7 +1928,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -1967,7 +1967,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2005,7 +2005,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2043,7 +2043,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2082,7 +2082,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First word</li>
                                     <li><code>input2</code> (required) - Second word</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2120,7 +2120,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input text</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2158,7 +2158,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input character</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2196,7 +2196,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2235,7 +2235,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2274,7 +2274,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <ul>
                                     <li><code>string</code> (required) - First string</li>
                                     <li><code>input2</code> (required) - Second string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2312,7 +2312,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2350,7 +2350,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2388,7 +2388,7 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
                                 <h6>Parameters</h6>
                                 <ul>
                                     <li><code>string</code> (required) - Input string</li>
-                                    <li><code>language</code> (required) - Language (English/Telugu)</li>
+                                    <li><code>language</code> (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)</li>
                                 </ul>
                             </div>
                         </div>
@@ -2532,3 +2532,6 @@ $apiBase = 'https://ananya.telugupuzzles.com/api.php/';
     </div>
 </body>
 </html>
+
+
+

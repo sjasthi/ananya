@@ -8,8 +8,8 @@
 
 //Class hindi_parser{
 
-function stripSpacesHindi($log_chars) {
-    $code_points = parseToCodePoints(implode($log_chars));
+function hindi_stripSpaces($log_chars) {
+    $code_points = hindi_parseToCodePoints(implode($log_chars));
     $build = array();
     $build_i = 0;
     for($i=0; $i < count($code_points); $i++) {
@@ -17,7 +17,7 @@ function stripSpacesHindi($log_chars) {
             continue;
         else {
             $build[$build_i++] = $log_chars[$i];
-            if(isHalant(end($code_points[$i]) && $i + 1 < count($code_points))) {
+            if(hindi_isHalant(end($code_points[$i])) && $i + 1 < count($code_points)) {
                 if($code_points[$i+1] == 32) { // if the next character is a space...
                     $build[$build_i][count($build[$build_i])] = json_decode("\u200c");
                 }
@@ -29,8 +29,8 @@ function stripSpacesHindi($log_chars) {
 
 // $word expects a single utf-8 encoded word
 // returns a 2 dimensional array, representing the unicoded logical characters of the word
-function parseToCodePoints($word) {
-    $word_array = explode_hindi(json_encode($word));
+function hindi_parseToCodePoints($word) {
+    $word_array = hindi_explode($word);
     $i = 0;
     $logical_chars = array();
     $ch_buffer = array();
@@ -43,15 +43,15 @@ function parseToCodePoints($word) {
             continue;
         }
         $next_ch = $word_array[$i];
-        if(isDependent($next_ch)) {
+        if(hindi_isDependent($next_ch)) {
             $ch_buffer[count($ch_buffer)] = $next_ch;
             $i++;
             $logical_chars[count($logical_chars)] = $ch_buffer;
             $ch_buffer = array();
             continue;
         }
-        if(isHalant($current_ch)) {
-            if(isConsonant($next_ch)) {
+        if(hindi_isHalant($current_ch)) {
+            if(hindi_isConsonant($next_ch)) {
                 if($i < count($word_array)) {
                     continue;
                 }
@@ -60,8 +60,8 @@ function parseToCodePoints($word) {
             $logical_chars[count($logical_chars)] = $ch_buffer;
             $ch_buffer = array();
             continue;
-        } else if(isConsonant($current_ch)) {
-            if(isHalant($next_ch) || isDependentVowel($next_ch)) {
+        } else if(hindi_isConsonant($current_ch)) {
+            if(hindi_isHalant($next_ch) || hindi_isDependentVowel($next_ch)) {
                 if($i < count($word_array)) {
                     continue;
                 }
@@ -70,8 +70,8 @@ function parseToCodePoints($word) {
             $logical_chars[count($logical_chars)] = $ch_buffer;
             $ch_buffer = array();
             continue;
-        } else if(isVowel($current_ch)) {
-            if(isDependentVowel($next_ch)) {
+        } else if(hindi_isVowel($current_ch)) {
+            if(hindi_isDependentVowel($next_ch)) {
                 $ch_buffer[count($ch_buffer)] = $next_ch;
                 $i++;
             }
@@ -87,25 +87,26 @@ function parseToCodePoints($word) {
 
 
 // returns a 2d array of the logical characters, but using Hindi characters
-function parseToLogicalCharacters($word) {
+function hindi_parseToLogicalCharacters($word) {
     if(is_array($word)) {
         for($i=0; $i < count($word); $i++)
-            $word[$i] = parseToCharacter($word[$i]);
+            $word[$i] = hindi_parseToCharacter($word[$i]);
         return $word;
     }
-    else return parseToLogicalCharacters(parseToCodePoints($word));
+    else return hindi_parseToLogicalCharacters(hindi_parseToCodePoints($word));
 }
 
-function parseToCharacter($logical_char) {
+function hindi_parseToCharacter($logical_char) {
     $hindi_char = "";
     foreach($logical_char as $char) {
-        if(isHindi($char))	$hindi_char .= sprintf("\\u%'04s", dechex($char));
+        if(hindi_isChar($char))	$hindi_char .= sprintf("\\u%'04s", dechex($char));
         else return chr($char);
     }
     return json_decode('"'.$hindi_char.'"');
 }
 
-function explode_hindi($to_explode) {
+function hindi_explode($word) {
+    $to_explode = json_encode($word);
     $pos=0;
     $e_pos=0;
     $exploded = array();
@@ -117,7 +118,7 @@ function explode_hindi($to_explode) {
         if(strcmp($to_explode[$pos], "\\") == 0) { // if the the character in question is a slash...
             if(strcmp($to_explode[$pos + 1], "u") == 0) { // ...followed by a u...
                 $char = intval(substr($to_explode, $pos + 2, 4), 16); // convert to a number
-                if(isHindi($char)) {
+                if(hindi_isChar($char)) {
                     // if it matches, add it as a character, bump the counter up by six, and continue
                     $exploded[$e_pos++] = $char;
                     $pos += 6;
@@ -130,27 +131,27 @@ function explode_hindi($to_explode) {
     return $exploded;
 }
 
-function isConsonant($ch) {
+function hindi_isConsonant($ch) {
     return ( $ch >= 0x0915 && $ch <= 0x0939 );
 }
 
-function isDependentVowel($ch) {
+function hindi_isDependentVowel($ch) {
     return ( $ch >= 0x093e && $ch <= 0x094c );
 }
 
-function isDependent($ch) {
+function hindi_isDependent($ch) {
     return ( ($ch == 0x0900) || ($ch == 0x0901) || ($ch == 0x0902) || ($ch == 0x0903) );
 }
 
-function isVowel($ch) {
+function hindi_isVowel($ch) {
     return ($ch >= 0x0904 && $ch <= 0x0914);
 }
 //0c4d
-function isHalant($ch) {
+function hindi_isHalant($ch) {
     return $ch == 0x094d;
 }
 
-function isHindiNumber($ch) {
+function hindi_isNumber($ch) {
     return ($ch >= 0x0966 && $ch <= 0x096f);
 }
 
@@ -158,7 +159,7 @@ function isHindiNumber($ch) {
 // so it is theoretically possible to get a false positive. However, other than
 // intentionally feeding this function bad data, there's no practical way to get
 // that false positive, and nothing harmful would happen if you did
-function isHindi($ch) {
+function hindi_isChar($ch) {
     return ( $ch >= 0x0900 && $ch <= 0x097f ) || ( $ch == 0x200c );
 }
 //}

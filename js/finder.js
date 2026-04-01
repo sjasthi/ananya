@@ -199,7 +199,7 @@ processButton.addEventListener("click", async () => {
 })
 
 function sanitizeWord(word) {
-    return word.replace(/[^\u0C00-\u0C7F\u0020-\u007E]/g, '').trim();
+    return word.replace(/[^\u0900-\u097F\u0A80-\u0AFF\u0C00-\u0C7F\u0D00-\u0D7F\u0020-\u007E]/g, '').trim();
 }
 
 function normalizeForComparison(word) {
@@ -356,5 +356,5 @@ function remove_non_ascii(str) {
         return false;
     else
         str = str.toString();
-    return str.replace(/[^\x20-\x7E\uC00-\u0C7F]/g, '');
+    return str.replace(/[^\x20-\x7E\u0900-\u097F\u0A80-\u0AFF\u0C00-\u0C7F\u0D00-\u0D7F]/g, '');
 }

@@ -1,6 +1,6 @@
 # Indic Language Word Processor API Reference
 
-A comprehensive REST API for processing Telugu and English text, providing advanced linguistic analysis and manipulation capabilities.
+A comprehensive REST API for processing English, Telugu, Hindi, Gujarati, and Malayalam text, providing advanced linguistic analysis and manipulation capabilities.
 
 ## 🚀 Quick Start
 
@@ -45,7 +45,7 @@ Returns the logical length of a string.
 
 **Parameters:**
 - `string` (required) - Input string
-- `language` (required) - Language (English/Telugu)
+- `language` (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)
 
 **Example:**
 ```bash
@@ -70,7 +70,7 @@ Returns the reverse of the input string.
 
 **Parameters:**
 - `string` (required) - Input string
-- `language` (required) - Language (English/Telugu)
+- `language` (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)
 
 **Example:**
 ```bash
@@ -95,7 +95,7 @@ Returns the input string with characters in random order.
 
 **Parameters:**
 - `string` (required) - Input string
-- `language` (required) - Language (English/Telugu)
+- `language` (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)
 
 ### Replace Substring
 Replaces occurrences of a substring with another string.
@@ -132,7 +132,7 @@ Returns the number of Unicode code points in the string.
 
 **Parameters:**
 - `string` (required) - Input string
-- `language` (required) - Language (English/Telugu)
+- `language` (required) - Language (English/Telugu/Hindi/Gujarati/Malayalam)
 
 **Example:**
 ```bash
@@ -387,7 +387,7 @@ Checks if two strings have the same consonants and length.
 ## 🌐 Language Processing
 
 ### Detect Language
-Automatically detects if a string is English, Telugu, or mixed.
+Automatically detects if a string is English, Telugu, Hindi, Gujarati, Malayalam, or mixed.
 
 **Endpoint:** `GET /getLangForString.php`
 

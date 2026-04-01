@@ -361,7 +361,7 @@ function handleComparisonAPIs($action) {
 
             $resolvedLanguage = resolveUtilityLanguage($string, $language);
             if ($resolvedLanguage === null) {
-                sendResponse(400, "Unable to auto-detect a supported language (english/telugu). Provide language explicitly.", $string, null, null);
+                sendResponse(400, "Unable to auto-detect a supported language (english/telugu/hindi/gujarati/malayalam). Provide language explicitly.", $string, null, null);
                 return;
             }
 
@@ -525,7 +525,7 @@ function handleUtilityAPIs($action) {
 
             $resolvedLanguage = resolveUtilityLanguage($string, $requestedLanguage);
             if ($resolvedLanguage === null) {
-                sendResponse(400, "Unable to auto-detect a supported language (english/telugu). Provide language explicitly.", $string, null, null);
+                sendResponse(400, "Unable to auto-detect a supported language (english/telugu/hindi/gujarati/malayalam). Provide language explicitly.", $string, null, null);
                 return;
             }
 
@@ -544,7 +544,7 @@ function handleUtilityAPIs($action) {
         case 'length-no-spaces-commas':
             $resolvedLanguage = resolveUtilityLanguage($string, $requestedLanguage);
             if ($resolvedLanguage === null) {
-                sendResponse(400, "Unable to auto-detect a supported language (english/telugu). Provide language explicitly.", $string, null, null);
+                sendResponse(400, "Unable to auto-detect a supported language (english/telugu/hindi/gujarati/malayalam). Provide language explicitly.", $string, null, null);
                 return;
             }
 
@@ -578,12 +578,40 @@ function resolveUtilityLanguage($string, $requestedLanguage)
     }
 
     if (!empty($requestedLanguage)) {
-        sendResponse(400, "Unsupported language. Supported values: english, telugu", $string, null, null);
+        sendResponse(400, "Unsupported language. Supported values: english, telugu, hindi, gujarati, malayalam", $string, null, null);
     }
 
-    $detector = new wordProcessor($string, '');
-    $detectedLanguage = $detector->getLangForString();
+    $detectedLanguage = detectSupportedLanguageFromString($string);
     return normalizeSupportedUtilityLanguage($detectedLanguage);
+}
+
+function detectSupportedLanguageFromString($string)
+{
+    if (!is_string($string) || trim($string) === '') {
+        return null;
+    }
+
+    if (preg_match('/[\x{0C00}-\x{0C7F}]/u', $string)) {
+        return 'telugu';
+    }
+
+    if (preg_match('/[\x{0900}-\x{097F}]/u', $string)) {
+        return 'hindi';
+    }
+
+    if (preg_match('/[\x{0A80}-\x{0AFF}]/u', $string)) {
+        return 'gujarati';
+    }
+
+    if (preg_match('/[\x{0D00}-\x{0D7F}]/u', $string)) {
+        return 'malayalam';
+    }
+
+    if (preg_match('/[A-Za-z]/', $string)) {
+        return 'english';
+    }
+
+    return null;
 }
 
 function normalizeSupportedUtilityLanguage($language)
@@ -599,6 +627,18 @@ function normalizeSupportedUtilityLanguage($language)
 
     if ($lang === 'telugu') {
         return 'telugu';
+    }
+
+    if ($lang === 'hindi') {
+        return 'hindi';
+    }
+
+    if ($lang === 'gujarati') {
+        return 'gujarati';
+    }
+
+    if ($lang === 'malayalam') {
+        return 'malayalam';
     }
 
     return null;

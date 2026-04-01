@@ -213,7 +213,7 @@
             <div class="parser-container">
                 <div class="row page-header">
                     <div class="col-12">
-                        <h2 class="text-center mb-4">Telugu Text Parser</h2>
+                        <h2 class="text-center mb-4">Indic Text Parser</h2>
                         <p class="text-center text-muted">Parse and analyze text with advanced linguistic processing and word frequency analysis</p>
                     </div>
                 </div>
@@ -225,6 +225,9 @@
                             <select id="language-select" class="form-select">
                                 <option value="english">English</option>
                                 <option value="telugu" selected>Telugu (తెలుగు)</option>
+                                <option value="hindi">Hindi (हिन्दी)</option>
+                                <option value="gujarati">Gujarati (ગુજરાતી)</option>
+                                <option value="malayalam">Malayalam (മലയാളം)</option>
                             </select>
                         </div>
                         <div class="col-md-6 d-flex align-items-end">
@@ -245,7 +248,7 @@
 "షీరోస్" పుస్తకం కేవలం జీవితచరిత్రల సమాహారం మాత్రమే కాదు — అది ఒక చైతన్య ఉద్యమం, మహిళా సాధికారతకు అంకితమైన సాహిత్య రూపం. ప్రతి అమ్మాయి ఒక షీరో కావచ్చు, ప్రతి పాఠకుడు మార్పుకు మార్గదర్శకుడు కావచ్చు అనే సందేశాన్ని ఇది అందిస్తుంది.</textarea>
                         <small class="form-text text-muted mt-2">
                             <i class="fas fa-info-circle me-1"></i>
-                            The parser supports both English and Telugu text. Words will be analyzed for length and frequency.
+                            The parser supports English, Telugu, Hindi, Gujarati, and Malayalam text. Words will be analyzed for length and frequency.
                         </small>
                     </div>
                 </div>

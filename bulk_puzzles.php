@@ -114,6 +114,9 @@ include 'includes/header.php';
                 <select id="output-language" class="form-select" required>
                     <option value="telugu" selected>Telugu</option>
                     <option value="english">English</option>
+                    <option value="hindi">Hindi</option>
+                    <option value="gujarati">Gujarati</option>
+                    <option value="malayalam">Malayalam</option>
                 </select>
             </div>
             <div class="col-md-3">
