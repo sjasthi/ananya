@@ -31,7 +31,7 @@ if userInput == '1':
     getLengthinput2 = 'NA'
     getLengthinput3 = 'NA'
     getLengthlanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getlength.php?string='+ getLengthinput1 + '&language=' + getLengthlanguage
+    url = 'http://localhost/ananya/api/getlength.php?string='+ getLengthinput1 + '&language=' + getLengthlanguage
     getLengthURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -53,7 +53,7 @@ if userInput == '1':
     reverseInput2 = 'NA'
     reverseInput3 = 'NA'
     reverseLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/reverse.php?string='+reverseInput1+'&language='+reverseLanguage
+    url = 'http://localhost/ananya/api/reverse.php?string='+reverseInput1+'&language='+reverseLanguage
     reverseURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -73,7 +73,7 @@ if userInput == '1':
     getCodePointLengthInput1 = 'hello'
     getCodePointLengthInput2 = 'NA'
     getCodePointLengthInput3 = 'NA'
-    url = 'http://localhost/indic-wp/api/getCodePointLength.php?string=hello&language=English'
+    url = 'http://localhost/ananya/api/getCodePointLength.php?string=hello&language=English'
     getCodePointLengthURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -94,7 +94,7 @@ if userInput == '1':
     getCodePointsInput2 = 'NA'
     getCodePointsInput3 = 'NA'
     getCodePointsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getCodePoints.php?string='+getCodePointsInput1+'&language='+getCodePointsLanguage
+    url = 'http://localhost/ananya/api/getCodePoints.php?string='+getCodePointsInput1+'&language='+getCodePointsLanguage
     getCodePointsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -116,7 +116,7 @@ if userInput == '1':
     getwordLevelInput2 = 'NA'
     getwordLevelInput3 = 'NA'
     getWordLevelLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getwordLevel.php?string='+getwordLevelInput1+'&language='+ getWordLevelLanguage
+    url = 'http://localhost/ananya/api/getwordLevel.php?string='+getwordLevelInput1+'&language='+ getWordLevelLanguage
     getWordLevelURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -138,7 +138,7 @@ if userInput == '1':
     getLogicalCharsInput2 = 'NA'
     getLogicalCharsInput3 = 'NA'
     getLogicalCharsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getLogicalChars.php?string='+getLogicalCharsInput1+'&language='+getLogicalCharsLanguage
+    url = 'http://localhost/ananya/api/getLogicalChars.php?string='+getLogicalCharsInput1+'&language='+getLogicalCharsLanguage
     getLogicalCharsURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -160,7 +160,7 @@ if userInput == '1':
     getWordStrengthInput2 = 'NA'
     getWordStrengthInput3 = 'NA'
     getWordStrengthLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getWordStrength.php?string='+getWordStrengthInput1+'&language='+getWordStrengthLanguage
+    url = 'http://localhost/ananya/api/getWordStrength.php?string='+getWordStrengthInput1+'&language='+getWordStrengthLanguage
     getWordStrengthURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -182,7 +182,7 @@ if userInput == '1':
     getWordWeightInput2 = 'NA'
     getWordWeightInput3 = 'NA'
     getWordWeightLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getWordWeight.php?string='+getWordWeightInput1+'&language=' + getWordWeightLanguage
+    url = 'http://localhost/ananya/api/getWordWeight.php?string='+getWordWeightInput1+'&language=' + getWordWeightLanguage
     getWordWeightURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -205,7 +205,7 @@ if userInput == '1':
     isPalindromeInput2 = 'NA'
     isPalindromeInput3 = 'NA'
     isPalindromeLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/isPalindrome.php?string='+isPalindromeInput1+'&language=' + isPalindromeLanguage
+    url = 'http://localhost/ananya/api/isPalindrome.php?string='+isPalindromeInput1+'&language=' + isPalindromeLanguage
     isPalindromeURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -228,7 +228,7 @@ if userInput == '1':
     randomizeInput2 = 'NA'
     randomizeInput3 = 'NA'
     randomizeLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/randomize.php?string='+randomizeInput1+'&language=' + randomizeLanguage
+    url = 'http://localhost/ananya/api/randomize.php?string='+randomizeInput1+'&language=' + randomizeLanguage
     randomizeURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -250,7 +250,7 @@ if userInput == '1':
     containsSpaceInput2 = 'NA'
     containsSpaceInput3 = 'NA'
     containsSpaceLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/containsSpace.php?string='+containsSpaceInput1+'&language=' + containsSpaceLanguage
+    url = 'http://localhost/ananya/api/containsSpace.php?string='+containsSpaceInput1+'&language=' + containsSpaceLanguage
     containsSpaceURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -273,7 +273,7 @@ if userInput == '1':
     getLengthNoSpacesInput2 = 'NA'
     getLengthNoSpacesInput3 = 'NA'
     getLengthNoSpacesLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getLengthNoSpaces.php?string='+getLengthNoSpacesInput1+'&language=' + getLengthNoSpacesLanguage
+    url = 'http://localhost/ananya/api/getLengthNoSpaces.php?string='+getLengthNoSpacesInput1+'&language=' + getLengthNoSpacesLanguage
     getLengthNoSpacesURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -297,7 +297,7 @@ if userInput == '1':
     getLengthNoSpacesNoCommasInput2 = 'NA'
     getLengthNoSpacesNoCommasInput3 = 'NA'
     getLengthNoSpacesNoCommasLanguage= 'English'
-    url = 'http://localhost/indic-wp/api/getLengthNoSpacesNoCommas.php?string='+getLengthNoSpacesNoCommasInput1+'&language=' + getLengthNoSpacesNoCommasLanguage
+    url = 'http://localhost/ananya/api/getLengthNoSpacesNoCommas.php?string='+getLengthNoSpacesNoCommasInput1+'&language=' + getLengthNoSpacesNoCommasLanguage
     getLengthNoSpacesNoCommasURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -319,7 +319,7 @@ if userInput == '1':
     parseToLogicalCharsInput2 = 'NA'
     parseToLogicalCharsInput3 = 'NA'
     parseToLogicalCharsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/parseToLogicalChars.php?string='+parseToLogicalCharsInput1+'&language='+parseToLogicalCharsLanguage
+    url = 'http://localhost/ananya/api/parseToLogicalChars.php?string='+parseToLogicalCharsInput1+'&language='+parseToLogicalCharsLanguage
     ParseToLogicalCharsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -341,7 +341,7 @@ if userInput == '1':
     parseToLogicalCharactersInput2 = 'NA'
     parseToLogicalCharactersInput3 = 'NA'
     parseToLogicalCharactersLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/parseToLogicalChars.php?string='+parseToLogicalCharactersInput1+'&language='+parseToLogicalCharactersLanguage
+    url = 'http://localhost/ananya/api/parseToLogicalChars.php?string='+parseToLogicalCharactersInput1+'&language='+parseToLogicalCharactersLanguage
     parseToLogicalCharactersURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -363,7 +363,7 @@ if userInput == '1':
     isAnagramInput2 = 'ellho'
     isAnagramInput3 = 'NA'
     isAnagramLanguage = 'Language'
-    url = 'http://localhost/indic-wp/api/isAnagram.php?input1='+isAnagramInput1+'&input2=' + isAnagramLanguage + '&input3=' + isAnagramInput2
+    url = 'http://localhost/ananya/api/isAnagram.php?input1='+isAnagramInput1+'&input2=' + isAnagramLanguage + '&input3=' + isAnagramInput2
     isAnagramURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -386,7 +386,7 @@ if userInput == '1':
     startsWithInput2 = 'h'
     startsWithInput3 = 'NA'
     startsWithLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/startsWith.php?string='+startsWithInput1+'&language='+startsWithLanguage+'&start=' + startsWithInput2
+    url = 'http://localhost/ananya/api/startsWith.php?string='+startsWithInput1+'&language='+startsWithLanguage+'&start=' + startsWithInput2
     startsWithURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -409,7 +409,7 @@ if userInput == '1':
     endsWithInput2 = 'o'
     endsWithInput3 = 'NA'
     endsWithLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/endsWith.php?string='+endsWithInput1+'&language='+endsWithLanguage+'&end=' + endsWithInput2
+    url = 'http://localhost/ananya/api/endsWith.php?string='+endsWithInput1+'&language='+endsWithLanguage+'&end=' + endsWithInput2
     endsWithURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -431,7 +431,7 @@ if userInput == '1':
     containsStringInput2 = 'lo'
     containsStringInput3 = 'NA'
     containsStringLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/containsString.php?string='+containsStringInput1+'&language='+containsStringLanguage+'&contains=' + containsStringInput2
+    url = 'http://localhost/ananya/api/containsString.php?string='+containsStringInput1+'&language='+containsStringLanguage+'&contains=' + containsStringInput2
     containsStringURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -454,7 +454,7 @@ if userInput == '1':
     containsCharInput2 = 'o'
     containsCharInput3 = 'NA'
     containsCharLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/containsChar.php?string='+containsCharInput1+'&language='+containsCharLanguage+'&contains=' + containsCharInput2
+    url = 'http://localhost/ananya/api/containsChar.php?string='+containsCharInput1+'&language='+containsCharLanguage+'&contains=' + containsCharInput2
     containsCharURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -477,7 +477,7 @@ if userInput == '1':
     containsLogicalCharsInput2 = 'l,o'
     containsLogicalCharsInput3 = 'NA'
     containsLogicalCharLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/containsLogicalChars.php?string='+containsLogicalCharsInput1+'&language='+containsLogicalCharLanguage+'&contains=' +containsLogicalCharsInput2
+    url = 'http://localhost/ananya/api/containsLogicalChars.php?string='+containsLogicalCharsInput1+'&language='+containsLogicalCharLanguage+'&contains=' +containsLogicalCharsInput2
     containsLogicalCharsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -500,7 +500,7 @@ if userInput == '1':
     containsAllLogicalCharsInput2 = 'l,o'
     containsAllLogicalCharsInput3 = 'NA'
     containsAllLogicalCharsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/containsAllLogicalChars.php?string='+containsAllLogicalCharsInput1+'&language='+containsAllLogicalCharsLanguage+'&contains=' + containsAllLogicalCharsInput2
+    url = 'http://localhost/ananya/api/containsAllLogicalChars.php?string='+containsAllLogicalCharsInput1+'&language='+containsAllLogicalCharsLanguage+'&contains=' + containsAllLogicalCharsInput2
     containsAllLogicalCharsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -523,7 +523,7 @@ if userInput == '1':
     containsLogicalCharSequenceInput2 = 'lo'
     containsLogicalCharSequenceInput3 = 'NA'
     containsLogicalCharSequenceLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/containsLogicalCharSequence.php?string='+containsLogicalCharSequenceInput1+'&language='+containsLogicalCharSequenceLanguage+'&contains=' + containsLogicalCharSequenceInput2
+    url = 'http://localhost/ananya/api/containsLogicalCharSequence.php?string='+containsLogicalCharSequenceInput1+'&language='+containsLogicalCharSequenceLanguage+'&contains=' + containsLogicalCharSequenceInput2
     containsLogicalCharSequenceURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -546,7 +546,7 @@ if userInput == '1':
     canMakeWordInput2 = 'lo'
     canMakeWordInput3 = 'NA'
     canMakeWordLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/canMakeWord.php?string='+canMakeWordInput1+'&language='+canMakeWordLanguage+'&word=' + canMakeWordInput2
+    url = 'http://localhost/ananya/api/canMakeWord.php?string='+canMakeWordInput1+'&language='+canMakeWordLanguage+'&word=' + canMakeWordInput2
     canMakeWordURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -569,7 +569,7 @@ if userInput == '1':
     canMakeAllWordsInput2 = 'hell,lo'
     canMakeAllWordsInput3 = 'NA'
     canMakeAllWordsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/canMakeAllWords.php?string='+canMakeAllWordsInput1+'&language='+canMakeAllWordsLanguage+'&words=' + canMakeAllWordsInput2
+    url = 'http://localhost/ananya/api/canMakeAllWords.php?string='+canMakeAllWordsInput1+'&language='+canMakeAllWordsLanguage+'&words=' + canMakeAllWordsInput2
     canMakeAllWordsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -592,7 +592,7 @@ if userInput == '1':
     addCharacterAtEndInput2 = 'a'
     addCharacterAtEndInput3 = 'NA'
     addCharacterAtEndLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/addCharacterAtEnd.php?string='+addCharacterAtEndInput1+'&language='+addCharacterAtEndLanguage+'&char=' + addCharacterAtEndInput2
+    url = 'http://localhost/ananya/api/addCharacterAtEnd.php?string='+addCharacterAtEndInput1+'&language='+addCharacterAtEndLanguage+'&char=' + addCharacterAtEndInput2
     addCharacterAtEndURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -615,7 +615,7 @@ if userInput == '1':
     isIntersectingInput2 = 'el'
     isIntersectingInput3 = 'NA'
     isIntersectingLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/isIntersecting.php?string='+ isIntersectingInput1 + '&language='+isIntersectingLanguage+'&word='+ isIntersectingInput2
+    url = 'http://localhost/ananya/api/isIntersecting.php?string='+ isIntersectingInput1 + '&language='+isIntersectingLanguage+'&word='+ isIntersectingInput2
     isIntersectingURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -638,7 +638,7 @@ if userInput == '1':
     getIntersectingRankInput2 = 'el'
     getIntersectingRankInput3 = 'NA'
     getIntersectingRankLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getIntersectingRank.php?string='+ getIntersectingRankInput1 + '&language='+getIntersectingRankLanguage+'&word='+ getIntersectingRankInput2
+    url = 'http://localhost/ananya/api/getIntersectingRank.php?string='+ getIntersectingRankInput1 + '&language='+getIntersectingRankLanguage+'&word='+ getIntersectingRankInput2
     getIntersectingRankURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -662,7 +662,7 @@ if userInput == '1':
     getUniqueIntersectingRankInput2 = ['e', 'l', 'i']
     getUniqueIntersectingRankInput3 = 'NA'
     getUniqueIntersectingRankLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getUniqueIntersectingRank.php?string='+ getUniqueIntersectingRankInput1 + '&language='+getUniqueIntersectingRankLanguage+'&list[0]='+ getUniqueIntersectingRankInput2[0]+'&list[1]='+ getUniqueIntersectingRankInput2[1] +'&list[2]='+ getUniqueIntersectingRankInput2[2]
+    url = 'http://localhost/ananya/api/getUniqueIntersectingRank.php?string='+ getUniqueIntersectingRankInput1 + '&language='+getUniqueIntersectingRankLanguage+'&list[0]='+ getUniqueIntersectingRankInput2[0]+'&list[1]='+ getUniqueIntersectingRankInput2[1] +'&list[2]='+ getUniqueIntersectingRankInput2[2]
     getUniqueIntersectingRankURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -684,7 +684,7 @@ if userInput == '1':
     compareToInput2 = 'hello'
     compareToInput3 = 'NA'
     compareToLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/compareTo.php?string='+ getUniqueIntersectingRankInput1 + '&language='+compareToLanguage+'&secondString='+ compareToInput2
+    url = 'http://localhost/ananya/api/compareTo.php?string='+ getUniqueIntersectingRankInput1 + '&language='+compareToLanguage+'&secondString='+ compareToInput2
     compareToURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -706,7 +706,7 @@ if userInput == '1':
     compareToIgnoreCaseInput2 = 'hel'
     compareToIgnoreCaseInput3 = 'NA'
     compareToIgnoreCaseLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/compareToIgnoreCase.php?string='+ compareToIgnoreCaseInput1 + '&language='+compareToIgnoreCaseLanguage+'&secondString='+ compareToIgnoreCaseInput2
+    url = 'http://localhost/ananya/api/compareToIgnoreCase.php?string='+ compareToIgnoreCaseInput1 + '&language='+compareToIgnoreCaseLanguage+'&secondString='+ compareToIgnoreCaseInput2
     compareToIgnoreCaseURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -730,7 +730,7 @@ if userInput == '1':
     splitWordInput2 = '2'
     splitWordInput3 = 'NA'
     splitWordLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/splitWord.php?string='+ splitWordInput1 + '&language='+splitWordLanguage+'&col='+ splitWordInput2
+    url = 'http://localhost/ananya/api/splitWord.php?string='+ splitWordInput1 + '&language='+splitWordLanguage+'&col='+ splitWordInput2
     splitWordURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -753,7 +753,7 @@ if userInput == '1':
     equalsInput2 = 'hello!'
     equalsInput3 = 'NA'
     equalsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/equals.php?string='+ equalsInput1 + '&language='+equalsLanguage+'&secondString='+ equalsInput2
+    url = 'http://localhost/ananya/api/equals.php?string='+ equalsInput1 + '&language='+equalsLanguage+'&secondString='+ equalsInput2
     equalsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -777,7 +777,7 @@ if userInput == '1':
     reverseEqualsInput2 = '!olleh'
     reverseEqualsInput3 = 'NA'
     reverseEqualsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/reverseEquals.php?string='+ reverseEqualsInput1 + '&language='+reverseEqualsLanguage+'&secondString='+ reverseEqualsInput2
+    url = 'http://localhost/ananya/api/reverseEquals.php?string='+ reverseEqualsInput1 + '&language='+reverseEqualsLanguage+'&secondString='+ reverseEqualsInput2
     reverseEqualsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -799,7 +799,7 @@ if userInput == '1':
     logicalCharAtInput2 = '3'
     logicalCharAtInput3 = 'NA'
     logicalCharAtLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/logicalCharAt.php?string='+ logicalCharAtInput1 + '&language='+logicalCharAtLanguage+'&index='+ logicalCharAtInput2
+    url = 'http://localhost/ananya/api/logicalCharAt.php?string='+ logicalCharAtInput1 + '&language='+logicalCharAtLanguage+'&index='+ logicalCharAtInput2
     logicalCharAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -821,7 +821,7 @@ if userInput == '1':
     getUniqueIntersectingLogicalCharsAtInput2 = ['l','l']
     getUniqueIntersectingLogicalCharsAtInput3 = 'NA'
     getUniqueIntersectingLogicalCharsAtLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getUniqueIntersectingLogicalChars.php?string='+ getUniqueIntersectingLogicalCharsAtInput1 + '&language='+getUniqueIntersectingLogicalCharsAtLanguage+'&list[0]='+ getUniqueIntersectingLogicalCharsAtInput2[0] +'&list[1]='+ getUniqueIntersectingLogicalCharsAtInput2[1]
+    url = 'http://localhost/ananya/api/getUniqueIntersectingLogicalChars.php?string='+ getUniqueIntersectingLogicalCharsAtInput1 + '&language='+getUniqueIntersectingLogicalCharsAtLanguage+'&list[0]='+ getUniqueIntersectingLogicalCharsAtInput2[0] +'&list[1]='+ getUniqueIntersectingLogicalCharsAtInput2[1]
     getUniqueIntersectingLogicalCharsAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -843,7 +843,7 @@ if userInput == '1':
     indexOfInput2 = 'l'
     indexOfInput3 = 'NA'
     indexOfLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/indexOf.php?string='+ indexOfInput1 + '&language='+indexOfLanguage+'&char='+ indexOfInput2
+    url = 'http://localhost/ananya/api/indexOf.php?string='+ indexOfInput1 + '&language='+indexOfLanguage+'&char='+ indexOfInput2
     indexOfURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -865,7 +865,7 @@ if userInput == '1':
     addCharacterAtInput2 = '1'
     addCharacterAtInput3 = 'e'
     addCharacterAtLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/addCharacterAt.php?string='+ addCharacterAtInput1 + '&language='+addCharacterAtLanguage+'&index='+ addCharacterAtInput2 +'&char=' +addCharacterAtInput3
+    url = 'http://localhost/ananya/api/addCharacterAt.php?string='+ addCharacterAtInput1 + '&language='+addCharacterAtLanguage+'&index='+ addCharacterAtInput2 +'&char=' +addCharacterAtInput3
     addCharacterAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -887,7 +887,7 @@ if userInput == '1':
     replaceInput2 = 'ell'
     replaceInput3 = 'i'
     replaceLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/replace.php?string='+ replaceInput1 + '&language='+replaceLanguage+'&target='+ replaceInput2 +'&new=' +replaceInput3
+    url = 'http://localhost/ananya/api/replace.php?string='+ replaceInput1 + '&language='+replaceLanguage+'&target='+ replaceInput2 +'&new=' +replaceInput3
     replaceAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -911,7 +911,7 @@ if userInput == '1':
     baseConsonantInput2 = 'hello'
     baseConsonantInput3 = 'NA'
     baseConsonantLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/baseConsonants.php?input1='+ baseConsonantInput1 + '&input2='+ baseConsonantLanguage +'&input3='+ baseConsonantInput2
+    url = 'http://localhost/ananya/api/baseConsonants.php?input1='+ baseConsonantInput1 + '&input2='+ baseConsonantLanguage +'&input3='+ baseConsonantInput2
     baseConsonantAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -935,7 +935,7 @@ if userInput == '1':
     headsAndTailInput2 = 'other'
     headsAndTailInput3 = 'NA'
     headsAndTailLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/areHeadAndTailWords.php?input1='+ headsAndTailInput1 + '&input2='+ headsAndTailLanguage +'&input3='+ headsAndTailInput2
+    url = 'http://localhost/ananya/api/areHeadAndTailWords.php?input1='+ headsAndTailInput1 + '&input2='+ headsAndTailLanguage +'&input3='+ headsAndTailInput2
     headsAndTailAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -958,7 +958,7 @@ if userInput == '1':
     areLadderWordsInput2 = 'hillo'
     areLadderWordsInput3 = 'NA'
     areLadderWordsLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/areLadderWords.php?input1='+ areLadderWordsInput1 + '&input2='+ areLadderWordsLanguage +'&input3='+ areLadderWordsInput2
+    url = 'http://localhost/ananya/api/areLadderWords.php?input1='+ areLadderWordsInput1 + '&input2='+ areLadderWordsLanguage +'&input3='+ areLadderWordsInput2
     areLadderWordsAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -978,7 +978,7 @@ elif userInput == '2':
     getLengthinput2 = 'NA'
     getLengthinput3 = 'NA'
     getLengthlanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getlength.php?string='+ getLengthinput1 + '&language=' + getLengthlanguage
+    url = 'http://localhost/ananya/api/getlength.php?string='+ getLengthinput1 + '&language=' + getLengthlanguage
     getLengthURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -993,7 +993,7 @@ elif userInput == '2':
     reverseInput2 = 'NA'
     reverseInput3 = 'NA'
     reverseLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/reverse.php?string='+reverseInput1+'&language='+reverseLanguage
+    url = 'http://localhost/ananya/api/reverse.php?string='+reverseInput1+'&language='+reverseLanguage
     reverseURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1009,7 +1009,7 @@ elif userInput == '2':
     getCodePointLengthInput2 = 'NA'
     getCodePointLengthInput3 = 'NA'
     getCodePointLengthLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getCodePointLength.php?string='+getCodePointLengthInput1+'&language=' + getCodePointLengthLanguage
+    url = 'http://localhost/ananya/api/getCodePointLength.php?string='+getCodePointLengthInput1+'&language=' + getCodePointLengthLanguage
     getCodePointLengthURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1026,7 +1026,7 @@ elif userInput == '2':
     getCodePointsInput2 = 'NA'
     getCodePointsInput3 = 'NA'
     getCodePointsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getCodePoints.php?string='+getCodePointsInput1+'&language='+getCodePointsLanguage
+    url = 'http://localhost/ananya/api/getCodePoints.php?string='+getCodePointsInput1+'&language='+getCodePointsLanguage
     getCodePointsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1042,7 +1042,7 @@ elif userInput == '2':
     getwordLevelInput2 = 'NA'
     getwordLevelInput3 = 'NA'
     getWordLevelLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getwordLevel.php?string='+getwordLevelInput1+'&language='+ getWordLevelLanguage
+    url = 'http://localhost/ananya/api/getwordLevel.php?string='+getwordLevelInput1+'&language='+ getWordLevelLanguage
     getWordLevelURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1057,7 +1057,7 @@ elif userInput == '2':
     getLogicalCharsInput2 = 'NA'
     getLogicalCharsInput3 = 'NA'
     getLogicalCharsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getLogicalChars.php?string='+getLogicalCharsInput1+'&language='+getLogicalCharsLanguage
+    url = 'http://localhost/ananya/api/getLogicalChars.php?string='+getLogicalCharsInput1+'&language='+getLogicalCharsLanguage
     getLogicalCharsURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1074,7 +1074,7 @@ elif userInput == '2':
     getWordStrengthInput2 = 'NA'
     getWordStrengthInput3 = 'NA'
     getWordStrengthLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getWordStrength.php?string='+getWordStrengthInput1+'&language='+getWordStrengthLanguage
+    url = 'http://localhost/ananya/api/getWordStrength.php?string='+getWordStrengthInput1+'&language='+getWordStrengthLanguage
     getWordStrengthURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1090,7 +1090,7 @@ elif userInput == '2':
     getWordWeightInput2 = 'NA'
     getWordWeightInput3 = 'NA'
     getWordWeightLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getWordWeight.php?string='+getWordWeightInput1+'&language=' + getWordWeightLanguage
+    url = 'http://localhost/ananya/api/getWordWeight.php?string='+getWordWeightInput1+'&language=' + getWordWeightLanguage
     getWordWeightURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1107,7 +1107,7 @@ elif userInput == '2':
     isPalindromeInput2 = 'NA'
     isPalindromeInput3 = 'NA'
     isPalindromeLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/isPalindrome.php?string='+isPalindromeInput1+'&language=' + isPalindromeLanguage
+    url = 'http://localhost/ananya/api/isPalindrome.php?string='+isPalindromeInput1+'&language=' + isPalindromeLanguage
     isPalindromeURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1123,7 +1123,7 @@ elif userInput == '2':
     randomizeInput2 = 'NA'
     randomizeInput3 = 'NA'
     randomizeLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/randomize.php?string='+randomizeInput1+'&language=' + randomizeLanguage
+    url = 'http://localhost/ananya/api/randomize.php?string='+randomizeInput1+'&language=' + randomizeLanguage
     randomizeURL = url
     # r = requests.get(url)
     # dataDecoded = getDecode(r.text)
@@ -1134,7 +1134,7 @@ elif userInput == '2':
     randomizeJsonOUTPUT = 'NA'#x
 
 
-    # url = 'http://localhost/indic-wp/api/randomize.php?string=hello&language=English'
+    # url = 'http://localhost/ananya/api/randomize.php?string=hello&language=English'
     # r = requests.get(url)
     # dataDecoded = getDecode(r.text)
     # x = json.loads(dataDecoded)
@@ -1154,7 +1154,7 @@ elif userInput == '2':
     containsSpaceInput2 = 'NA'
     containsSpaceInput3 = 'NA'
     containsSpaceLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/containsSpace.php?string='+containsSpaceInput1+'&language=' + containsSpaceLanguage
+    url = 'http://localhost/ananya/api/containsSpace.php?string='+containsSpaceInput1+'&language=' + containsSpaceLanguage
     containsSpaceURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1170,7 +1170,7 @@ elif userInput == '2':
     getLengthNoSpacesInput2 = 'NA'
     getLengthNoSpacesInput3 = 'NA'
     getLengthNoSpacesLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getLengthNoSpaces.php?string='+getLengthNoSpacesInput1+'&language=' + getLengthNoSpacesLanguage
+    url = 'http://localhost/ananya/api/getLengthNoSpaces.php?string='+getLengthNoSpacesInput1+'&language=' + getLengthNoSpacesLanguage
     getLengthNoSpacesURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1187,7 +1187,7 @@ elif userInput == '2':
     getLengthNoSpacesNoCommasInput2 = 'NA'
     getLengthNoSpacesNoCommasInput3 = 'NA'
     getLengthNoSpacesNoCommasLanguage= 'Telugu'
-    url = 'http://localhost/indic-wp/api/getLengthNoSpacesNoCommas.php?string='+getLengthNoSpacesNoCommasInput1+'&language=' + getLengthNoSpacesNoCommasLanguage
+    url = 'http://localhost/ananya/api/getLengthNoSpacesNoCommas.php?string='+getLengthNoSpacesNoCommasInput1+'&language=' + getLengthNoSpacesNoCommasLanguage
     getLengthNoSpacesNoCommasURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1203,7 +1203,7 @@ elif userInput == '2':
     parseToLogicalCharsInput2 = 'NA'
     parseToLogicalCharsInput3 = 'NA'
     parseToLogicalCharsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/parseToLogicalChars.php?string='+parseToLogicalCharsInput1+'&language='+parseToLogicalCharsLanguage
+    url = 'http://localhost/ananya/api/parseToLogicalChars.php?string='+parseToLogicalCharsInput1+'&language='+parseToLogicalCharsLanguage
     ParseToLogicalCharsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1220,7 +1220,7 @@ elif userInput == '2':
     parseToLogicalCharactersInput2 = 'NA'
     parseToLogicalCharactersInput3 = 'NA'
     parseToLogicalCharactersLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/parseToLogicalCharacters.php?string='+parseToLogicalCharactersInput1+'&language='+parseToLogicalCharactersLanguage
+    url = 'http://localhost/ananya/api/parseToLogicalCharacters.php?string='+parseToLogicalCharactersInput1+'&language='+parseToLogicalCharactersLanguage
     parseToLogicalCharactersURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1237,7 +1237,7 @@ elif userInput == '2':
     isAnagramInput2 = 'అఆమెస్ట్రేరిలికాయా'
     isAnagramInput3 = 'NA'
     isAnagramLanguage = 'Language'
-    url = 'http://localhost/indic-wp/api/isAnagram.php?input1='+isAnagramInput1+'&input2=' + isAnagramLanguage + '&input3=' + isAnagramInput2
+    url = 'http://localhost/ananya/api/isAnagram.php?input1='+isAnagramInput1+'&input2=' + isAnagramLanguage + '&input3=' + isAnagramInput2
     isAnagramURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1253,7 +1253,7 @@ elif userInput == '2':
     startsWithInput2 = 'అమె'
     startsWithInput3 = 'NA'
     startsWithLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/startsWith.php?string='+startsWithInput1+'&language='+startsWithLanguage+'&start=' + startsWithInput2
+    url = 'http://localhost/ananya/api/startsWith.php?string='+startsWithInput1+'&language='+startsWithLanguage+'&start=' + startsWithInput2
     startsWithURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1269,7 +1269,7 @@ elif userInput == '2':
     endsWithInput2 = 'లియా'
     endsWithInput3 = 'NA'
     endsWithLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/endsWith.php?string='+endsWithInput1+'&language='+endsWithLanguage+'&end=' + endsWithInput2
+    url = 'http://localhost/ananya/api/endsWith.php?string='+endsWithInput1+'&language='+endsWithLanguage+'&end=' + endsWithInput2
     endsWithURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1285,7 +1285,7 @@ elif userInput == '2':
     containsStringInput2 = 'అమెరికా'
     containsStringInput3 = 'NA'
     containsStringLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/containsString.php?string='+containsStringInput1+'&language='+containsStringLanguage+'&contains=' + containsStringInput2
+    url = 'http://localhost/ananya/api/containsString.php?string='+containsStringInput1+'&language='+containsStringLanguage+'&contains=' + containsStringInput2
     containsStringURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1301,7 +1301,7 @@ elif userInput == '2':
     containsCharInput2 = 'స్ట్రే'
     containsCharInput3 = 'NA'
     containsCharLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/containsChar.php?string='+containsCharInput1+'&language='+containsCharLanguage+'&contains=' + containsCharInput2
+    url = 'http://localhost/ananya/api/containsChar.php?string='+containsCharInput1+'&language='+containsCharLanguage+'&contains=' + containsCharInput2
     containsCharURL = url 
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1316,7 +1316,7 @@ elif userInput == '2':
     containsLogicalCharsInput2 = 'కా,యా,లి'
     containsLogicalCharsInput3 = 'NA'
     containsLogicalCharLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/containsLogicalChars.php?string='+containsLogicalCharsInput1+'&language='+containsLogicalCharLanguage+'&contains=' +containsLogicalCharsInput2
+    url = 'http://localhost/ananya/api/containsLogicalChars.php?string='+containsLogicalCharsInput1+'&language='+containsLogicalCharLanguage+'&contains=' +containsLogicalCharsInput2
     containsLogicalCharsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1332,7 +1332,7 @@ elif userInput == '2':
     containsAllLogicalCharsInput2 = 'కా,యా,లి'
     containsAllLogicalCharsInput3 = 'NA'
     containsAllLogicalCharsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/containsAllLogicalChars.php?string='+containsAllLogicalCharsInput1+'&language='+containsAllLogicalCharsLanguage+'&contains=' + containsAllLogicalCharsInput2
+    url = 'http://localhost/ananya/api/containsAllLogicalChars.php?string='+containsAllLogicalCharsInput1+'&language='+containsAllLogicalCharsLanguage+'&contains=' + containsAllLogicalCharsInput2
     containsAllLogicalCharsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1348,7 +1348,7 @@ elif userInput == '2':
     containsLogicalCharSequenceInput2 = 'రికాఆ'
     containsLogicalCharSequenceInput3 = 'NA'
     containsLogicalCharSequenceLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/containsLogicalCharSequence.php?string='+containsLogicalCharSequenceInput1+'&language='+containsLogicalCharSequenceLanguage+'&contains=' + containsLogicalCharSequenceInput2
+    url = 'http://localhost/ananya/api/containsLogicalCharSequence.php?string='+containsLogicalCharSequenceInput1+'&language='+containsLogicalCharSequenceLanguage+'&contains=' + containsLogicalCharSequenceInput2
     containsLogicalCharSequenceURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1364,7 +1364,7 @@ elif userInput == '2':
     canMakeWordInput2 = 'అమెరికా'
     canMakeWordInput3 = 'NA'
     canMakeWordLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/canMakeWord.php?string='+canMakeWordInput1+'&language='+canMakeWordLanguage+'&word=' + canMakeWordInput2
+    url = 'http://localhost/ananya/api/canMakeWord.php?string='+canMakeWordInput1+'&language='+canMakeWordLanguage+'&word=' + canMakeWordInput2
     canMakeWordURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1380,7 +1380,7 @@ elif userInput == '2':
     canMakeAllWordsInput2 = 'అమెరికా,ఆస్ట్రేలియా'
     canMakeAllWordsInput3 = 'NA'
     canMakeAllWordsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/canMakeAllWords.php?string='+canMakeAllWordsInput1+'&language='+canMakeAllWordsLanguage+'&words=' + canMakeAllWordsInput2
+    url = 'http://localhost/ananya/api/canMakeAllWords.php?string='+canMakeAllWordsInput1+'&language='+canMakeAllWordsLanguage+'&words=' + canMakeAllWordsInput2
     canMakeAllWordsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1396,7 +1396,7 @@ elif userInput == '2':
     addCharacterAtEndInput2 = 'ల్లో'
     addCharacterAtEndInput3 = 'NA'
     addCharacterAtEndLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/addCharacterAtEnd.php?string='+addCharacterAtEndInput1+'&language='+addCharacterAtEndLanguage+'&char=' + addCharacterAtEndInput2
+    url = 'http://localhost/ananya/api/addCharacterAtEnd.php?string='+addCharacterAtEndInput1+'&language='+addCharacterAtEndLanguage+'&char=' + addCharacterAtEndInput2
     addCharacterAtEndURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1411,7 +1411,7 @@ elif userInput == '2':
     isIntersectingInput2 = 'ఇటలి'
     isIntersectingInput3 = 'NA'
     isIntersectingLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/isIntersecting.php?string='+ isIntersectingInput1 + '&language='+isIntersectingLanguage+'&word='+ isIntersectingInput2
+    url = 'http://localhost/ananya/api/isIntersecting.php?string='+ isIntersectingInput1 + '&language='+isIntersectingLanguage+'&word='+ isIntersectingInput2
     isIntersectingURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1427,7 +1427,7 @@ elif userInput == '2':
     getIntersectingRankInput2 = 'కాయాలి'
     getIntersectingRankInput3 = 'NA'
     getIntersectingRankLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getIntersectingRank.php?string='+ getIntersectingRankInput1 + '&language='+getIntersectingRankLanguage+'&word='+ getIntersectingRankInput2
+    url = 'http://localhost/ananya/api/getIntersectingRank.php?string='+ getIntersectingRankInput1 + '&language='+getIntersectingRankLanguage+'&word='+ getIntersectingRankInput2
     getIntersectingRankURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1443,7 +1443,7 @@ elif userInput == '2':
     getUniqueIntersectingRankInput2 = ['కా','యా','లి']
     getUniqueIntersectingRankInput3 = 'NA'
     getUniqueIntersectingRankLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getUniqueIntersectingRank.php?string='+ getUniqueIntersectingRankInput1 + '&language='+getUniqueIntersectingRankLanguage+'&list[0]='+ getUniqueIntersectingRankInput2[0]+'&list[1]='+ getUniqueIntersectingRankInput2[1] +'&list[2]='+ getUniqueIntersectingRankInput2[2]
+    url = 'http://localhost/ananya/api/getUniqueIntersectingRank.php?string='+ getUniqueIntersectingRankInput1 + '&language='+getUniqueIntersectingRankLanguage+'&list[0]='+ getUniqueIntersectingRankInput2[0]+'&list[1]='+ getUniqueIntersectingRankInput2[1] +'&list[2]='+ getUniqueIntersectingRankInput2[2]
     getUniqueIntersectingRankURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1459,7 +1459,7 @@ elif userInput == '2':
     compareToInput2 = 'అమెరికాఆస్ట్రేలియా'
     compareToInput3 = 'NA'
     compareToLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/compareTo.php?string='+ getUniqueIntersectingRankInput1 + '&language='+compareToLanguage+'&secondString='+ compareToInput2
+    url = 'http://localhost/ananya/api/compareTo.php?string='+ getUniqueIntersectingRankInput1 + '&language='+compareToLanguage+'&secondString='+ compareToInput2
     compareToURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1475,7 +1475,7 @@ elif userInput == '2':
     compareToIgnoreCaseInput2 = 'అమెరికాఆస్ట్రేలియా'
     compareToIgnoreCaseInput3 = 'NA'
     compareToIgnoreCaseLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/compareToIgnoreCase.php?string='+ compareToIgnoreCaseInput1 + '&language='+compareToIgnoreCaseLanguage+'&secondString='+ compareToIgnoreCaseInput2
+    url = 'http://localhost/ananya/api/compareToIgnoreCase.php?string='+ compareToIgnoreCaseInput1 + '&language='+compareToIgnoreCaseLanguage+'&secondString='+ compareToIgnoreCaseInput2
     compareToIgnoreCaseURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1491,7 +1491,7 @@ elif userInput == '2':
     splitWordInput2 = '2'
     splitWordInput3 = 'NA'
     splitWordLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/splitWord.php?string='+ splitWordInput1 + '&language='+splitWordLanguage+'&col='+ splitWordInput2
+    url = 'http://localhost/ananya/api/splitWord.php?string='+ splitWordInput1 + '&language='+splitWordLanguage+'&col='+ splitWordInput2
     splitWordURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1507,7 +1507,7 @@ elif userInput == '2':
     equalsInput2 = 'అమెరికాఆస్ట్రేలియా!'
     equalsInput3 = 'NA'
     equalsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/equals.php?string='+ equalsInput1 + '&language='+equalsLanguage+'&secondString='+ equalsInput2
+    url = 'http://localhost/ananya/api/equals.php?string='+ equalsInput1 + '&language='+equalsLanguage+'&secondString='+ equalsInput2
     equalsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1522,7 +1522,7 @@ elif userInput == '2':
     reverseEqualsInput2 = 'యాలిస్ట్రేఆకారిమెఅ'
     reverseEqualsInput3 = 'NA'
     reverseEqualsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/reverseEquals.php?string='+ reverseEqualsInput1 + '&language='+reverseEqualsLanguage+'&secondString='+ reverseEqualsInput2
+    url = 'http://localhost/ananya/api/reverseEquals.php?string='+ reverseEqualsInput1 + '&language='+reverseEqualsLanguage+'&secondString='+ reverseEqualsInput2
     reverseEqualsURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1538,7 +1538,7 @@ elif userInput == '2':
     logicalCharAtInput2 = '5'
     logicalCharAtInput3 = 'NA'
     logicalCharAtLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/logicalCharAt.php?string='+ logicalCharAtInput1 + '&language='+logicalCharAtLanguage+'&index='+ logicalCharAtInput2
+    url = 'http://localhost/ananya/api/logicalCharAt.php?string='+ logicalCharAtInput1 + '&language='+logicalCharAtLanguage+'&index='+ logicalCharAtInput2
     logicalCharAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1553,7 +1553,7 @@ elif userInput == '2':
     addCharacterAtInput2 = '3'
     addCharacterAtInput3 = 'క్క'
     addCharacterAtLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/addCharacterAt.php?string='+ addCharacterAtInput1 + '&language='+addCharacterAtLanguage+'&index='+ addCharacterAtInput2 +'&char=' +addCharacterAtInput3
+    url = 'http://localhost/ananya/api/addCharacterAt.php?string='+ addCharacterAtInput1 + '&language='+addCharacterAtLanguage+'&index='+ addCharacterAtInput2 +'&char=' +addCharacterAtInput3
     addCharacterAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1568,7 +1568,7 @@ elif userInput == '2':
     replaceInput2 = 'అమెరికా'
     replaceInput3 = 'క్క'
     replaceLanguage = 'English'
-    url = 'http://localhost/indic-wp/api/replace.php?string='+ replaceInput1 + '&language='+addCharacterAtLanguage+'&target='+ replaceInput2 +'&new=' +replaceInput3
+    url = 'http://localhost/ananya/api/replace.php?string='+ replaceInput1 + '&language='+addCharacterAtLanguage+'&target='+ replaceInput2 +'&new=' +replaceInput3
     replaceAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1584,7 +1584,7 @@ elif userInput == '2':
     getUniqueIntersectingLogicalCharsAtInput2 = ['కా','యా','లి']
     getUniqueIntersectingLogicalCharsAtInput3 = 'NA'
     getUniqueIntersectingLogicalCharsAtLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/getUniqueIntersectingLogicalChars.php?string='+ getUniqueIntersectingLogicalCharsAtInput1 + '&language='+getUniqueIntersectingLogicalCharsAtLanguage+'&list[0]='+ getUniqueIntersectingLogicalCharsAtInput2[0] +'&list[1]='+ getUniqueIntersectingLogicalCharsAtInput2[1]+'&list[2]='+ getUniqueIntersectingLogicalCharsAtInput2[2]
+    url = 'http://localhost/ananya/api/getUniqueIntersectingLogicalChars.php?string='+ getUniqueIntersectingLogicalCharsAtInput1 + '&language='+getUniqueIntersectingLogicalCharsAtLanguage+'&list[0]='+ getUniqueIntersectingLogicalCharsAtInput2[0] +'&list[1]='+ getUniqueIntersectingLogicalCharsAtInput2[1]+'&list[2]='+ getUniqueIntersectingLogicalCharsAtInput2[2]
     getUniqueIntersectingLogicalCharsAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1600,7 +1600,7 @@ elif userInput == '2':
     indexOfInput2 = 'స్ట్రే'
     indexOfInput3 = 'NA'
     indexOfLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/indexOf.php?string='+ indexOfInput1 + '&language='+indexOfLanguage+'&char='+ indexOfInput2
+    url = 'http://localhost/ananya/api/indexOf.php?string='+ indexOfInput1 + '&language='+indexOfLanguage+'&char='+ indexOfInput2
     indexOfURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1615,7 +1615,7 @@ elif userInput == '2':
     baseConsonantInput2 = 'కర్త'
     baseConsonantInput3 = 'NA'
     baseConsonantLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/baseConsonants.php?input1='+ baseConsonantInput1 + '&input2='+ baseConsonantLanguage +'&input3='+ baseConsonantInput2
+    url = 'http://localhost/ananya/api/baseConsonants.php?input1='+ baseConsonantInput1 + '&input2='+ baseConsonantLanguage +'&input3='+ baseConsonantInput2
     baseConsonantAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1630,7 +1630,7 @@ elif userInput == '2':
     headsAndTailInput2 = 'కుడుము'
     headsAndTailInput3 = 'NA'
     headsAndTailLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/areHeadAndTailWords.php?input1='+ headsAndTailInput1 + '&input2='+ headsAndTailLanguage +'&input3='+ headsAndTailInput2
+    url = 'http://localhost/ananya/api/areHeadAndTailWords.php?input1='+ headsAndTailInput1 + '&input2='+ headsAndTailLanguage +'&input3='+ headsAndTailInput2
     headsAndTailAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
@@ -1646,7 +1646,7 @@ elif userInput == '2':
     areLadderWordsInput2 = 'మురుగు'
     areLadderWordsInput3 = 'NA'
     areLadderWordsLanguage = 'Telugu'
-    url = 'http://localhost/indic-wp/api/areLadderWords.php?input1='+ areLadderWordsInput1 + '&input2='+ areLadderWordsLanguage +'&input3='+ areLadderWordsInput2
+    url = 'http://localhost/ananya/api/areLadderWords.php?input1='+ areLadderWordsInput1 + '&input2='+ areLadderWordsLanguage +'&input3='+ areLadderWordsInput2
     areLadderWordsAtURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)

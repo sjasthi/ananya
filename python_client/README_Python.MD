@@ -16,7 +16,7 @@ Any input listed on a service that is needed will have a value. In the getLength
     getLengthinput2 = 'NA'
     getLengthinput3 = 'NA'
     getLengthlanguage = 'English'
-    url = 'http://localhost/indic-wp/api/getlength.php?string='+ input1 + '&language=' + language
+    url = 'http://localhost/ananya/api/getlength.php?string='+ input1 + '&language=' + language
     getLengthgetLengthURL = url
     r = requests.get(url)
     dataDecoded = getDecode(r.text)
