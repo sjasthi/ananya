@@ -15,7 +15,7 @@
         $language = $_POST['language'];
 
         //Resourse Address        
-        $url = "http://localhost/indic-wp/api/isPalindrome.php?string=$word&language=$language";
+        $url = "http://localhost/ananya/api/isPalindrome.php?string=$word&language=$language";
 
         //Send request to Resourse        
         $client = curl_init($url);

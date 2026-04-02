@@ -2,7 +2,7 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
 
 public class API implements Runnable {
-    private String url = "http://localhost/indic-wp/api/";
+    private String url = "http://localhost/ananya/api/";
     private String[] inputs = null;
     private String method = null;
     private String expected = null;
