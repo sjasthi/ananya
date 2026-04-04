@@ -21,6 +21,8 @@ function llm_bootstrap_env_once($baseDir = null) {
     $envPaths[] = $root . '/mcp_server/.env';
     $envPaths[] = dirname($root) . '/.env';
 
+    $loadedEnvPath = '';
+
     foreach ($envPaths as $envPath) {
         if (!is_string($envPath) || $envPath === '' || !file_exists($envPath)) {
             continue;
@@ -46,8 +48,11 @@ function llm_bootstrap_env_once($baseDir = null) {
             $_SERVER[$key] = $val;
         }
 
+        $loadedEnvPath = $envPath;
+
         break;
     }
+
 }
 
 function llm_default_model_for_provider($provider) {

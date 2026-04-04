@@ -1,0 +1,440 @@
+[25-Feb-2026 17:59:32 America/Boise] Calling API: https://jasthi.com/ananya/api/text/length.php?string=cucumber%3F&language=english
+[25-Feb-2026 17:59:32 America/Boise] API Response (200): ﻿﻿{"response_code":200,"message":"Length Calculated","string":"cucumber?","language":"english","data":9}
+[25-Feb-2026 17:59:32 America/Boise] Non-JSON API response, retrying via router: https://jasthi.com/ananya/api.php/text/length?string=cucumber%3F&language=english
+[25-Feb-2026 17:59:32 America/Boise] Router Response (200): {"response_code":200,"message":"Length calculated","string":"cucumber?","language":"english","data":9,"success":true,"result":9,"error":null}
+[25-Feb-2026 17:59:40 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 17:59:40 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 17:59:40 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 17:59:40 America/Boise] chat_api.php | Question: What does API mean? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:08:11 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:08:11 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:08:11 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:08:11 America/Boise] chat_api.php | Question: How many letters in the word California | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:08:49 America/Boise] Calling API: https://jasthi.com/ananya/api/text/length.php?string=California&language=english
+[25-Feb-2026 18:08:49 America/Boise] API Response (200): ﻿﻿{"response_code":200,"message":"Length Calculated","string":"California","language":"english","data":10}
+[25-Feb-2026 18:08:49 America/Boise] Non-JSON API response, retrying via router: https://jasthi.com/ananya/api.php/text/length?string=California&language=english
+[25-Feb-2026 18:08:49 America/Boise] Router Response (200): {"response_code":200,"message":"Length calculated","string":"California","language":"english","data":10,"success":true,"result":10,"error":null}
+[25-Feb-2026 18:09:08 America/Boise] Calling API: https://jasthi.com/ananya/api/text/length.php?string=California&language=english
+[25-Feb-2026 18:09:08 America/Boise] API Response (200): ﻿﻿{"response_code":200,"message":"Length Calculated","string":"California","language":"english","data":10}
+[25-Feb-2026 18:09:08 America/Boise] Non-JSON API response, retrying via router: https://jasthi.com/ananya/api.php/text/length?string=California&language=english
+[25-Feb-2026 18:09:08 America/Boise] Router Response (200): {"response_code":200,"message":"Length calculated","string":"California","language":"english","data":10,"success":true,"result":10,"error":null}
+[25-Feb-2026 18:09:28 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:09:28 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:09:28 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:09:28 America/Boise] chat_api.php | Question: Can you scramble the word Mixedup | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:09:49 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:09:49 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:09:49 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:09:49 America/Boise] chat_api.php | Question: Can you scramble the word Mixedup | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:10:44 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:10:44 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:10:44 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:10:44 America/Boise] chat_api.php | Question: How do I set my gemini env key? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:15:21 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:15:21 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:15:21 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:15:21 America/Boise] chat_api.php | Question: cAn you add an "E" in the middle of Middle | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:17:29 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:17:29 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:17:29 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:17:29 America/Boise] chat_api.php | Question: Add an 'E' to the word Hello | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:18:26 America/Boise] Calling API: https://jasthi.com/ananya/api/text/length.php?string=Help&language=english
+[25-Feb-2026 18:18:27 America/Boise] API Response (200): ﻿﻿{"response_code":200,"message":"Length Calculated","string":"Help","language":"english","data":4}
+[25-Feb-2026 18:18:27 America/Boise] Non-JSON API response, retrying via router: https://jasthi.com/ananya/api.php/text/length?string=Help&language=english
+[25-Feb-2026 18:18:27 America/Boise] Router Response (200): {"response_code":200,"message":"Length calculated","string":"Help","language":"english","data":4,"success":true,"result":4,"error":null}
+[25-Feb-2026 18:18:51 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:18:51 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:18:51 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:18:51 America/Boise] chat_api.php | Question: What is an API | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:21:32 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:21:32 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:21:32 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:21:32 America/Boise] chat_api.php | Question: How many letters are in fruit? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:24:12 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:24:12 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:24:12 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:24:12 America/Boise] chat_api.php | Question: How many letters in fruit? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:24:22 America/Boise] Calling API: https://ananya.telugupuzzles.com/api/text/length.php?string=fruit%3F&language=english
+[25-Feb-2026 18:24:22 America/Boise] API Response (200): ﻿﻿{"response_code":200,"message":"Length Calculated","string":"fruit?","language":"english","data":6}
+[25-Feb-2026 18:24:22 America/Boise] Non-JSON API response, retrying via router: https://ananya.telugupuzzles.com/api.php/text/length?string=fruit%3F&language=english
+[25-Feb-2026 18:24:22 America/Boise] Router Response (404): {"response_code":404,"message":"API category not found: api.php","string":null,"language":null,"data":null,"success":false,"result":null,"error":"API category not found: api.php"}
+[25-Feb-2026 18:24:30 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:24:30 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:24:30 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:24:30 America/Boise] chat_api.php | Question: What is an API? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:25:45 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:25:45 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:25:45 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:25:45 America/Boise] chat_api.php | Question: How many letters in good | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:34:24 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:34:24 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:34:24 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:34:24 America/Boise] chat_api.php | Question: How many letters in help | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 18:49:30 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 18:49:30 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:49:30 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 18:49:30 America/Boise] chat_api.php | Question: How many letters in Hello | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Feb-2026 19:22:39 America/Boise] Calling API: https://jasthi.com/ananya/api/text/length.php?string=banana%3F&language=english
+[25-Feb-2026 19:22:39 America/Boise] API Response (200): ﻿﻿{"response_code":200,"message":"Length Calculated","string":"banana?","language":"english","data":7}
+[25-Feb-2026 19:22:39 America/Boise] Non-JSON API response, retrying via router: https://jasthi.com/ananya/api.php/text/length?string=banana%3F&language=english
+[25-Feb-2026 19:22:39 America/Boise] Router Response (200): {"response_code":200,"message":"Length calculated","string":"banana?","language":"english","data":7,"success":true,"result":7,"error":null}
+[25-Feb-2026 19:22:45 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Feb-2026 19:22:45 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 19:22:45 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Feb-2026 19:22:45 America/Boise] chat_api.php | Question: What does API mean? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[27-Feb-2026 15:01:25 America/Boise] PHP Warning:  foreach() argument must be of type array|object, string given in /home2/icsbinco/public_html/ananya/word_processor.php on line 190
+[11-Mar-2026 10:58:27 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[11-Mar-2026 10:58:27 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[11-Mar-2026 10:58:27 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[11-Mar-2026 10:58:27 America/Boise] chat_api.php | Question: Hello | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[16-Mar-2026 18:46:46 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[16-Mar-2026 18:46:46 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[16-Mar-2026 18:46:46 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[16-Mar-2026 18:46:46 America/Boise] chat_api.php | Question: are u there? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[18-Mar-2026 13:32:29 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[18-Mar-2026 13:32:29 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 13:32:29 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 13:32:29 America/Boise] chat_api.php | Question: what is the length of fruit | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[18-Mar-2026 13:32:40 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[18-Mar-2026 13:32:40 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 13:32:40 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 13:32:40 America/Boise] chat_api.php | Question: What is the length of fruit? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[18-Mar-2026 13:32:53 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[18-Mar-2026 13:32:53 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 13:32:53 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 13:32:53 America/Boise] chat_api.php | Question: what is the codepoint of fruit | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[18-Mar-2026 17:43:31 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[18-Mar-2026 17:43:31 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 17:43:31 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[18-Mar-2026 17:43:31 America/Boise] chat_api.php | Question: What are the common letters between God and Dog | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Mar-2026 11:14:57 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[25-Mar-2026 11:14:57 America/Boise] LLM Raw Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Mar-2026 11:14:57 America/Boise] LLM Strict Response:
+Gemini API key not configured. Set GEMINI_API_KEY in .env
+---END---
+[25-Mar-2026 11:14:57 America/Boise] chat_api.php | Question: What is an API? | API: none | Doc: none | Response: Gemini API key not configured. Set GEMINI_API_KEY in .env
+[25-Mar-2026 11:40:44 America/Boise] Tool call [replace_in_text] URL: http://localhost/ananya/api.php/text/replace?string=chicken+and+salad&input2=chicken&input3=chicken+and+salad&language=english
+[25-Mar-2026 11:40:44 America/Boise] Tool call [reverse_text] URL: http://localhost/ananya/api.php/text/reverse?string=chicken+and+salad&language=english
+[25-Mar-2026 18:02:57 America/Boise] Tool call [check_anagram] URL: http://localhost/ananya/api.php/analysis/is-anagram?string=cat&input2=hat&language=english
+[25-Mar-2026 18:06:46 America/Boise] PHP tool orchestration failed; falling back to legacy single-shot flow. Error: groq API error (HTTP 400): Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.
+[25-Mar-2026 18:06:46 America/Boise] LLM Raw Response:
+groq API error (HTTP 404): The model `mistral` does not exist or you do not have access to it.
+---END---
+[25-Mar-2026 18:06:46 America/Boise] LLM Strict Response:
+groq API error (HTTP 404): The model `mistral` does not exist or you do not have access to it.
+---END---
+[25-Mar-2026 18:06:46 America/Boise] chat_api.php | Question: Give me a Telugu puzzle on Dances of India (default count = 10, gird size 16 x 12) | API: none | Doc: none | Response: groq API error (HTTP 404): The model `mistral` does not exist or you do not have access to it.
+[25-Mar-2026 18:07:05 America/Boise] PHP tool orchestration failed; falling back to legacy single-shot flow. Error: groq API error (HTTP 400): Failed to call a function. Please adjust your prompt. See 'failed_generation' for more details.
+[25-Mar-2026 18:07:05 America/Boise] LLM Raw Response:
+groq API error (HTTP 404): The model `mistral` does not exist or you do not have access to it.
+---END---
+[25-Mar-2026 18:07:05 America/Boise] LLM Strict Response:
+groq API error (HTTP 404): The model `mistral` does not exist or you do not have access to it.
+---END---
+[25-Mar-2026 18:07:05 America/Boise] chat_api.php | Question: Give me a Telugu puzzle on Dances of India (default count = 10, gird size 16 x 12) | API: none | Doc: none | Response: groq API error (HTTP 404): The model `mistral` does not exist or you do not have access to it.
+[29-Mar-2026 07:16:53 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[29-Mar-2026 07:17:06 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[29-Mar-2026 07:17:37 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:17:37 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[29-Mar-2026 07:17:56 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:17:56 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[29-Mar-2026 07:17:56 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:17:56 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[29-Mar-2026 07:21:12 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:21:12 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[29-Mar-2026 07:31:15 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:31:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[29-Mar-2026 07:31:35 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:31:35 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[29-Mar-2026 07:31:35 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[29-Mar-2026 07:31:35 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 14:35:23 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[31-Mar-2026 14:36:37 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[31-Mar-2026 14:36:37 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 14:36:37 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[31-Mar-2026 14:36:37 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 14:36:37 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[31-Mar-2026 14:36:37 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 14:37:04 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[31-Mar-2026 14:37:04 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[31-Mar-2026 14:37:04 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[31-Mar-2026 14:37:04 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 14:37:04 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 14:37:04 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[31-Mar-2026 19:29:19 America/Boise] PHP Warning:  Undefined array key 6 in /home2/icsbinco/public_html/ananya/word_processor.php on line 360
+[31-Mar-2026 20:46:06 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[01-Apr-2026 16:23:56 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[01-Apr-2026 16:24:21 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[01-Apr-2026 16:24:21 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[01-Apr-2026 16:24:21 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[01-Apr-2026 16:24:21 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[01-Apr-2026 16:24:21 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[01-Apr-2026 16:24:21 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[01-Apr-2026 17:26:31 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[01-Apr-2026 17:28:10 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[01-Apr-2026 17:33:03 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[01-Apr-2026 17:33:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[01-Apr-2026 17:38:41 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[01-Apr-2026 17:45:48 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[01-Apr-2026 17:48:03 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[01-Apr-2026 17:48:03 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[01-Apr-2026 17:48:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[01-Apr-2026 17:48:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 07:30:08 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 07:33:59 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 07:34:32 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 07:37:37 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 07:40:45 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 07:43:46 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 07:43:57 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:05:31 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:05:43 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:06:03 America/Boise] PHP Warning:  Undefined array key 6 in /home2/icsbinco/public_html/ananya/word_processor.php on line 605
+[04-Apr-2026 09:06:34 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:06:45 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:07:19 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:07:19 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:07:19 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:07:19 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:07:19 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:07:19 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:07:24 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:07:24 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:07:24 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:07:24 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:08:17 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:08:17 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:08:17 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:08:17 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:08:17 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:08:17 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:08:17 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:08:17 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:08:17 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:08:17 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:09:26 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:09:26 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:13:39 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:13:39 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:13:53 America/Boise] MCP server unreachable (http://localhost:8000/chat): Failed to connect to localhost port 8000: Connection refused (HTTP 0)
+[04-Apr-2026 09:13:53 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: MCP server unavailable or returned invalid response.
+[04-Apr-2026 09:37:41 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:37:41 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:37:41 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:37:47 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:37:47 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:40:31 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:41:17 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:46:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:46:28 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:59:02 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:59:29 America/Boise] PHP Warning:  Undefined array key 6 in /home2/icsbinco/public_html/ananya/word_processor.php on line 605
+[04-Apr-2026 09:59:32 America/Boise] PHP Warning:  Undefined array key 6 in /home2/icsbinco/public_html/ananya/word_processor.php on line 605
+[04-Apr-2026 09:59:48 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:59:48 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:59:48 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:59:53 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 09:59:55 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:00:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:00:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:00:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:00:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:00:03 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:04:34 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:04:34 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:04:34 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:04:34 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:04:34 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:16 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=fruit, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:16 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=12, theme=fruit, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:16 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Animals in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:16 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Animals in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:16 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Indian Festivals in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:16 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Indian Festivals in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:17 America/Boise] WordFind final words count=8, requested=10, theme=Animals in Telugu, language=telugu
+[04-Apr-2026 10:09:18 America/Boise] WordFind final words count=10, requested=10, theme=fruit, language=telugu
+[04-Apr-2026 10:09:18 America/Boise] WordFind final words count=8, requested=10, theme=Indian Festivals in Telugu, language=telugu
+[04-Apr-2026 10:09:20 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:20 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Planets in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:20 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Planets in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:21 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:21 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Musical Instruments in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:21 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Musical Instruments in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:22 America/Boise] WordFind final words count=8, requested=10, theme=Planets in Telugu, language=telugu
+[04-Apr-2026 10:09:23 America/Boise] WordFind final words count=8, requested=10, theme=Musical Instruments in Telugu, language=telugu
+[04-Apr-2026 10:09:27 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:27 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:27 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:27 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=fruit, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:27 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=fruit, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:27 America/Boise] WordFind final words count=10, requested=10, theme=fruit, language=english
+[04-Apr-2026 10:09:27 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Indian Festivals in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:27 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Indian Festivals in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:27 America/Boise] WordFind final words count=10, requested=10, theme=Indian Festivals in English, language=english
+[04-Apr-2026 10:09:27 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Animals in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:27 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Animals in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:27 America/Boise] WordFind final words count=10, requested=10, theme=Animals in English, language=english
+[04-Apr-2026 10:09:27 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:27 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:09:27 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Planets in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:27 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Planets in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:27 America/Boise] WordFind final words count=10, requested=10, theme=Planets in English, language=english
+[04-Apr-2026 10:09:27 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Musical Instruments in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:09:27 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Musical Instruments in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:09:27 America/Boise] WordFind final words count=10, requested=10, theme=Musical Instruments in English, language=english
+[04-Apr-2026 10:22:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:22:15 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:22:15 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=animals, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:22:15 America/Boise] WordFind final words count=12, requested=12, theme=animals, language=english
+[04-Apr-2026 10:24:29 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:24:29 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:24:29 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=animals, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:24:29 America/Boise] WordFind final words count=12, requested=12, theme=animals, language=english
+[04-Apr-2026 10:24:55 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:24:55 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:24:55 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=animals, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:24:55 America/Boise] WordFind final words count=12, requested=12, theme=animals, language=english
+[04-Apr-2026 10:25:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:15 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:15 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Animals in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:15 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Animals in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:15 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Indian Festivals in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:15 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Indian Festivals in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:15 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=fruit, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:15 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=12, theme=fruit, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:18 America/Boise] WordFind final words count=8, requested=10, theme=Indian Festivals in Telugu, language=telugu
+[04-Apr-2026 10:25:18 America/Boise] WordFind final words count=8, requested=10, theme=Animals in Telugu, language=telugu
+[04-Apr-2026 10:25:19 America/Boise] WordFind final words count=10, requested=10, theme=fruit, language=telugu
+[04-Apr-2026 10:25:21 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:21 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Planets in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:21 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Planets in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:21 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:21 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Musical Instruments in Telugu, language=telugu, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:21 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=10, theme=Musical Instruments in Telugu, language=telugu, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:23 America/Boise] WordFind final words count=8, requested=10, theme=Planets in Telugu, language=telugu
+[04-Apr-2026 10:25:23 America/Boise] WordFind final words count=8, requested=10, theme=Musical Instruments in Telugu, language=telugu
+[04-Apr-2026 10:25:32 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:32 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:32 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:32 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Animals in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:32 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Animals in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:32 America/Boise] WordFind final words count=10, requested=10, theme=Animals in English, language=english
+[04-Apr-2026 10:25:32 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Indian Festivals in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:32 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Indian Festivals in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:32 America/Boise] WordFind final words count=10, requested=10, theme=Indian Festivals in English, language=english
+[04-Apr-2026 10:25:32 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=fruit, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:32 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=fruit, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:32 America/Boise] WordFind final words count=10, requested=10, theme=fruit, language=english
+[04-Apr-2026 10:25:32 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:32 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:25:32 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Planets in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:32 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Planets in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:32 America/Boise] WordFind final words count=10, requested=10, theme=Planets in English, language=english
+[04-Apr-2026 10:25:32 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=Musical Instruments in English, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:25:32 America/Boise] WordFind source counts: llm_raw=0, fallback_raw=20, theme=Musical Instruments in English, language=english, provider=groq, model=llama-3.3-70b-versatile
+[04-Apr-2026 10:25:32 America/Boise] WordFind final words count=10, requested=10, theme=Musical Instruments in English, language=english
+[04-Apr-2026 10:33:13 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:33:13 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:36:49 America/Boise] LLM env bootstrap: loaded_env=/home2/icsbinco/public_html/ananya/.env, APP_ENV_PATH=(empty), ANANYA_ENV_PATH=(empty), GROQ_KEY_LEN=56, GROQ_KEY_TAIL=wHnD
+[04-Apr-2026 10:36:59 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:36:59 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:41:42 America/Boise] LLM env bootstrap: loaded_env=/home2/icsbinco/public_html/ananya/.env, APP_ENV_PATH=(empty), ANANYA_ENV_PATH=(empty), GROQ_KEY_LEN=56, GROQ_KEY_TAIL=1Eup
+[04-Apr-2026 10:41:51 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:41:51 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:45:08 America/Boise] LLM env bootstrap: loaded_env=/home2/icsbinco/public_html/ananya/.env, APP_ENV_PATH=(empty), ANANYA_ENV_PATH=(empty), GROQ_KEY_LEN=56, GROQ_KEY_TAIL=1Eup
+[04-Apr-2026 10:45:13 America/Boise] LLM env bootstrap: loaded_env=/home2/icsbinco/public_html/ananya/.env, APP_ENV_PATH=(empty), ANANYA_ENV_PATH=(empty), GROQ_KEY_LEN=56, GROQ_KEY_TAIL=1Eup
+[04-Apr-2026 10:45:15 America/Boise] LLM env bootstrap: loaded_env=/home2/icsbinco/public_html/ananya/.env, APP_ENV_PATH=(empty), ANANYA_ENV_PATH=(empty), GROQ_KEY_LEN=56, GROQ_KEY_TAIL=1Eup
+[04-Apr-2026 10:45:25 America/Boise] Chat API: falling back to legacy single-shot flow. Reason: Direct LLM selected from UI (skipped MCP server).
+[04-Apr-2026 10:45:25 America/Boise] LLM provider HTTP error: provider=groq, model=llama-3.3-70b-versatile, http=401, key_len=56, key_tail=c04o, message=Invalid API Key
+[04-Apr-2026 10:45:25 America/Boise] WordFind LLM candidates: provider error. provider=groq, model=llama-3.3-70b-versatile, theme=animals, language=english, resp=groq API error (HTTP 401): Invalid API Key
+[04-Apr-2026 10:45:25 America/Boise] LLM provider HTTP error: provider=groq, model=llama-3.3-70b-versatile, http=401, key_len=56, key_tail=c04o, message=Invalid API Key
