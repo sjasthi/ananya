@@ -246,7 +246,7 @@ class wordProcessor
 			);
 		}
 
-		$lines = @file($seedFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		$lines = file($seedFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 		if ($lines === false) {
 			return array(
 				'ok' => false,

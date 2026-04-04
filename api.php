@@ -33,6 +33,9 @@ if (empty($segments)) {
 $category = $segments[0] ?? '';
 $action = $segments[1] ?? '';
 
+// Guard against pathological query sizes while keeping normal inputs unaffected.
+enforceRequestSizeLimits();
+
 // Route based on category/action pattern
 switch ($category) {
     case 'characters':
@@ -656,6 +659,28 @@ function handleAuthAPIs($action) {
             break;
         default:
             sendResponse(404, "Auth API action not found: $action", null, null, null);
+    }
+}
+
+function enforceRequestSizeLimits() {
+    $maxLen = (int)(getenv('API_MAX_INPUT_LENGTH') ?: 100000);
+    if ($maxLen <= 0) {
+        $maxLen = 100000;
+    }
+
+    foreach (['string', 'input2', 'input3'] as $key) {
+        if (!array_key_exists($key, $_GET)) {
+            continue;
+        }
+
+        if (is_array($_GET[$key])) {
+            sendResponse(400, "Invalid parameter type: $key", null, null, null);
+        }
+
+        $value = (string)$_GET[$key];
+        if (strlen($value) > $maxLen) {
+            sendResponse(413, "Input too large for parameter: $key", null, null, null);
+        }
     }
 }
 
