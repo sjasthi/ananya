@@ -1692,12 +1692,15 @@ function generate_word_find_answer($question, $llm_provider, $llm_model, $langua
         [$llmWordsRaw, $usedLlm] = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $language);
     }
 
-    // For known themes (dog/cat), prioritize curated theme words and then add LLM variety.
-    $preferCurated = $useStrictCuratedTheme;
-    $merged = $preferCurated
-        ? $fallbackWordsRaw
-        : array_merge($llmWordsRaw, $fallbackWordsRaw);
-    $words = sanitize_word_list($merged, $count, $language, $req['gridCols']);
+    // Keep LLM suggestions primary for general themes. Use curated fallback only to fill gaps.
+    if ($useStrictCuratedTheme) {
+        $words = sanitize_word_list($fallbackWordsRaw, $count, $language, $req['gridCols']);
+    } else {
+        $words = sanitize_word_list($llmWordsRaw, $count, $language, $req['gridCols']);
+        if (count($words) < $count) {
+            $words = sanitize_word_list(array_merge($words, $fallbackWordsRaw), $count, $language, $req['gridCols']);
+        }
+    }
 
     if (count($words) < $count) {
         // Add deterministic fillers to reach requested count if needed.
@@ -1949,6 +1952,14 @@ $llm_model = trim($_POST['llm_model'] ?? ($data['llm_model'] ?? ''));
 
 if (!in_array($llm_provider, ['gemini', 'openai', 'groq'], true)) {
     $llm_provider = '';
+}
+
+if ($llm_provider !== '' && function_exists('llm_provider_has_api_key') && !llm_provider_has_api_key($llm_provider)) {
+    echo json_encode([
+        'error' => strtoupper($llm_provider) . ' API key not configured.',
+        'llm_consulted' => false,
+    ]);
+    exit;
 }
 
 if ($llm_model !== '' && !preg_match('/^[A-Za-z0-9._:-]{1,120}$/', $llm_model)) {
