@@ -547,7 +547,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function parseThemes(text) {
         const lines = String(text || '').split(/\r?\n/);
-        return lines.map(s => s.trim()).filter(Boolean);
+        return lines
+            .map(s => s.trim().replace(/^\d+\s*\|\s*/, ''))
+            .filter(Boolean);
     }
 
     function parseGrid(value) {
