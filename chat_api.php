@@ -48,7 +48,6 @@ function call_detected_api($api_name, $params) {
     
     $result = curl_exec($ch);
     $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     error_log("API Response ($http_code): " . substr($result, 0, 200));
 
@@ -67,7 +66,6 @@ function call_detected_api($api_name, $params) {
             curl_setopt($ch2, CURLOPT_HEADER, false);
             $retry = curl_exec($ch2);
             $retry_code = curl_getinfo($ch2, CURLINFO_HTTP_CODE);
-            curl_close($ch2);
 
             error_log("Router Response ($retry_code): " . substr($retry, 0, 200));
             return $retry ?: $result;
@@ -578,7 +576,6 @@ function split_logical_units_via_ananya_api($word, $language = 'english') {
 
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
 
     if ($response === false || $httpCode < 200 || $httpCode >= 400) {
         return [];
@@ -1844,7 +1841,6 @@ function execute_chat_tool($toolName, $args, $language, $apiBaseUrl) {
     $response = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $curlErr = curl_error($ch);
-    curl_close($ch);
 
     if ($response === false || $httpCode < 200 || $httpCode >= 400) {
         $message = 'Tool execution failed (HTTP ' . $httpCode . '): ' . ($curlErr ?: 'Request error');
@@ -2256,7 +2252,6 @@ function call_mcp_server($url, $question, $language, $timeout, $llm_provider = '
     $result = curl_exec($ch);
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     $err = curl_error($ch);
-    curl_close($ch);
 
     if($result === false || $httpCode < 200 || $httpCode >= 500) {
         // MCP server is down or errored — trigger fallback
