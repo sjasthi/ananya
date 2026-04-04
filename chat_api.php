@@ -1,44 +1,10 @@
 <?php
-// Load .env file if it exists
-$envPaths = [];
-
-// Preferred for shared hosting: absolute env file path set at server level.
-// You can set APP_ENV_PATH or ANANYA_ENV_PATH to something like:
-// /home/yourcpaneluser/.ananya/.env
-$absoluteEnvPath = getenv('APP_ENV_PATH') ?: getenv('ANANYA_ENV_PATH') ?: '';
-if (!empty($absoluteEnvPath)) {
-    $envPaths[] = $absoluteEnvPath;
-}
-
-// Fallbacks for local development.
-$envPaths[] = __DIR__ . '/mcp_server/.env';
-$envPaths[] = __DIR__ . '/.env';
-$envPaths[] = __DIR__ . '/../.env';
-
-foreach ($envPaths as $envPath) {
-    if (!file_exists($envPath)) {
-        continue;
-    }
-
-    $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-    foreach ($lines as $line) {
-        $line = trim($line);
-        if ($line === '' || str_starts_with($line, '#') || strpos($line, '=') === false) {
-            continue;
-        }
-
-        list($key, $val) = explode('=', $line, 2);
-        putenv(trim($key) . '=' . trim($val));
-    }
-
-    break;
-}
-
 header('Content-Type: application/json; charset=utf-8');
 // chat_api.php - receives question and performs in-process LLM + tool orchestration
 
 require_once __DIR__ . '/includes/api_reference.php';
 require_once __DIR__ . '/includes/llm_handler.php';
+llm_bootstrap_env_once(__DIR__);
 
 // Tool-loop settings
 $CHAT_MAX_TOOL_ITERS = (int)(getenv('CHAT_MAX_TOOL_ITERS') ?: 5);
@@ -828,13 +794,17 @@ function request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model,
 
     // llm_ask returns plain text on success and error text on failure.
     if (!is_string($resp) || trim($resp) === '') {
-        return [[], false];
+        error_log('WordFind LLM candidates: empty response. provider=' . ($llm_provider ?: 'default') . ', model=' . ($llm_model ?: 'default') . ', theme=' . $theme . ', language=' . $language);
+        return [[], false, false, ''];
     }
     if (stripos($resp, 'API error') !== false || stripos($resp, 'not configured') !== false || stripos($resp, 'request failed') !== false) {
-        return [[], true];
+        error_log('WordFind LLM candidates: provider error. provider=' . ($llm_provider ?: 'default') . ', model=' . ($llm_model ?: 'default') . ', theme=' . $theme . ', language=' . $language . ', resp=' . substr(trim($resp), 0, 240));
+        return [[], true, true, trim((string)$resp)];
     }
 
-    return [parse_words_from_llm_text($resp), true];
+    $parsed = parse_words_from_llm_text($resp);
+    error_log('WordFind LLM candidates: parsed=' . count($parsed) . ', provider=' . ($llm_provider ?: 'default') . ', model=' . ($llm_model ?: 'default') . ', theme=' . $theme . ', language=' . $language);
+    return [$parsed, true, false, ''];
 }
 
 function can_place_word($grid, $nRows, $nCols, $units, $row, $col, $dr, $dc) {
@@ -1425,9 +1395,16 @@ function generate_crossword_answer($question, $llm_provider, $llm_model, $langua
         }
 
         $resp = llm_ask($prompt, $opts);
+        $respText = trim((string)$resp);
+        if ($respText === '' || stripos($respText, 'API error') !== false || stripos($respText, 'not configured') !== false || stripos($respText, 'request failed') !== false) {
+            return [
+                'ok' => false,
+                'answer' => $respText !== '' ? $respText : 'LLM provider request failed.',
+            ];
+        }
         return [
             'ok' => true,
-            'answer' => trim((string)$resp) . "\n\nLLM consulted - Yes",
+            'answer' => $respText . "\n\nLLM consulted - Yes",
         ];
     }
 
@@ -1688,9 +1665,27 @@ function generate_word_find_answer($question, $llm_provider, $llm_model, $langua
 
     $llmWordsRaw = [];
     $usedLlm = false;
+    $llmProviderError = false;
+    $llmProviderErrorMessage = '';
     if (!$useStrictCuratedTheme) {
-        [$llmWordsRaw, $usedLlm] = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $language);
+        $llmResult = request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model, $language);
+        $llmWordsRaw = is_array($llmResult[0] ?? null) ? $llmResult[0] : [];
+        $usedLlm = !empty($llmResult[1]);
+        $llmProviderError = !empty($llmResult[2]);
+        $llmProviderErrorMessage = trim((string)($llmResult[3] ?? ''));
     }
+
+    // If the caller explicitly selected a provider/model and it failed, surface
+    // the provider error instead of silently switching to fallback vocabulary.
+    if (!$useStrictCuratedTheme && $llm_provider !== '' && $llmProviderError) {
+        $safeError = $llmProviderErrorMessage !== '' ? $llmProviderErrorMessage : 'LLM provider request failed.';
+        return [
+            'ok' => false,
+            'answer' => $safeError,
+        ];
+    }
+
+    error_log('WordFind source counts: llm_raw=' . count($llmWordsRaw) . ', fallback_raw=' . count($fallbackWordsRaw) . ', theme=' . $theme . ', language=' . $language . ', provider=' . ($llm_provider ?: 'default') . ', model=' . ($llm_model ?: 'default'));
 
     // Keep LLM suggestions primary for general themes. Use curated fallback only to fill gaps.
     if ($useStrictCuratedTheme) {
@@ -1717,6 +1712,8 @@ function generate_word_find_answer($question, $llm_provider, $llm_model, $langua
         }
         $words = sanitize_word_list(array_merge($words, $extras), $count, $language, $req['gridCols']);
     }
+
+    error_log('WordFind final words count=' . count($words) . ', requested=' . $count . ', theme=' . $theme . ', language=' . $language);
 
     $puzzle = build_word_find_puzzle($words, $language, $req['gridCols'], $req['gridRows']);
     if ($puzzle === null) {
