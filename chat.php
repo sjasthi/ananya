@@ -1,11 +1,6 @@
 <?php
 require_once __DIR__ . '/includes/llm_handler.php';
-
-// Load local .env similarly to chat_api.php, if vlucas/phpdotenv is available.
-if (class_exists(\Dotenv\Dotenv::class)) {
-    $dotenv = \Dotenv\Dotenv::createImmutable(__DIR__);
-    $dotenv->safeLoad();
-}
+llm_bootstrap_env_once(__DIR__);
 
 // Define default LLM choices that are known to be supported by chat_api.php.
 $defaultLlms = [
@@ -34,6 +29,24 @@ $llmChoices = array_values(array_filter($llmChoices, function ($choice) use ($al
 if (empty($llmChoices)) {
     $llmChoices = $defaultLlms;
 }
+
+$providerAvailability = [];
+foreach ($allowedProviders as $providerName) {
+    $providerAvailability[$providerName] = function_exists('llm_provider_has_api_key')
+        ? llm_provider_has_api_key($providerName)
+        : true;
+}
+
+$firstEnabledChoice = '';
+foreach ($llmChoices as $choice) {
+    $p = strtolower($choice['provider'] ?? '');
+    $m = trim((string)($choice['model'] ?? ''));
+    if (($providerAvailability[$p] ?? false) && $m !== '') {
+        $firstEnabledChoice = $p . ':' . $m;
+        break;
+    }
+}
+
 $defaultProvider = strtolower(getenv('LLM_PROVIDER') ?: '');
 $defaultModel = trim(getenv('LLM_MODEL') ?: '');
 $selectedChoice = '';
@@ -41,6 +54,10 @@ $selectedChoice = '';
 foreach ($llmChoices as $choice) {
     $provider = strtolower($choice['provider'] ?? '');
     $model = trim($choice['model'] ?? '');
+
+    if (!($providerAvailability[$provider] ?? false)) {
+        continue;
+    }
 
     if ($defaultModel !== '' && $defaultProvider !== '' && $provider === $defaultProvider && $model === $defaultModel) {
         $selectedChoice = $provider . ':' . $model;
@@ -52,8 +69,8 @@ foreach ($llmChoices as $choice) {
     }
 }
 
-if ($selectedChoice === '' && !empty($llmChoices[0])) {
-    $selectedChoice = strtolower($llmChoices[0]['provider']) . ':' . $llmChoices[0]['model'];
+if ($selectedChoice === '' && $firstEnabledChoice !== '') {
+    $selectedChoice = $firstEnabledChoice;
 }
 ?>
 <!DOCTYPE html>
@@ -557,12 +574,19 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
                                         $model = $choice['model'] ?? '';
                                         $value = $provider . ':' . $model;
                                         $label = $choice['label'] ?? ($provider . ' - ' . $model);
+                                        $isEnabled = $providerAvailability[$provider] ?? false;
+                                        $disabledReason = strtoupper($provider) . ' API key is not configured.';
                                     ?>
-                                    <option value="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>" <?php echo ($value === $selectedChoice ? 'selected' : ''); ?>>
+                                    <option value="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>"
+                                        <?php echo (!$isEnabled ? 'disabled' : ''); ?>
+                                        title="<?php echo htmlspecialchars($isEnabled ? '' : $disabledReason, ENT_QUOTES, 'UTF-8'); ?>"
+                                        <?php echo (($value === $selectedChoice && $isEnabled) ? 'selected' : ''); ?>>
                                         <?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
+                                        <?php echo $isEnabled ? '' : ' (Unavailable)'; ?>
                                     </option>
                                 <?php endforeach; ?>
                             </select>
+                            <div class="form-text">Unavailable providers are disabled because their API keys are not configured.</div>
                         </div>
                     </div>
 

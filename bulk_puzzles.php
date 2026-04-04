@@ -1,3 +1,29 @@
+<?php
+require_once __DIR__ . '/includes/llm_handler.php';
+llm_bootstrap_env_once(__DIR__);
+
+$bulkLlms = [
+    ['provider' => 'groq', 'model' => 'llama-3.3-70b-versatile', 'label' => 'Groq - llama-3.3-70b-versatile'],
+    ['provider' => 'gemini', 'model' => 'gemini-2.0-flash', 'label' => 'Gemini - gemini-2.0-flash'],
+    ['provider' => 'openai', 'model' => 'gpt-4o-mini', 'label' => 'OpenAI - gpt-4o-mini'],
+];
+
+$providerAvailability = [];
+foreach (['groq', 'gemini', 'openai'] as $providerName) {
+    $providerAvailability[$providerName] = function_exists('llm_provider_has_api_key')
+        ? llm_provider_has_api_key($providerName)
+        : true;
+}
+
+$bulkSelectedChoice = '';
+foreach ($bulkLlms as $choice) {
+    $provider = strtolower($choice['provider']);
+    if ($providerAvailability[$provider] ?? false) {
+        $bulkSelectedChoice = $provider . ':' . $choice['model'];
+        break;
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -275,6 +301,28 @@ include 'includes/header.php';
                     <option value="gujarati">Gujarati</option>
                     <option value="malayalam">Malayalam</option>
                 </select>
+            </div>
+            <div class="col-md-3">
+                <label for="bulk-llm-select" class="form-label">LLM <span class="required-indicator">*</span></label>
+                <select id="bulk-llm-select" class="form-select" required>
+                    <?php foreach ($bulkLlms as $choice): ?>
+                        <?php
+                            $provider = strtolower($choice['provider']);
+                            $model = trim((string)$choice['model']);
+                            $value = $provider . ':' . $model;
+                            $isEnabled = $providerAvailability[$provider] ?? false;
+                            $disabledReason = strtoupper($provider) . ' API key is not configured.';
+                        ?>
+                        <option value="<?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?>"
+                            <?php echo (!$isEnabled ? 'disabled' : ''); ?>
+                            title="<?php echo htmlspecialchars($isEnabled ? '' : $disabledReason, ENT_QUOTES, 'UTF-8'); ?>"
+                            <?php echo (($value === $bulkSelectedChoice && $isEnabled) ? 'selected' : ''); ?>>
+                            <?php echo htmlspecialchars($choice['label'], ENT_QUOTES, 'UTF-8'); ?>
+                            <?php echo $isEnabled ? '' : ' (Unavailable)'; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <div class="form-text">Unavailable providers are disabled because their API keys are not configured.</div>
             </div>
             <div class="col-md-3">
                 <label for="word-count" class="form-label">Word Count <span class="required-indicator">*</span></label>

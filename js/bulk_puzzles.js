@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const fileInput = document.getElementById('theme-file');
     const themeList = document.getElementById('theme-list');
     const outputLanguage = document.getElementById('output-language');
+    const llmSelect = document.getElementById('bulk-llm-select');
     const countInput = document.getElementById('word-count');
     const gridInput = document.getElementById('grid-size');
     const generateBtn = document.getElementById('generate-btn');
@@ -569,8 +570,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    async function fetchPuzzle(theme, count, gridLabel, language) {
+    async function fetchPuzzle(theme, count, gridLabel, language, llmValue) {
         const lang = String(language || 'telugu').toLowerCase();
+        const parts = String(llmValue || '').split(':');
+        const bulkProvider = (parts[0] || '').trim().toLowerCase();
+        const bulkModel = parts.slice(1).join(':').trim();
         const langLabels = {
             english: 'English',
             telugu: 'Telugu',
@@ -579,15 +583,15 @@ document.addEventListener('DOMContentLoaded', function () {
             malayalam: 'Malayalam'
         };
         const langLabel = langLabels[lang] || 'English';
-        const question = `Give me a ${langLabel} puzzle on ${theme} (default count = ${count}, grid size ${gridLabel})`;
+        const question = `Create a word find with ${count} words about ${theme} in ${langLabel}, grid ${gridLabel}.`;
         const res = await fetch('chat_api.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 question,
                 language: lang,
-                llm_provider: '',
-                llm_model: ''
+                llm_provider: bulkProvider,
+                llm_model: bulkModel
             })
         });
 
@@ -659,7 +663,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    async function generateAll(themes, count, gridLabel, language) {
+    async function generateAll(themes, count, gridLabel, language, llmValue) {
         resultsEl.innerHTML = '';
         const total = themes.length;
         let done = 0;
@@ -676,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cursor++;
                 const theme = themes[i];
                 progressEl.textContent = `Generating ${done + 1}/${total}: ${theme}`;
-                const result = await fetchPuzzle(theme, count, gridLabel, language);
+                const result = await fetchPuzzle(theme, count, gridLabel, language, llmValue);
                 updateResultCard(slots[i], theme, result);
                 done++;
                 progressEl.textContent = `Generated ${done}/${total}`;
@@ -711,12 +715,18 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        const llmValue = llmSelect ? String(llmSelect.value || '').trim() : '';
+        if (!llmValue) {
+            progressEl.textContent = 'No LLM provider is available. Configure at least one API key to enable bulk generation.';
+            return;
+        }
+
         const count = Math.max(3, Math.min(20, parseInt(countInput.value || '10', 10) || 10));
         const grid = parseGrid(gridInput.value);
         const language = outputLanguage ? String(outputLanguage.value || 'telugu').toLowerCase() : 'telugu';
         generateBtn.disabled = true;
         try {
-            await generateAll(themes, count, grid.label, language);
+            await generateAll(themes, count, grid.label, language, llmValue);
         } finally {
             generateBtn.disabled = false;
         }

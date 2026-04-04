@@ -2,6 +2,54 @@
 // LLM handler for shared hosting.
 // Supports OpenAI-compatible chat completions with optional tool-calling.
 
+function llm_bootstrap_env_once($baseDir = null) {
+    static $bootstrapped = false;
+    if ($bootstrapped) {
+        return;
+    }
+    $bootstrapped = true;
+
+    $root = is_string($baseDir) && $baseDir !== '' ? rtrim($baseDir, '/\\') : dirname(__DIR__);
+
+    $envPaths = [];
+    $absoluteEnvPath = getenv('APP_ENV_PATH') ?: getenv('ANANYA_ENV_PATH') ?: '';
+    if (!empty($absoluteEnvPath)) {
+        $envPaths[] = $absoluteEnvPath;
+    }
+
+    $envPaths[] = $root . '/mcp_server/.env';
+    $envPaths[] = $root . '/.env';
+    $envPaths[] = dirname($root) . '/.env';
+
+    foreach ($envPaths as $envPath) {
+        if (!is_string($envPath) || $envPath === '' || !file_exists($envPath)) {
+            continue;
+        }
+
+        $lines = file($envPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim((string)$line);
+            if ($line === '' || strpos($line, '#') === 0 || strpos($line, '=') === false) {
+                continue;
+            }
+
+            list($key, $val) = explode('=', $line, 2);
+            $key = trim((string)$key);
+            $val = trim((string)$val);
+            $val = trim($val, " \t\n\r\0\x0B\"'");
+            if ($key === '') {
+                continue;
+            }
+
+            putenv($key . '=' . $val);
+            $_ENV[$key] = $val;
+            $_SERVER[$key] = $val;
+        }
+
+        break;
+    }
+}
+
 function llm_default_model_for_provider($provider) {
     $defaults = [
         'gemini' => 'gemini-2.0-flash',
@@ -10,6 +58,24 @@ function llm_default_model_for_provider($provider) {
     ];
 
     return $defaults[$provider] ?? 'gpt-4o-mini';
+}
+
+function llm_provider_key_env_name($provider) {
+    $p = strtolower(trim((string)$provider));
+    if ($p === 'openai') return 'OPENAI_API_KEY';
+    if ($p === 'gemini') return 'GEMINI_API_KEY';
+    if ($p === 'groq') return 'GROQ_API_KEY';
+    return '';
+}
+
+function llm_provider_has_api_key($provider) {
+    $envName = llm_provider_key_env_name($provider);
+    if ($envName === '') {
+        return false;
+    }
+
+    $value = trim((string)(getenv($envName) ?: ''));
+    return $value !== '';
 }
 
 function llm_get_provider_config($opts = []) {
