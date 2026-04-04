@@ -169,6 +169,35 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     }
 
+    function parseWordFindAnswerKeyLine(line) {
+        const cleaned = String(line || '').trim().replace(/^\-\s*/, '');
+        if (!cleaned) {
+            return null;
+        }
+
+        const m = cleaned.match(/^(.*?):\s*\((\d+)\s*,\s*(\d+)\)\s*->\s*\((\d+)\s*,\s*(\d+)\)\s*([A-Za-z?]{1,3})\s*$/u);
+        if (!m) {
+            return {
+                text: cleaned,
+                startRow: null,
+                startCol: null,
+                endRow: null,
+                endCol: null,
+                dir: ''
+            };
+        }
+
+        return {
+            text: cleaned,
+            word: m[1].trim(),
+            startRow: parseInt(m[2], 10),
+            startCol: parseInt(m[3], 10),
+            endRow: parseInt(m[4], 10),
+            endCol: parseInt(m[5], 10),
+            dir: String(m[6] || '').toUpperCase()
+        };
+    }
+
     function tokenizeGridLine(line) {
         const tokens = [];
         let i = 0;
@@ -377,7 +406,8 @@ document.addEventListener('DOMContentLoaded', function () {
             .slice(0, answerStop)
             .map(line => line.trim())
             .filter(line => /^-\s*/.test(line))
-            .map(line => line.replace(/^-\s*/, '').trim());
+            .map(parseWordFindAnswerKeyLine)
+            .filter(Boolean);
 
         return {
             title: titleLine,
@@ -413,6 +443,105 @@ document.addEventListener('DOMContentLoaded', function () {
             .join('');
     }
 
+    function renderWordFindAnswerKeyItems(entries) {
+        if (!entries.length) {
+            return '<li>No answer key entries available.</li>';
+        }
+
+        return entries
+            .map(entry => `<li>${escapeHtml(entry.text || '')}</li>`)
+            .join('');
+    }
+
+    function clearPuzzleHighlights(container) {
+        if (!container) return;
+        container.querySelectorAll('.answer-line-overlay').forEach(layer => layer.remove());
+    }
+
+    function getGridCellCenter(gridEl, row, col) {
+        if (!gridEl || !Number.isFinite(row) || !Number.isFinite(col)) {
+            return null;
+        }
+
+        const cell = gridEl.querySelector(`td[data-row="${row}"][data-col="${col}"]`);
+        if (!cell) {
+            return null;
+        }
+
+        return {
+            x: cell.offsetLeft + (cell.offsetWidth / 2),
+            y: cell.offsetTop + (cell.offsetHeight / 2)
+        };
+    }
+
+    function drawAnswerLines(container, wrapSelector, gridSelector, segments, variantClass) {
+        clearPuzzleHighlights(container);
+
+        const wrap = container.querySelector(wrapSelector);
+        const grid = container.querySelector(gridSelector);
+        if (!wrap || !grid || !segments.length) {
+            return;
+        }
+
+        const ns = 'http://www.w3.org/2000/svg';
+        const svg = document.createElementNS(ns, 'svg');
+        svg.setAttribute('class', `answer-line-overlay ${variantClass}`);
+        svg.setAttribute('width', String(grid.offsetWidth));
+        svg.setAttribute('height', String(grid.offsetHeight));
+        svg.setAttribute('viewBox', `0 0 ${grid.offsetWidth} ${grid.offsetHeight}`);
+        svg.style.left = `${grid.offsetLeft}px`;
+        svg.style.top = `${grid.offsetTop}px`;
+
+        segments.forEach(seg => {
+            const start = getGridCellCenter(grid, seg.startRow, seg.startCol);
+            const end = getGridCellCenter(grid, seg.endRow, seg.endCol);
+            if (!start || !end) {
+                return;
+            }
+
+            const line = document.createElementNS(ns, 'line');
+            line.setAttribute('x1', String(start.x));
+            line.setAttribute('y1', String(start.y));
+            line.setAttribute('x2', String(end.x));
+            line.setAttribute('y2', String(end.y));
+            svg.appendChild(line);
+        });
+
+        wrap.appendChild(svg);
+    }
+
+    function highlightCrosswordAnswers(container, entries) {
+        const segments = entries
+            .map(entry => {
+                const dr = entry.direction === 'down' ? 1 : 0;
+                const dc = entry.direction === 'across' ? 1 : 0;
+                const letters = Array.from(String(entry.word || '').trim());
+                const length = Math.max(1, letters.length);
+                return {
+                    startRow: entry.row,
+                    startCol: entry.col,
+                    endRow: entry.row + (dr * (length - 1)),
+                    endCol: entry.col + (dc * (length - 1))
+                };
+            })
+            .filter(seg => Number.isFinite(seg.startRow) && Number.isFinite(seg.startCol) && Number.isFinite(seg.endRow) && Number.isFinite(seg.endCol));
+
+        drawAnswerLines(container, '.crossword-grid-wrap', '.crossword-grid', segments, 'crossword-lines');
+    }
+
+    function highlightWordFindAnswers(container, entries) {
+        const segments = entries
+            .map(entry => ({
+                startRow: entry.startRow,
+                startCol: entry.startCol,
+                endRow: entry.endRow,
+                endCol: entry.endCol
+            }))
+            .filter(seg => Number.isFinite(seg.startRow) && Number.isFinite(seg.startCol) && Number.isFinite(seg.endRow) && Number.isFinite(seg.endCol));
+
+        drawAnswerLines(container, '.wordfind-grid-wrap', '.wordfind-grid', segments, 'wordfind-lines');
+    }
+
     function buildCrosswordMarkup(parsed, includeToolbar, includeAnswerKey) {
         const startMap = {};
         parsed.answerKeyEntries.forEach(entry => {
@@ -428,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     const key = `${rIdx + 1}:${cIdx + 1}`;
                     const clueNum = startMap[key] || '';
-                    gridHtml += '<td class="open">';
+                    gridHtml += `<td class="open" data-row="${rIdx + 1}" data-col="${cIdx + 1}">`;
                     if (clueNum) {
                         gridHtml += `<span class="cell-number">${clueNum}</span>`;
                     }
@@ -468,10 +597,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function buildWordFindMarkup(parsed, includeToolbar, includeAnswerKey) {
         let gridHtml = '<table class="wordfind-grid" aria-label="Word find grid"><tbody>';
-        parsed.gridRows.forEach(row => {
+        parsed.gridRows.forEach((row, rIdx) => {
             gridHtml += '<tr>';
-            row.forEach(cell => {
-                gridHtml += `<td>${escapeHtml(cell || '')}</td>`;
+            row.forEach((cell, cIdx) => {
+                gridHtml += `<td data-row="${rIdx + 1}" data-col="${cIdx + 1}">${escapeHtml(cell || '')}</td>`;
             });
             gridHtml += '</tr>';
         });
@@ -481,9 +610,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ? parsed.words.map(word => `<li>${escapeHtml(word)}</li>`).join('')
             : '<li>No word list available.</li>';
 
-        const answerKeyMarkup = parsed.answerKeyEntries.length
-            ? parsed.answerKeyEntries.map(item => `<li>${escapeHtml(item)}</li>`).join('')
-            : '<li>No answer key entries available.</li>';
+        const answerKeyMarkup = renderWordFindAnswerKeyItems(parsed.answerKeyEntries);
 
         return `
             <div class="wordfind-render">
@@ -536,51 +663,45 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 300);
     }
 
-    function printCrossword(parsed) {
-        const content = buildCrosswordMarkup(parsed, false, false);
-        const style = `
-            <style>
-                body { font-family: Arial, sans-serif; margin: 24px; color: #111827; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                h5 { margin: 0 0 8px; font-size: 24px; }
-                .crossword-meta { font-size: 13px; color: #4b5563; margin-bottom: 10px; }
-                .crossword-grid { border-collapse: collapse; margin: 12px 0 16px; }
-                .crossword-grid td { width: 28px; height: 28px; border: 1px solid #1f2937; position: relative; }
-                .crossword-grid td.blocked { background: #111827; border-color: #111827; }
-                .crossword-grid td.open { background: #fff; }
-                .cell-number { position: absolute; top: 1px; left: 2px; font-size: 9px; font-weight: 700; color: #111827; }
-                .crossword-clues { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
-                .crossword-clues h6 { margin: 0 0 6px; font-size: 14px; }
-                .crossword-clues ul { list-style: none; margin: 0; padding-left: 0; font-size: 12px; line-height: 1.4; }
-                .crossword-clues li { margin-bottom: 2px; }
-                .clue-num { font-weight: 700; }
-                .crossword-grid td.blocked::before { content: '\\25A0'; color: #111827; font-size: 18px; line-height: 26px; display: block; text-align: center; }
-                @media print {
-                    body { margin: 12mm; }
-                }
-            </style>
+    function buildSharedPuzzlePrintStyle() {
+        return `
+            body { font-family: Arial, sans-serif; margin: 24px; color: #111827; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            h5 { margin: 0 0 8px; font-size: 24px; }
+            .crossword-meta, .wordfind-meta { font-size: 13px; color: #4b5563; margin-bottom: 10px; }
+            .crossword-render, .wordfind-render, .crossword-grid-wrap, .wordfind-grid-wrap { border: none; box-shadow: none; background: #fff; padding: 0; }
+            .crossword-grid, .wordfind-grid { border-collapse: collapse; margin: 10px 0 14px; }
+            .crossword-grid td { width: 28px; height: 28px; border: 1px solid #1f2937; position: relative; }
+            .wordfind-grid td { width: 30px; height: 30px; border: 1px solid #1f2937; text-align: center; font-weight: 700; font-size: 14px; }
+            .crossword-grid td.blocked { background: #111827; border-color: #111827; }
+            .crossword-grid td.open { background: #fff; }
+            .cell-number { position: absolute; top: 1px; left: 2px; font-size: 9px; font-weight: 700; color: #111827; }
+            .crossword-clues { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 8px; }
+            .crossword-clues h6, .wordfind-words h6 { margin: 0 0 6px; font-size: 14px; }
+            .crossword-clues ul { list-style: none; margin: 0; padding-left: 0; font-size: 12px; line-height: 1.4; }
+            .crossword-clues li { margin-bottom: 2px; }
+            .clue-num { font-weight: 700; }
+            .wordfind-words ul { margin: 0; padding-left: 18px; column-count: 2; font-size: 12px; }
+            .crossword-grid td.blocked::before { content: '\\25A0'; color: #111827; font-size: 18px; line-height: 26px; display: block; text-align: center; }
+            .crossword-answer-key, .wordfind-answer-key, .answer-line-overlay { display: none !important; }
+            @media print { body { margin: 12mm; } }
         `;
+    }
 
-        printDocumentFromMarkup('Crossword Puzzle', content, style);
+    function printPuzzle(parsed, type) {
+        const content = type === 'crossword'
+            ? buildCrosswordMarkup(parsed, false, false)
+            : buildWordFindMarkup(parsed, false, false);
+        const title = type === 'crossword' ? 'Crossword Puzzle' : 'Word Find Puzzle';
+        const style = `<style>${buildSharedPuzzlePrintStyle()}</style>`;
+        printDocumentFromMarkup(title, content, style);
+    }
+
+    function printCrossword(parsed) {
+        printPuzzle(parsed, 'crossword');
     }
 
     function printWordFind(parsed) {
-        const content = buildWordFindMarkup(parsed, false, false);
-        const style = `
-            <style>
-                body { font-family: Arial, sans-serif; margin: 24px; color: #111827; }
-                h5 { margin: 0 0 8px; font-size: 24px; }
-                .wordfind-meta { font-size: 13px; color: #4b5563; margin-bottom: 10px; }
-                .wordfind-grid { border-collapse: collapse; margin: 10px 0 14px; }
-                .wordfind-grid td { width: 30px; height: 30px; border: 1px solid #1f2937; text-align: center; font-weight: 700; font-size: 14px; }
-                .wordfind-words h6 { margin: 6px 0; font-size: 14px; }
-                .wordfind-words ul { margin: 0; padding-left: 18px; column-count: 2; font-size: 12px; }
-                @media print {
-                    body { margin: 12mm; }
-                }
-            </style>
-        `;
-
-        printDocumentFromMarkup('Word Find Puzzle', content, style);
+        printPuzzle(parsed, 'wordfind');
     }
 
     function appendMessage(who, text, source, llmProvider, llmModel) {
@@ -605,6 +726,16 @@ document.addEventListener('DOMContentLoaded', function () {
                             printCrossword(parsed);
                         });
                     }
+                    const answerKeyDetails = bubble.querySelector('.crossword-answer-key');
+                    if (answerKeyDetails) {
+                        answerKeyDetails.addEventListener('toggle', function () {
+                            if (answerKeyDetails.open) {
+                                highlightCrosswordAnswers(bubble, parsed.answerKeyEntries);
+                            } else {
+                                clearPuzzleHighlights(bubble);
+                            }
+                        });
+                    }
                 } else {
                     const teluguClass = containsTeluguScript(text) ? ' puzzle-output-telugu' : '';
                     bubble.innerHTML = '<pre class="puzzle-output' + teluguClass + '">' + escapeHtml(text) + '</pre>';
@@ -618,6 +749,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (printBtn) {
                         printBtn.addEventListener('click', function () {
                             printWordFind(parsedWordFind);
+                        });
+                    }
+                    const answerKeyDetails = bubble.querySelector('.wordfind-answer-key');
+                    if (answerKeyDetails) {
+                        answerKeyDetails.addEventListener('toggle', function () {
+                            if (answerKeyDetails.open) {
+                                highlightWordFindAnswers(bubble, parsedWordFind.answerKeyEntries);
+                            } else {
+                                clearPuzzleHighlights(bubble);
+                            }
                         });
                     }
                 } else {

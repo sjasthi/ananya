@@ -69,6 +69,146 @@
             font-family: "Noto Sans Telugu", "Noto Sans Mono", Consolas, "Courier New", monospace;
         }
 
+        .crossword-render,
+        .wordfind-render {
+            width: 100%;
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .crossword-header h5,
+        .wordfind-header h5 {
+            margin: 0 0 6px;
+            font-size: 1.05rem;
+            font-weight: 700;
+        }
+
+        .crossword-meta,
+        .wordfind-meta {
+            font-size: 0.85rem;
+            color: #4b5563;
+            line-height: 1.35;
+        }
+
+        .crossword-grid-wrap,
+        .wordfind-grid-wrap {
+            position: relative;
+            overflow: auto;
+            margin: 10px 0 12px;
+        }
+
+        .crossword-grid,
+        .wordfind-grid {
+            border-collapse: collapse;
+            margin: 0;
+        }
+
+        .crossword-grid td,
+        .wordfind-grid td {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #1f2937;
+            position: relative;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .crossword-grid td.blocked {
+            background: #111827;
+            border-color: #111827;
+        }
+
+        .crossword-grid td.open {
+            background: #ffffff;
+        }
+
+        .crossword-grid .cell-number {
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            font-size: 9px;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1;
+        }
+
+        .crossword-clues h6,
+        .wordfind-words h6 {
+            margin-bottom: 4px;
+            font-weight: 700;
+        }
+
+        .crossword-clues .clue-list,
+        .wordfind-words ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            font-size: 0.86rem;
+            line-height: 1.35;
+        }
+
+        .crossword-clues .clue-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .crossword-clues .clue-num {
+            font-weight: 700;
+        }
+
+        .wordfind-words ul {
+            columns: 2;
+            column-gap: 18px;
+        }
+
+        .crossword-answer-key,
+        .wordfind-answer-key {
+            margin-top: 10px;
+            font-size: 0.84rem;
+            border-top: 1px dashed #cfd4da;
+            padding-top: 8px;
+        }
+
+        .crossword-answer-key summary,
+        .wordfind-answer-key summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .crossword-answer-key ul,
+        .wordfind-answer-key ul {
+            margin: 8px 0 0;
+            padding-left: 1.1rem;
+        }
+
+        .answer-line-overlay {
+            position: absolute;
+            pointer-events: none;
+            z-index: 3;
+            overflow: visible;
+        }
+
+        .answer-line-overlay line {
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .answer-line-overlay.crossword-lines line {
+            stroke: #005fcc;
+            stroke-width: 5;
+        }
+
+        .answer-line-overlay.wordfind-lines line {
+            stroke: #8a3d00;
+            stroke-width: 5;
+            stroke-dasharray: 6 3;
+        }
+
         @media print {
             body {
                 background: #fff;
@@ -78,14 +218,31 @@
                 display: none !important;
             }
 
+            .crossword-answer-key,
+            .wordfind-answer-key,
+            .answer-line-overlay {
+                display: none !important;
+            }
+
             .panel {
                 box-shadow: none;
-                border: 1px solid #ddd;
+                border: none;
+                padding: 0;
             }
 
             .puzzle-card {
                 page-break-inside: avoid;
                 break-inside: avoid;
+                border: none;
+                padding: 0;
+            }
+
+            .crossword-render,
+            .wordfind-render,
+            .crossword-grid-wrap,
+            .wordfind-grid-wrap {
+                border: none;
+                box-shadow: none;
             }
         }
     </style>
