@@ -237,6 +237,7 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
             }
 
             .crossword-grid-wrap {
+                position: relative;
                 overflow: auto;
                 margin-bottom: 12px;
             }
@@ -347,6 +348,7 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
             }
 
             .wordfind-grid-wrap {
+                position: relative;
                 overflow: auto;
                 margin-bottom: 12px;
             }
@@ -365,6 +367,29 @@ if ($selectedChoice === '' && !empty($llmChoices[0])) {
                 font-size: 0.9rem;
                 font-weight: 700;
                 color: #111827;
+            }
+
+            .answer-line-overlay {
+                position: absolute;
+                pointer-events: none;
+                z-index: 3;
+                overflow: visible;
+            }
+
+            .answer-line-overlay line {
+                fill: none;
+                stroke-linecap: round;
+            }
+
+            .answer-line-overlay.crossword-lines line {
+                stroke: #005fcc;
+                stroke-width: 5;
+            }
+
+            .answer-line-overlay.wordfind-lines line {
+                stroke: #8a3d00;
+                stroke-width: 5;
+                stroke-dasharray: 6 3;
             }
 
             .wordfind-words h6 {
