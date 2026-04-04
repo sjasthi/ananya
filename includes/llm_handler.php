@@ -17,8 +17,8 @@ function llm_bootstrap_env_once($baseDir = null) {
         $envPaths[] = $absoluteEnvPath;
     }
 
-    $envPaths[] = $root . '/mcp_server/.env';
     $envPaths[] = $root . '/.env';
+    $envPaths[] = $root . '/mcp_server/.env';
     $envPaths[] = dirname($root) . '/.env';
 
     foreach ($envPaths as $envPath) {
@@ -275,7 +275,7 @@ function llm_get_configured_models() {
 
     $provider = strtolower(getenv('LLM_PROVIDER') ?: '');
     $model = trim(getenv('LLM_MODEL') ?: '');
-    if ($provider !== '' && $model !== '') {
+    if ($provider !== '' && $model !== '' && strtolower($model) !== 'auto') {
         $exists = false;
         foreach ($configured as $choice) {
             if (strtolower($choice['provider']) === $provider && $choice['model'] === $model) {
