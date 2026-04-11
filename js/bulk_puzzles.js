@@ -7,8 +7,27 @@ document.addEventListener('DOMContentLoaded', function () {
     const gridInput = document.getElementById('grid-size');
     const generateBtn = document.getElementById('generate-btn');
     const printBtn = document.getElementById('print-btn');
+    const printBtnWrap = document.getElementById('print-btn-wrap');
     const progressEl = document.getElementById('progress');
     const resultsEl = document.getElementById('results');
+
+    let latestPuzzleRecords = [];
+
+    function setPrintButtonState(enabled, reason) {
+        if (!printBtn) {
+            return;
+        }
+
+        const disabled = !enabled;
+        printBtn.disabled = disabled;
+        printBtn.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+
+        const tooltipText = reason || '';
+        if (printBtnWrap) {
+            printBtnWrap.setAttribute('title', tooltipText);
+        }
+        printBtn.setAttribute('title', tooltipText);
+    }
 
     function escapeHtml(text) {
         return String(text)
@@ -326,6 +345,181 @@ document.addEventListener('DOMContentLoaded', function () {
             .join('');
     }
 
+    function buildFinalAnswerKeyMarkup(records) {
+        const usable = (records || []).filter(record => {
+            if (!record || !record.ok || !record.parsed) {
+                return false;
+            }
+
+            const entries = Array.isArray(record.parsed.answerKeyEntries) ? record.parsed.answerKeyEntries : [];
+            return entries.length > 0;
+        });
+
+        if (!usable.length) {
+            return '';
+        }
+
+        const sections = usable.map(record => {
+            const title = `#${record.index + 1} ${record.theme}`;
+            const solvedMarkup = record.type === 'crossword'
+                ? renderMiniCrosswordSolution(record.parsed)
+                : renderMiniWordFindSolution(record.parsed);
+
+            if (record.type === 'crossword') {
+                return `
+                    <section class="answer-key-page-item">
+                        <h3>${escapeHtml(title)}</h3>
+                        <div class="answer-key-layout">
+                            <div class="answer-key-left">
+                                <div class="answer-key-type">Crossword answer key</div>
+                                <ul>${renderCrosswordAnswerKeyItems(record.parsed.answerKeyEntries || [])}</ul>
+                            </div>
+                            <div class="answer-key-right">
+                                <div class="solved-mini-title">Solved</div>
+                                ${solvedMarkup}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+
+            return `
+                <section class="answer-key-page-item">
+                    <h3>${escapeHtml(title)}</h3>
+                    <div class="answer-key-layout">
+                        <div class="answer-key-left">
+                            <div class="answer-key-type">Word find answer key</div>
+                            <ul>${renderWordFindAnswerKeyItems(record.parsed.answerKeyEntries || [])}</ul>
+                        </div>
+                        <div class="answer-key-right">
+                            <div class="solved-mini-title">Solved</div>
+                            ${solvedMarkup}
+                        </div>
+                    </div>
+                </section>
+            `;
+        }).join('');
+
+        return `
+            <section class="print-answer-key-pages" aria-label="Final answer key pages">
+                <h2>Final Answer Key (All Puzzles)</h2>
+                ${sections}
+            </section>
+        `;
+    }
+
+    function renderFinalAnswerKeyPages(records) {
+        if (!resultsEl) {
+            return;
+        }
+
+        const existing = resultsEl.querySelector('.print-answer-key-pages');
+        if (existing) {
+            existing.remove();
+        }
+
+        const markup = buildFinalAnswerKeyMarkup(records);
+        if (markup) {
+            resultsEl.insertAdjacentHTML('beforeend', markup);
+        }
+    }
+
+    function renderMiniCrosswordSolution(parsed) {
+        const grid = parsed && parsed.solutionGrid && Array.isArray(parsed.solutionGrid.rows)
+            ? parsed.solutionGrid.rows
+            : [];
+
+        if (!grid.length) {
+            return '<div class="mini-solved-box">N/A</div>';
+        }
+
+        const rowCount = grid.length;
+        const colCount = Math.max(0, ...(grid.map(row => row.length)));
+
+        const segments = (parsed.answerKeyEntries || [])
+            .map(entry => {
+                const dr = entry.direction === 'down' ? 1 : 0;
+                const dc = entry.direction === 'across' ? 1 : 0;
+                const letters = Array.from(String(entry.word || '').trim());
+                const length = Math.max(1, letters.length);
+
+                return {
+                    startRow: entry.row,
+                    startCol: entry.col,
+                    endRow: entry.row + (dr * (length - 1)),
+                    endCol: entry.col + (dc * (length - 1))
+                };
+            })
+            .filter(seg => Number.isFinite(seg.startRow) && Number.isFinite(seg.startCol) && Number.isFinite(seg.endRow) && Number.isFinite(seg.endCol));
+
+        let html = '<div class="mini-solved-box"><table class="mini-solved-grid mini-crossword-grid" aria-label="Mini solved crossword"><tbody>';
+        grid.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                if (cell.blocked) {
+                    html += '<td class="blocked"></td>';
+                } else {
+                    html += `<td>${escapeHtml(cell.letter || '')}</td>`;
+                }
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += buildMiniSolutionOverlay(rowCount, colCount, segments, 'crossword');
+        html += '</div>';
+
+        return html;
+    }
+
+    function renderMiniWordFindSolution(parsed) {
+        const rows = parsed && Array.isArray(parsed.gridRows) ? parsed.gridRows : [];
+        if (!rows.length) {
+            return '<div class="mini-solved-box">N/A</div>';
+        }
+
+        const rowCount = rows.length;
+        const colCount = Math.max(0, ...(rows.map(row => row.length)));
+        const segments = (parsed.answerKeyEntries || [])
+            .map(entry => ({
+                startRow: entry.startRow,
+                startCol: entry.startCol,
+                endRow: entry.endRow,
+                endCol: entry.endCol
+            }))
+            .filter(seg => Number.isFinite(seg.startRow) && Number.isFinite(seg.startCol) && Number.isFinite(seg.endRow) && Number.isFinite(seg.endCol));
+
+        let html = '<div class="mini-solved-box"><table class="mini-solved-grid mini-wordfind-grid" aria-label="Mini solved word find"><tbody>';
+        rows.forEach(row => {
+            html += '<tr>';
+            row.forEach(cell => {
+                html += `<td>${escapeHtml(cell || '')}</td>`;
+            });
+            html += '</tr>';
+        });
+        html += '</tbody></table>';
+        html += buildMiniSolutionOverlay(rowCount, colCount, segments, 'wordfind');
+        html += '</div>';
+
+        return html;
+    }
+
+    function buildMiniSolutionOverlay(rowCount, colCount, segments, variant) {
+        if (!rowCount || !colCount || !segments || !segments.length) {
+            return '';
+        }
+
+        const lines = segments.map(seg => {
+            const x1 = (((seg.startCol - 1) + 0.5) / colCount) * 100;
+            const y1 = (((seg.startRow - 1) + 0.5) / rowCount) * 100;
+            const x2 = (((seg.endCol - 1) + 0.5) / colCount) * 100;
+            const y2 = (((seg.endRow - 1) + 0.5) / rowCount) * 100;
+
+            return `<line x1="${x1}%" y1="${y1}%" x2="${x2}%" y2="${y2}%"></line>`;
+        }).join('');
+
+        return `<svg class="mini-solved-overlay mini-solved-overlay-${variant}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">${lines}</svg>`;
+    }
+
     function buildCrosswordMarkup(parsed) {
         const startMap = {};
         parsed.answerKeyEntries.forEach(entry => {
@@ -639,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return { card, meta, content };
     }
 
-    function updateResultCard(slot, theme, result) {
+    function updateResultCard(slot, theme, result, index) {
         if (result.ok) {
             const provider = result.provider ? String(result.provider).toUpperCase() : 'DEFAULT';
             slot.meta.textContent = `Status: OK | LLM: ${provider}${result.model ? ' / ' + result.model : ''}`;
@@ -651,20 +845,49 @@ document.addEventListener('DOMContentLoaded', function () {
             if (parsedCrossword) {
                 slot.content.innerHTML = buildCrosswordMarkup(parsedCrossword);
                 bindAnswerKeyLogic(slot.card, 'crossword', parsedCrossword);
+                return {
+                    ok: true,
+                    index,
+                    theme,
+                    type: 'crossword',
+                    parsed: parsedCrossword
+                };
             } else if (parsedWordFind) {
                 slot.content.innerHTML = buildWordFindMarkup(parsedWordFind);
                 bindAnswerKeyLogic(slot.card, 'wordfind', parsedWordFind);
+                return {
+                    ok: true,
+                    index,
+                    theme,
+                    type: 'wordfind',
+                    parsed: parsedWordFind
+                };
             } else {
                 slot.content.innerHTML = `<pre class="puzzle-output${hasTelugu(answer) ? ' telugu' : ''}">${escapeHtml(answer)}</pre>`;
+                return {
+                    ok: true,
+                    index,
+                    theme,
+                    type: 'raw',
+                    parsed: null
+                };
             }
         } else {
             slot.meta.textContent = `Status: Failed | ${result.error}`;
             slot.content.innerHTML = `<pre class="puzzle-output">${escapeHtml(`Failed to generate puzzle for theme: ${theme}\nReason: ${result.error}`)}</pre>`;
+            return {
+                ok: false,
+                index,
+                theme,
+                type: 'error',
+                parsed: null
+            };
         }
     }
 
     async function generateAll(themes, count, gridLabel, language, llmValue) {
         resultsEl.innerHTML = '';
+        latestPuzzleRecords = [];
         const total = themes.length;
         let done = 0;
 
@@ -681,7 +904,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const theme = themes[i];
                 progressEl.textContent = `Generating ${done + 1}/${total}: ${theme}`;
                 const result = await fetchPuzzle(theme, count, gridLabel, language, llmValue);
-                updateResultCard(slots[i], theme, result);
+                latestPuzzleRecords[i] = updateResultCard(slots[i], theme, result, i);
                 done++;
                 progressEl.textContent = `Generated ${done}/${total}`;
             }
@@ -693,6 +916,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         await Promise.all(workers);
+        renderFinalAnswerKeyPages(latestPuzzleRecords);
         progressEl.textContent = `Done. Generated ${done} puzzle(s).`;
     }
 
@@ -712,12 +936,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const themes = parseThemes(themeList.value);
         if (!themes.length) {
             progressEl.textContent = 'Please provide at least one theme.';
+            setPrintButtonState(false, 'Generate all puzzles first. Print is enabled after generation completes.');
             return;
         }
 
         const llmValue = llmSelect ? String(llmSelect.value || '').trim() : '';
         if (!llmValue) {
             progressEl.textContent = 'No LLM provider is available. Configure at least one API key to enable bulk generation.';
+            setPrintButtonState(false, 'Print is disabled because puzzle generation cannot start without an available LLM provider.');
             return;
         }
 
@@ -725,14 +951,21 @@ document.addEventListener('DOMContentLoaded', function () {
         const grid = parseGrid(gridInput.value);
         const language = outputLanguage ? String(outputLanguage.value || 'telugu').toLowerCase() : 'telugu';
         generateBtn.disabled = true;
+        setPrintButtonState(false, 'Please wait. Print is enabled after all puzzles finish generating.');
         try {
             await generateAll(themes, count, grid.label, language, llmValue);
+            setPrintButtonState(true, 'Print / Save PDF');
         } finally {
             generateBtn.disabled = false;
         }
     });
 
     printBtn.addEventListener('click', function () {
+        if (printBtn.disabled) {
+            return;
+        }
         window.print();
     });
+
+    setPrintButtonState(false, 'Generate all puzzles first. Print is enabled after generation completes.');
 });
