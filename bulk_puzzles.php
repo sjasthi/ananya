@@ -235,6 +235,116 @@ foreach ($bulkLlms as $choice) {
             stroke-dasharray: 6 3;
         }
 
+        .print-answer-key-pages {
+            display: none;
+        }
+
+        .answer-key-page-item {
+            border-top: 1px solid #d1d5db;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+
+        .answer-key-page-item h3 {
+            margin: 0 0 6px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .answer-key-type {
+            color: #4b5563;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .answer-key-page-item ul {
+            margin: 0;
+            padding-left: 1.1rem;
+        }
+
+        .answer-key-layout {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 14px;
+        }
+
+        .answer-key-left {
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+
+        .answer-key-right {
+            flex: 0 0 auto;
+            width: 2in;
+        }
+
+        .solved-mini-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #374151;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .mini-solved-box {
+            width: 2in;
+            height: 2in;
+            border: 1px solid #9ca3af;
+            background: #fff;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mini-solved-grid {
+            width: 100%;
+            height: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        .mini-solved-grid td {
+            border: 1px solid #d1d5db;
+            padding: 0;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 8px;
+            line-height: 1;
+            font-weight: 600;
+        }
+
+        .mini-crossword-grid td.blocked {
+            background: #111827;
+            border-color: #111827;
+            color: transparent;
+        }
+
+        .mini-solved-overlay {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        .mini-solved-overlay line {
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .mini-solved-overlay-crossword line {
+            stroke: #0b5ed7;
+            stroke-width: 1.4;
+        }
+
+        .mini-solved-overlay-wordfind line {
+            stroke: #9a3412;
+            stroke-width: 1.4;
+            stroke-dasharray: 2 1;
+        }
+
         @media print {
             body {
                 background: #fff;
@@ -269,6 +379,22 @@ foreach ($bulkLlms as $choice) {
             .wordfind-grid-wrap {
                 border: none;
                 box-shadow: none;
+            }
+
+            .print-answer-key-pages {
+                display: block;
+                page-break-before: always;
+                break-before: page;
+                margin-top: 18px;
+            }
+
+            .answer-key-page-item {
+                page-break-inside: avoid;
+                break-inside: avoid;
+            }
+
+            .answer-key-layout {
+                gap: 10px;
             }
         }
     </style>
@@ -342,7 +468,9 @@ include 'includes/header.php';
 
         <div class="d-flex gap-2 mt-3">
             <button id="generate-btn" class="btn btn-primary"><i class="fas fa-bolt me-2"></i>Generate Puzzles</button>
-            <button id="print-btn" class="btn btn-outline-secondary"><i class="fas fa-print me-2"></i>Print / Save PDF</button>
+            <span id="print-btn-wrap" class="d-inline-block" title="Generate all puzzles first. Print is enabled after generation completes.">
+                <button id="print-btn" class="btn btn-outline-secondary" disabled aria-disabled="true"><i class="fas fa-print me-2"></i>Print / Save PDF</button>
+            </span>
         </div>
 
         <div id="progress" class="mt-3 small text-muted"></div>
