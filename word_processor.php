@@ -189,6 +189,37 @@ class wordProcessor
 		}
 	}
 
+	private function isTeluguCodePoint($codePoint)
+	{
+		if ($codePoint === null) {
+			return false;
+		}
+
+		if (is_string($codePoint)) {
+			$trimmed = trim($codePoint);
+			if ($trimmed === '') {
+				return false;
+			}
+
+			if (stripos($trimmed, '0x') === 0) {
+				$codePoint = hexdec(substr($trimmed, 2));
+			} elseif (ctype_xdigit($trimmed) && !is_numeric($trimmed)) {
+				$codePoint = hexdec($trimmed);
+			} elseif (is_numeric($trimmed)) {
+				$codePoint = (int)$trimmed;
+			} else {
+				return false;
+			}
+		}
+
+		if (!is_int($codePoint) && !is_float($codePoint)) {
+			return false;
+		}
+
+		$value = (int)$codePoint;
+		return $value >= 0x0C00 && $value <= 0x0C7F;
+	}
+
 	private function getSeedFilePath($language)
 	{
 		$lang = $this->normalizeLanguage($language);
@@ -669,9 +700,10 @@ class wordProcessor
 	function getWordStrength()
 	{
 		$len = $this->getLength();
+		$firstCodePoint = $this->getCodePoints()[0][0] ?? null;
 
 		// non-Telugu word, return the length as strength
-		if (!isTelugu($this->getCodePoints()[0][0])) return $len;
+		if ($this->normalizeLanguage($this->language) !== 'telugu' || !$this->isTeluguCodePoint($firstCodePoint)) return $len;
 
 		$strength = 1;
 		foreach ($this->getCodePoints() as $char)
@@ -683,9 +715,10 @@ class wordProcessor
 	function getWordWeight()
 	{
 		$len = $this->getLength();
+		$firstCodePoint = $this->getCodePoints()[0][0] ?? null;
 
 		// non-Telugu
-		if (!isTelugu($this->getCodePoints()[0][0])) return $len;
+		if ($this->normalizeLanguage($this->language) !== 'telugu' || !$this->isTeluguCodePoint($firstCodePoint)) return $len;
 
 		$weight = 0;
 		foreach ($this->getCodePoints() as $char)
