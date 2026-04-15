@@ -1,86 +1,16 @@
-# Ananya - Indic Language Text Processing
-
-> Play with Telugu, Hindi, Gujarati, Malayalam, and English text in new ways.
-
-## 🎯 What is Ananya?
-
-Ananya is an interactive text processing playground for Indic languages. It lets you explore language features like:
-
-- **Character analysis** — break text into logical components
-- **Word properties** — check palindromes, anagrams, word strength
-- **Text transformations** — reverse, randomize, split text
-- **Cross-language comparison** — compare how languages handle the same text
-- **AI-powered chat** — ask questions and get answers about your text (beta)
-
-All available in Spanish, Telugu, English, Hindi, Gujarati, and Malayalam.
-
-## 🚀 Get Started
-
-### Online
-Visit [Ananya at TeluguPuzzles.com](https://ananya.telugupuzzles.com) to start playing now.
-
-### Local Setup
-If you want to run it locally:
-
-1. Ensure you have [XAMPP](https://www.apachefriends.org/) installed
-2. Copy the `ananya/` folder to your XAMPP `htdocs/` directory
-3. Open `http://localhost/ananya/` in your browser
-
-## 🎮 Features
-
-### Main App
-Explore and analyze text with an interactive interface.
-- **Main UI**: <http://localhost/ananya/>
-- **Chat with Text**: <http://localhost/ananya/chat.php>
-- **Telugu Playground**: <http://localhost/ananya/play_with_telugu.php>
-
-### API & Tools (For Developers)
-The project also exposes a REST API for programmatic access and advanced integrations.
-- **Interactive API Docs**: <http://localhost/ananya/docs/api.php>
-- **Swagger Explorer**: <http://localhost/ananya/docs/swagger.php>
-- **For developers**: See [README - NewDevsStartHere.md](README%20-%20NewDevsStartHere.md)
-
-## 🌍 Supported Languages
-
-- ✅ **Telugu**
-- ✅ **English**
-- ✅ **Hindi**
-- ✅ **Gujarati**
-- ✅ **Malayalam**
-- ❌ Tamil (Coming soon)
-- ❌ Kannada (Coming soon)
-
-## 💡 Example Use Cases
-
-### Analyze a Word
-"What makes *అమెరికా* (America) special?"
-- See its logical character breakdown
-- Calculate word strength and complexity
-- Detect vowels, consonants, and rules
-
-### Find Patterns
-"Are these ladder words?"
-- Check if word pairs follow linguistic patterns
-- Compare intersecting characters
-- Explore anagrams and palindromes
-
-### Learn Languages
-Mix Telugu with English to explore how script differences affect text processing.
-
-## ❓ Have Questions?
-
-Check out the [interactive API documentation](http://localhost/ananya/docs/api.php) or play with the [Swagger explorer](http://localhost/ananya/docs/swagger.php) to see all available features.
-
-## 📄 License
-
-This project is open source. See repository for details.
-
----
-
-**New to development?** See [README - NewDevsStartHere.md](README%20-%20NewDevsStartHere.md) for setup and technical details.
 # Ananya - Indic Language Text Processing API
 
 > Comprehensive text processing toolkit for Indic languages with REST API interface
+
+## 📖 How to Use This Guide
+
+**You are here:** This README gets you from zero to running in about 15 minutes.
+
+1. Follow the Quick Start section below to deploy and verify the app
+2. Once running, explore the app UI and Swagger docs to learn capabilities
+3. Reference the docs and app for API details — this guide is setup-only
+
+---
 
 ## 🌍 Supported Languages
 
@@ -94,13 +24,19 @@ This project is open source. See repository for details.
 
 ## 🚀 Quick Start
 
-### 1. Prerequisites
+### 0. Prerequisites Setup
 
-- XAMPP/Apache with PHP for serving this project
-- Python 3.10+
-- An LLM provider key for MCP (default examples use Groq)
+Before starting, ensure you have:
 
-### 2. Local Deployment
+- **PHP/Apache**: Install [XAMPP](https://www.apachefriends.org/) (Windows/Mac/Linux)
+- **Python 3.10+**: Download from [python.org](https://www.python.org/downloads/)
+  - Windows: check "Add Python to PATH" during install
+- **LLM Provider API Key** (for optional MCP chat):
+  - [Groq](https://console.groq.com/) (recommended, free tier available)
+  - [Gemini](https://makersuite.google.com/app/apikey)
+  - [OpenAI](https://platform.openai.com/api-keys)
+
+### 1. Local Deployment
 
 ```bash
 # Deploy to your web server
@@ -110,7 +46,7 @@ cp -r ananya/ /path/to/htdocs/
 http://localhost/ananya/
 ```
 
-### 3. MCP Server (Optional)
+### 2. MCP Server (Optional)
 
 The MCP server provides tool-orchestrated chat behavior on top of Ananya APIs.
 
@@ -146,7 +82,7 @@ The MCP server provides tool-orchestrated chat behavior on top of Ananya APIs.
    python server.py
    ```
 
-### 4. Verify Local Setup
+### 3. Verify Local Setup
 
 - App: <http://localhost/ananya/>
 - API docs UI: <http://localhost/ananya/docs/api.php>
@@ -159,7 +95,7 @@ Quick API check:
 GET http://localhost/ananya/api.php/text/length?string=అమెరికా&language=telugu
 ```
 
-### 5. Explore in the App
+### 4. Explore in the App
 
 Use the product UI and live docs as your primary reference:
 
@@ -167,6 +103,7 @@ Use the product UI and live docs as your primary reference:
 - Chat UI: <http://localhost/ananya/chat.php>
 - Telugu playground: <http://localhost/ananya/play_with_telugu.php>
 - API docs: <http://localhost/ananya/docs/api.php>
+- Swagger explorer: <http://localhost/ananya/docs/swagger.php>
 - Swagger explorer: <http://localhost/ananya/docs/swagger.php>
 
 ## 🌐 Remote MCP Setup (For Live Demos)
