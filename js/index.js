@@ -46,11 +46,11 @@ const apiEndpoints = {
     isIntersecting: "api/comparison/is-intersecting.php",
     reverseEquals: "api/comparison/reverse-equals.php",
 
-    // api/ (legacy root)
-    getLength: "api/getLength.php",
-    getLength2: "api/getLength2.php",
-    getLogicalChars2: "api/getLogicalChars2.php",
-    parseToLogicalChars: "api/parseToLogicalChars2.php",
+    // legacy method names mapped to current routes
+    getLength: "api.php/text/length",
+    getLength2: "api.php/utility/length-alternative",
+    getLogicalChars2: "api.php/characters/logical",
+    parseToLogicalChars: "api.php/analysis/parse-to-logical-chars",
 
     // api/text/
     randomize: "api/text/randomize.php",
@@ -155,6 +155,10 @@ function updateInputs() {
         inputCells[i].value = input;
     }
 
+    // Character validation endpoints are single-character checks.
+    // Keep them pinned to language defaults instead of bulk universal text.
+    setCharacterValidationInputs(language);
+
     // For custom fixture inputs, switch to status-only checks by clearing expected fields.
     // Strict expected-value checks remain available when using default fixture inputs.
     var defaultInput = getDefaultUniversalInput(language);
@@ -164,6 +168,28 @@ function updateInputs() {
     } else {
         clearExpectedValues();
         setExpectationModeNotice("status-only");
+    }
+}
+
+function setCharacterValidationInputs(language) {
+    var charVowelEl = document.getElementById("charVowelInputText");
+    var charConstantEl = document.getElementById("charConstantInputText");
+
+    if (language == "English") {
+        if (charVowelEl) charVowelEl.value = "a";
+        if (charConstantEl) charConstantEl.value = "h";
+    } else if (language == "Telugu") {
+        if (charVowelEl) charVowelEl.value = "అ";
+        if (charConstantEl) charConstantEl.value = "క";
+    } else if (language == "Hindi") {
+        if (charVowelEl) charVowelEl.value = "अ";
+        if (charConstantEl) charConstantEl.value = "क";
+    } else if (language == "Gujarati") {
+        if (charVowelEl) charVowelEl.value = "અ";
+        if (charConstantEl) charConstantEl.value = "ક";
+    } else if (language == "Malayalam") {
+        if (charVowelEl) charVowelEl.value = "അ";
+        if (charConstantEl) charConstantEl.value = "ക";
     }
 }
 
@@ -725,33 +751,7 @@ function getLanguageValues(language) {
     var randomCountEl = document.getElementById("randomLogicalCharsInputText");
     if (randomCountEl) randomCountEl.value = "5";
     
-    // Set specific single-character inputs for character validation tests
-    if (language == "English") {
-        var charVowelEl = document.getElementById("charVowelInputText");
-        var charConstantEl = document.getElementById("charConstantInputText");
-        if (charVowelEl) charVowelEl.value = "a";
-        if (charConstantEl) charConstantEl.value = "h";
-    } else if (language == "Telugu") {
-        var charVowelEl = document.getElementById("charVowelInputText");
-        var charConstantEl = document.getElementById("charConstantInputText");
-        if (charVowelEl) charVowelEl.value = "అ";
-        if (charConstantEl) charConstantEl.value = "క";
-    } else if (language == "Hindi") {
-        var charVowelEl = document.getElementById("charVowelInputText");
-        var charConstantEl = document.getElementById("charConstantInputText");
-        if (charVowelEl) charVowelEl.value = "अ";
-        if (charConstantEl) charConstantEl.value = "क";
-    } else if (language == "Gujarati") {
-        var charVowelEl = document.getElementById("charVowelInputText");
-        var charConstantEl = document.getElementById("charConstantInputText");
-        if (charVowelEl) charVowelEl.value = "અ";
-        if (charConstantEl) charConstantEl.value = "ક";
-    } else if (language == "Malayalam") {
-        var charVowelEl = document.getElementById("charVowelInputText");
-        var charConstantEl = document.getElementById("charConstantInputText");
-        if (charVowelEl) charVowelEl.value = "അ";
-        if (charConstantEl) charConstantEl.value = "ക";
-    }
+    setCharacterValidationInputs(language);
 }
 
 
