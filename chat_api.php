@@ -6,6 +6,24 @@ require_once __DIR__ . '/includes/api_reference.php';
 require_once __DIR__ . '/includes/llm_handler.php';
 llm_bootstrap_env_once(__DIR__);
 
+$MODERATION_BLOCKLISTS = [];
+$moderationConfigPath = __DIR__ . '/includes/moderation_blocklists.php';
+if (file_exists($moderationConfigPath)) {
+    $loadedModerationBlocklists = require $moderationConfigPath;
+    if (is_array($loadedModerationBlocklists)) {
+        $MODERATION_BLOCKLISTS = $loadedModerationBlocklists;
+    }
+}
+
+$THEME_BLOCKLISTS = [];
+$themeConfigPath = __DIR__ . '/includes/theme_blocklists.php';
+if (file_exists($themeConfigPath)) {
+    $loadedThemeBlocklists = require $themeConfigPath;
+    if (is_array($loadedThemeBlocklists)) {
+        $THEME_BLOCKLISTS = $loadedThemeBlocklists;
+    }
+}
+
 // Tool-loop settings
 $CHAT_MAX_TOOL_ITERS = (int)(getenv('CHAT_MAX_TOOL_ITERS') ?: 5);
 $MCP_SERVER_URL = getenv('MCP_SERVER_URL') ?: 'http://localhost:8000/chat';
@@ -548,6 +566,223 @@ function normalize_word_for_grid($word, $language = 'english') {
     return $upper;
 }
 
+function normalize_text_for_moderation($text, $language = 'english') {
+    $language = normalize_supported_language($language);
+    $value = mb_strtolower(trim((string)$text), 'UTF-8');
+
+    if ($value === '') {
+        return '';
+    }
+
+    if ($language === 'english') {
+        $value = strtr($value, [
+            '0' => 'o',
+            '1' => 'i',
+            '3' => 'e',
+            '4' => 'a',
+            '5' => 's',
+            '7' => 't',
+            '@' => 'a',
+            '$' => 's',
+            '!' => 'i',
+        ]);
+        return preg_replace('/[^a-z]/', '', $value);
+    }
+
+    return preg_replace('/[^\p{L}\p{M}]/u', '', $value);
+}
+
+function inappropriate_terms_for_language($language = 'english') {
+    global $MODERATION_BLOCKLISTS;
+    $language = normalize_supported_language($language);
+
+    $commonEnglish = [
+        'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick',
+        'pussy', 'porn', 'nude', 'boob', 'penis', 'vagina',
+        'rape', 'cum', 'sex'
+    ];
+
+    $configured = is_array($MODERATION_BLOCKLISTS) ? $MODERATION_BLOCKLISTS : [];
+    $languageSpecific = [];
+    if (isset($configured[$language]) && is_array($configured[$language])) {
+        $languageSpecific = $configured[$language];
+    }
+    $englishConfigured = [];
+    if (isset($configured['english']) && is_array($configured['english'])) {
+        $englishConfigured = $configured['english'];
+    }
+
+    $merged = array_merge($commonEnglish, $englishConfigured, $languageSpecific);
+    $clean = [];
+    foreach ($merged as $term) {
+        $v = trim((string)$term);
+        if ($v !== '') {
+            $clean[] = $v;
+        }
+    }
+
+    return array_values(array_unique($clean));
+}
+
+function is_inappropriate_text($text, $language = 'english') {
+    $language = normalize_supported_language($language);
+    $normalizedByLang = normalize_text_for_moderation($text, $language);
+    $normalizedEnglish = normalize_text_for_moderation($text, 'english');
+    $terms = inappropriate_terms_for_language($language);
+
+    foreach ($terms as $term) {
+        $needleByLang = normalize_text_for_moderation($term, $language);
+        $needleEnglish = normalize_text_for_moderation($term, 'english');
+
+        if ($needleByLang === '' && $needleEnglish === '') {
+            continue;
+        }
+
+        if ($needleByLang !== '' && $normalizedByLang !== '' && strpos($normalizedByLang, $needleByLang) !== false) {
+            return true;
+        }
+        if ($needleEnglish !== '' && $normalizedEnglish !== '' && strpos($normalizedEnglish, $needleEnglish) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function is_inappropriate_text_any_language($text) {
+    $supported = ['english', 'telugu', 'hindi', 'gujarati', 'malayalam'];
+    foreach ($supported as $lang) {
+        if (is_inappropriate_text($text, $lang)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function disallowed_theme_keywords_for_language($language = 'english') {
+    global $THEME_BLOCKLISTS;
+
+    $language = normalize_supported_language($language);
+    $configured = is_array($THEME_BLOCKLISTS) ? $THEME_BLOCKLISTS : [];
+
+    $defaultEnglish = [
+        'recreational drugs', 'drug abuse', 'narcotic', 'marijuana', 'cannabis',
+        'weed', 'hashish', 'cocaine', 'heroin', 'meth', 'methamphetamine',
+        'opium', 'lsd', 'pcp'
+    ];
+
+    $englishConfigured = [];
+    if (isset($configured['english']) && is_array($configured['english'])) {
+        $englishConfigured = $configured['english'];
+    }
+
+    $languageSpecific = [];
+    if (isset($configured[$language]) && is_array($configured[$language])) {
+        $languageSpecific = $configured[$language];
+    }
+
+    $merged = array_merge($defaultEnglish, $englishConfigured, $languageSpecific);
+    $clean = [];
+    foreach ($merged as $keyword) {
+        $k = trim((string)$keyword);
+        if ($k !== '') {
+            $clean[] = $k;
+        }
+    }
+
+    return array_values(array_unique($clean));
+}
+
+function is_disallowed_theme_or_topic($text, $language = 'english') {
+    $language = normalize_supported_language($language);
+    $normalizedByLang = normalize_text_for_moderation($text, $language);
+    $normalizedEnglish = normalize_text_for_moderation($text, 'english');
+    $keywords = disallowed_theme_keywords_for_language($language);
+
+    foreach ($keywords as $keyword) {
+        $needleByLang = normalize_text_for_moderation($keyword, $language);
+        $needleEnglish = normalize_text_for_moderation($keyword, 'english');
+
+        if ($needleByLang === '' && $needleEnglish === '') {
+            continue;
+        }
+
+        if ($needleByLang !== '' && $normalizedByLang !== '' && strpos($normalizedByLang, $needleByLang) !== false) {
+            return true;
+        }
+
+        if ($needleEnglish !== '' && $normalizedEnglish !== '' && strpos($normalizedEnglish, $needleEnglish) !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function is_disallowed_theme_or_topic_any_language($text) {
+    $supported = ['english', 'telugu', 'hindi', 'gujarati', 'malayalam'];
+    foreach ($supported as $lang) {
+        if (is_disallowed_theme_or_topic($text, $lang)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function is_contextually_harmful_targeting($text, $language = 'english') {
+    $language = normalize_supported_language($language);
+    $raw = mb_strtolower(trim((string)$text), 'UTF-8');
+    if ($raw === '') {
+        return false;
+    }
+
+    // Educational framing should remain allowed.
+    if (preg_match('/\b(prevent|prevention|awareness|anti[-\s]?bully|stop\s+bully|kindness|respect|handle\s+bully|de[-\s]?escalat|self\s*control)\b/u', $raw)) {
+        return false;
+    }
+
+    // Direct person-targeted humiliation patterns (e.g., "how Jenny smells bad").
+    if (preg_match('/\bhow\s+[\p{L}]+\s+(smells?\s+bad|is\s+(ugly|stupid|dumb|gross|fat|worthless))\b/u', $raw)) {
+        return true;
+    }
+
+    // Violent/abusive intent paired with a personal target context.
+    $hasHarmIntent = preg_match('/\b(beat\s*up|hurt|attack|assault|harass|bully|humiliat|shame|insult|mock|slap|punch|kick|threaten)\b/u', $raw) === 1;
+    $hasTargetContext = preg_match('/\b(class|classmate|student|kid|boy|girl|that\s+[\p{L}]+|from\s+class|him|her|them|person)\b/u', $raw) === 1;
+    if ($hasHarmIntent && $hasTargetContext) {
+        return true;
+    }
+
+    // Name-calling frames around a person.
+    $hasInsultWord = preg_match('/\b(stupid|idiot|loser|freak|freakazoid|moron)\b/u', $raw) === 1;
+    if ($hasInsultWord && $hasTargetContext) {
+        return true;
+    }
+
+    return false;
+}
+
+function moderate_outbound_answer($answer, $language = 'english') {
+    $text = trim((string)$answer);
+    if ($text === '') {
+        return $answer;
+    }
+
+    if (
+        is_inappropriate_text($text, $language)
+        || is_inappropriate_text_any_language($text)
+        || is_disallowed_theme_or_topic($text, $language)
+        || is_disallowed_theme_or_topic_any_language($text)
+        || is_contextually_harmful_targeting($text, $language)
+    ) {
+        return 'I cannot provide puzzle content for that request. Please choose a classroom-safe theme.';
+    }
+
+    return $answer;
+}
+
 function split_logical_units_via_ananya_api($word, $language = 'english') {
     static $cache = [];
 
@@ -636,6 +871,9 @@ function sanitize_word_list($words, $maxCount, $language = 'english', $maxLen = 
     $clean = [];
     foreach ($words as $w) {
         $nw = normalize_word_for_grid($w, $language);
+        if ($nw === '' || is_inappropriate_text($nw, $language)) {
+            continue;
+        }
         $len = count(split_word_units($nw, $language));
         if ($len < 3 || $len > $maxLen) {
             continue;
@@ -772,7 +1010,7 @@ function request_theme_words_from_llm($theme, $count, $llm_provider, $llm_model,
     $opts = [
         'temperature' => 0.2,
         'max_tokens' => 220,
-        'system_prompt' => 'Return only a plain list of single ' . $languageName . ' words, one per line, no numbering, no punctuation, no extra text.',
+        'system_prompt' => 'Return only a plain list of single ' . $languageName . ' words, one per line, no numbering, no punctuation, no extra text. Avoid profanity, slurs, sexual terms, and other inappropriate words.',
     ];
 
     if ($llm_provider !== '') {
@@ -1356,6 +1594,23 @@ function generate_crossword_answer($question, $llm_provider, $llm_model, $langua
     $count = $req['count'];
     $lang  = strtolower((string)($language ?? 'english')) ?: 'english';
 
+    if (
+        is_inappropriate_text($theme, $lang)
+        || is_inappropriate_text_any_language($theme)
+        || is_inappropriate_text_any_language($question)
+        || is_disallowed_theme_or_topic($theme, $lang)
+        || is_disallowed_theme_or_topic_any_language($theme)
+        || is_disallowed_theme_or_topic($question, $lang)
+        || is_disallowed_theme_or_topic_any_language($question)
+        || is_contextually_harmful_targeting($theme, $lang)
+        || is_contextually_harmful_targeting($question, $lang)
+    ) {
+        return [
+            'ok' => false,
+            'answer' => 'That theme is not allowed for puzzle generation. Please use a classroom-safe, non-sensitive theme.',
+        ];
+    }
+
     // The deterministic crossword builder uses byte-level strlen()/indexing and
     // only works correctly with ASCII (English) words.  For non-English scripts
     // (e.g. Telugu) skip the builder and fall through to the LLM fallback so
@@ -1373,35 +1628,9 @@ function generate_crossword_answer($question, $llm_provider, $llm_model, $langua
     }
 
     if ($puzzle === null) {
-        $opts = [
-            'temperature' => 0.3,
-            'max_tokens' => 900,
-        ];
-        if ($lang === 'telugu') {
-            $opts['system_prompt'] = 'క్రాస్‌వర్డ్ పజిల్ సృష్టించండి. గ్రిడ్‌లో నిండిన అక్షరాలు, # బ్లాక్ చేయబడిన సెల్‌ల కోసం, అదనంగా Across, Down మరియు Answer key విభాగాలు ఉండాలి. Word find సృష్టించవద్దు.';
-            $prompt = $count . ' పదాలతో ' . $theme . ' అంశంపై క్రాస్‌వర్డ్ పజిల్ సృష్టించండి. Crossword Puzzle, Across, Down మరియు Answer key అనే శీర్షికలు ఉపయోగించండి.';
-        } else {
-            $opts['system_prompt'] = 'Create a crossword-style response with a blocked grid using # for black squares, plus Across, Down, and Answer key sections. Do not create a word find.';
-            $prompt = 'Create a crossword puzzle with ' . $count . ' words about ' . $theme . '. Use the headings Crossword Puzzle, Across, Down, and Answer key.';
-        }
-        if ($llm_provider !== '') {
-            $opts['provider'] = $llm_provider;
-        }
-        if ($llm_model !== '') {
-            $opts['model'] = $llm_model;
-        }
-
-        $resp = llm_ask($prompt, $opts);
-        $respText = trim((string)$resp);
-        if ($respText === '' || stripos($respText, 'API error') !== false || stripos($respText, 'not configured') !== false || stripos($respText, 'request failed') !== false) {
-            return [
-                'ok' => false,
-                'answer' => $respText !== '' ? $respText : 'LLM provider request failed.',
-            ];
-        }
         return [
-            'ok' => true,
-            'answer' => $respText . "\n\nLLM consulted - Yes",
+            'ok' => false,
+            'answer' => 'I could not construct a valid crossword with the deterministic builder for that request. Please try a broader classroom-safe theme or fewer words.',
         ];
     }
 
@@ -1655,6 +1884,23 @@ function generate_word_find_answer($question, $llm_provider, $llm_model, $langua
 
     $theme = $req['theme'];
     $count = $req['count'];
+
+    if (
+        is_inappropriate_text($theme, $language)
+        || is_inappropriate_text_any_language($theme)
+        || is_inappropriate_text_any_language($question)
+        || is_disallowed_theme_or_topic($theme, $language)
+        || is_disallowed_theme_or_topic_any_language($theme)
+        || is_disallowed_theme_or_topic($question, $language)
+        || is_disallowed_theme_or_topic_any_language($question)
+        || is_contextually_harmful_targeting($theme, $language)
+        || is_contextually_harmful_targeting($question, $language)
+    ) {
+        return [
+            'ok' => false,
+            'answer' => 'That theme is not allowed for puzzle generation. Please use a classroom-safe, non-sensitive theme.',
+        ];
+    }
 
     $canonicalTheme = strtolower(canonicalize_theme($theme));
     $fallbackWordsRaw = fallback_theme_words($theme, $language);
@@ -1964,6 +2210,28 @@ if(!$question) {
     exit;
 }
 
+$isGenerationRequest = is_generation_request($question);
+if (
+    $isGenerationRequest
+    && (
+        is_inappropriate_text($question, $language)
+        || is_inappropriate_text_any_language($question)
+        || is_disallowed_theme_or_topic($question, $language)
+        || is_disallowed_theme_or_topic_any_language($question)
+        || is_contextually_harmful_targeting($question, $language)
+    )
+) {
+    echo json_encode([
+        'question' => $question,
+        'language' => $language,
+        'answer' => 'That theme is not allowed for puzzle generation. Please use a classroom-safe, non-sensitive theme.',
+        'api_doc_name' => null,
+        'source' => 'fallback',
+        'llm_consulted' => true,
+    ]);
+    exit;
+}
+
 // ── Forward to MCP server (intent classification + tool calling handled there) ──
 
 // If the user explicitly selected an LLM/provider from the UI, use direct fallback path.
@@ -1971,7 +2239,7 @@ if(!$question) {
 $useDirectLlm = ($llm_provider !== '' || $llm_model !== '');
 
 $mcp_result = null;
-if (!$useDirectLlm) {
+if (!$useDirectLlm && !$isGenerationRequest) {
     $mcp_result = call_mcp_server($MCP_SERVER_URL, $question, $language, $MCP_TIMEOUT, $llm_provider, $llm_model);
 }
 
@@ -1979,6 +2247,9 @@ if($mcp_result !== null) {
     // MCP server responded successfully
     if (is_array($mcp_result)) {
         $mcp_result['llm_consulted'] = true;
+        if (!empty($mcp_result['answer'])) {
+            $mcp_result['answer'] = moderate_outbound_answer($mcp_result['answer'], $language);
+        }
         if (!empty($mcp_result['answer']) && stripos($mcp_result['answer'], 'LLM consulted') === false) {
             $mcp_result['answer'] .= "\n\nLLM consulted - Yes";
         }
@@ -2051,10 +2322,23 @@ if ($effective_llm_model === '' || strtolower($effective_llm_model) === 'auto') 
     $effective_llm_model = llm_default_model_for_provider($effective_llm_provider);
 }
 
-if (is_generation_request($question)) {
+if ($isGenerationRequest) {
     if (is_crossword_request($question)) {
         $crossword = generate_crossword_answer($question, $llm_provider, $llm_model, strtolower((string)$language));
         if (is_array($crossword)) {
+            if (empty($crossword['ok'])) {
+                echo json_encode([
+                    'error' => $crossword['answer'] ?? 'I could not construct a crossword for that request.',
+                    'question' => $question,
+                    'language' => $language,
+                    'llm_provider' => $effective_llm_provider,
+                    'llm_model' => $effective_llm_model,
+                    'source' => 'fallback',
+                    'llm_consulted' => true,
+                ]);
+                exit;
+            }
+
             echo json_encode([
                 'question' => $question,
                 'language' => $language,
@@ -2070,13 +2354,26 @@ if (is_generation_request($question)) {
     }
 
     $wordFind = generate_word_find_answer($question, $llm_provider, $llm_model, strtolower((string)$language));
-    if (is_array($wordFind) && !empty($wordFind['ok'])) {
+    if (is_array($wordFind)) {
+        if (empty($wordFind['ok'])) {
+            echo json_encode([
+                'error' => $wordFind['answer'] ?? 'I could not construct a valid word-find grid for that request.',
+                'question' => $question,
+                'language' => $language,
+                'llm_provider' => $effective_llm_provider,
+                'llm_model' => $effective_llm_model,
+                'source' => 'fallback',
+                'llm_consulted' => true,
+            ]);
+            exit;
+        }
+
         echo json_encode([
             'question' => $question,
             'language' => $language,
             'llm_provider' => $effective_llm_provider,
             'llm_model' => $effective_llm_model,
-            'answer' => $wordFind['answer'],
+            'answer' => $wordFind['answer'] ?? 'I could not construct a valid word-find grid for that request. Please try a broader classroom-safe theme.',
             'api_doc_name' => null,
             'source' => 'fallback',
             'llm_consulted' => true,
@@ -2084,31 +2381,12 @@ if (is_generation_request($question)) {
         exit;
     }
 
-    $generationOpts = [
-        'temperature' => 0.4,
-        'max_tokens' => (int)(getenv('LLM_MAX_TOKENS') ?: 1200),
-        'system_prompt' => 'You are Ananya. For generation requests (word-find/crossword/puzzle/word lists), respond directly with clear, concise content. Do not output API-call JSON unless explicitly asked.',
-    ];
-
-    if ($llm_provider !== '') {
-        $generationOpts['provider'] = $llm_provider;
-    }
-
-    if ($llm_model !== '') {
-        $generationOpts['model'] = $llm_model;
-    }
-
-    $resp = llm_ask($question, $generationOpts);
-    if (stripos($resp, 'LLM consulted') === false) {
-        $resp .= "\n\nLLM consulted - Yes";
-    }
-
     echo json_encode([
         'question' => $question,
         'language' => $language,
         'llm_provider' => $effective_llm_provider,
         'llm_model' => $effective_llm_model,
-        'answer' => $resp,
+        'answer' => 'I could not construct a valid puzzle with the deterministic builder for that request. Please try a broader classroom-safe theme or fewer words.',
         'api_doc_name' => null,
         'source' => 'fallback',
         'llm_consulted' => true,
@@ -2209,6 +2487,8 @@ error_log("chat_api.php | Question: " . $question . " | API: " . ($api_name ?: '
 if (stripos($resp, 'LLM consulted') === false) {
     $resp .= "\n\nLLM consulted - Yes";
 }
+
+$resp = moderate_outbound_answer($resp, $language);
 
 echo json_encode([
     'question' => $question,
