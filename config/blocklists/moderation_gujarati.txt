@@ -1,0 +1,6 @@
+# One blocked moderation term per line (UTF-8).
+ગાળો
+અશ્લીલ
+સેક્સ
+ન્યુડ
+પોર્ન

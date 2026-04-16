@@ -3,6 +3,7 @@
 // Seed blocklists for puzzle generation safety. Keep entries lowercase where possible.
 // This file intentionally includes only a minimal baseline and should be extended
 // through curated review for each supported language.
+// Deprecated at runtime: chat_api now reads config/blocklists/moderation_*.txt.
 return [
     'english' => [
         'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick',

@@ -1,0 +1,6 @@
+# One blocked moderation term per line (UTF-8).
+गाली
+अश्लील
+सेक्स
+न्यूड
+पोर्न

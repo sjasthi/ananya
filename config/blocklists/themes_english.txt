@@ -1,0 +1,29 @@
+﻿# One blocked theme/topic keyword per line (UTF-8).
+recreational drugs
+drug abuse
+narcotic
+marijuana
+cannabis
+weed
+hashish
+cocaine
+heroin
+meth
+methamphetamine
+opium
+lsd
+pcp
+smoking
+tobacco
+cigarette
+vaping
+vape
+nicotine
+alcohol
+drinking
+drunk
+swear words
+curse words
+bad words
+profanity
+abusive language
