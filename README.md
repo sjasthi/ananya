@@ -38,3 +38,49 @@ Safety mode:
 
 - Refactoring notes: [REFACTORING_README.md](REFACTORING_README.md)
 - Validation response update notes: [VALIDATION_RESPONSE_UPDATES.md](VALIDATION_RESPONSE_UPDATES.md)
+
+## Project File Structure (Current)
+
+This is the current workspace layout grouped by runtime role.
+
+```text
+ananya/
+	index.php
+	chat.php
+	chat_api.php
+	api.php
+	analyzer.php
+	analyze.php
+	finder.php
+	bulk_puzzles.php
+	api_testing.php
+	play_with_telugu.php
+	about.php
+	word_processor.php
+	telugu_parser.php
+	hindi_parser.php
+	gujarati_parser.php
+	malayalam_parser.php
+	api/                     # endpoint handlers routed by api.php
+	includes/                # shared runtime modules
+		api_reference.php
+		header.php
+		llm_handler.php
+		blocklist_loader.php
+	config/
+		blocklists/            # moderation and theme text lists
+	js/                      # page scripts
+		analyzer.js
+		chat.js
+		bulk_puzzles.js
+		finder.js
+		index.js
+	css/
+	docs/
+	images/
+	mcp_server/              # optional tool-orchestrated chat service
+	scripts/                 # developer checks and utilities
+	src/                     # refactor library source (not in active API path)
+	test_data/               # test fixtures and sample input themes
+	unused/                  # archived legacy files
+```
