@@ -2,6 +2,7 @@
 
 // Theme-level safety controls for puzzle generation.
 // These are topic keywords, not profanity tokens.
+// Deprecated at runtime: chat_api now reads config/blocklists/themes_*.txt.
 return [
     'english' => [
         'recreational drugs',

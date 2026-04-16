@@ -4,25 +4,8 @@ header('Content-Type: application/json; charset=utf-8');
 
 require_once __DIR__ . '/includes/api_reference.php';
 require_once __DIR__ . '/includes/llm_handler.php';
+require_once __DIR__ . '/includes/blocklist_loader.php';
 llm_bootstrap_env_once(__DIR__);
-
-$MODERATION_BLOCKLISTS = [];
-$moderationConfigPath = __DIR__ . '/includes/moderation_blocklists.php';
-if (file_exists($moderationConfigPath)) {
-    $loadedModerationBlocklists = require $moderationConfigPath;
-    if (is_array($loadedModerationBlocklists)) {
-        $MODERATION_BLOCKLISTS = $loadedModerationBlocklists;
-    }
-}
-
-$THEME_BLOCKLISTS = [];
-$themeConfigPath = __DIR__ . '/includes/theme_blocklists.php';
-if (file_exists($themeConfigPath)) {
-    $loadedThemeBlocklists = require $themeConfigPath;
-    if (is_array($loadedThemeBlocklists)) {
-        $THEME_BLOCKLISTS = $loadedThemeBlocklists;
-    }
-}
 
 // Tool-loop settings
 $CHAT_MAX_TOOL_ITERS = (int)(getenv('CHAT_MAX_TOOL_ITERS') ?: 5);
@@ -592,32 +575,49 @@ function normalize_text_for_moderation($text, $language = 'english') {
     return preg_replace('/[^\p{L}\p{M}]/u', '', $value);
 }
 
+function is_blocklist_config_ready_for_generation() {
+    static $checked = false;
+    static $ready = null;
+
+    if ($ready !== null) {
+        return $ready;
+    }
+
+    $ready = blocklist_config_is_ready();
+    if (!$ready && !$checked) {
+        $checked = true;
+        $errors = blocklist_config_errors();
+        foreach ($errors as $err) {
+            error_log('Blocklist configuration error: ' . $err);
+        }
+    }
+
+    return $ready;
+}
+
 function inappropriate_terms_for_language($language = 'english') {
-    global $MODERATION_BLOCKLISTS;
     $language = normalize_supported_language($language);
 
-    $commonEnglish = [
-        'fuck', 'shit', 'bitch', 'asshole', 'bastard', 'dick',
-        'pussy', 'porn', 'nude', 'boob', 'penis', 'vagina',
-        'rape', 'cum', 'sex'
-    ];
-
-    $configured = is_array($MODERATION_BLOCKLISTS) ? $MODERATION_BLOCKLISTS : [];
-    $languageSpecific = [];
-    if (isset($configured[$language]) && is_array($configured[$language])) {
-        $languageSpecific = $configured[$language];
-    }
-    $englishConfigured = [];
-    if (isset($configured['english']) && is_array($configured['english'])) {
-        $englishConfigured = $configured['english'];
+    $english = blocklist_load_entries('moderation', 'english');
+    if (empty($english['ok'])) {
+        return [];
     }
 
-    $merged = array_merge($commonEnglish, $englishConfigured, $languageSpecific);
+    if ($language === 'english') {
+        return $english['entries'];
+    }
+
+    $languageSpecific = blocklist_load_entries('moderation', $language);
+    if (empty($languageSpecific['ok'])) {
+        return [];
+    }
+
+    $merged = array_merge($english['entries'], $languageSpecific['entries']);
     $clean = [];
     foreach ($merged as $term) {
-        $v = trim((string)$term);
-        if ($v !== '') {
-            $clean[] = $v;
+        $value = trim((string)$term);
+        if ($value !== '') {
+            $clean[] = $value;
         }
     }
 
@@ -661,28 +661,23 @@ function is_inappropriate_text_any_language($text) {
 }
 
 function disallowed_theme_keywords_for_language($language = 'english') {
-    global $THEME_BLOCKLISTS;
-
     $language = normalize_supported_language($language);
-    $configured = is_array($THEME_BLOCKLISTS) ? $THEME_BLOCKLISTS : [];
 
-    $defaultEnglish = [
-        'recreational drugs', 'drug abuse', 'narcotic', 'marijuana', 'cannabis',
-        'weed', 'hashish', 'cocaine', 'heroin', 'meth', 'methamphetamine',
-        'opium', 'lsd', 'pcp'
-    ];
-
-    $englishConfigured = [];
-    if (isset($configured['english']) && is_array($configured['english'])) {
-        $englishConfigured = $configured['english'];
+    $english = blocklist_load_entries('themes', 'english');
+    if (empty($english['ok'])) {
+        return [];
     }
 
-    $languageSpecific = [];
-    if (isset($configured[$language]) && is_array($configured[$language])) {
-        $languageSpecific = $configured[$language];
+    if ($language === 'english') {
+        return $english['entries'];
     }
 
-    $merged = array_merge($defaultEnglish, $englishConfigured, $languageSpecific);
+    $languageSpecific = blocklist_load_entries('themes', $language);
+    if (empty($languageSpecific['ok'])) {
+        return [];
+    }
+
+    $merged = array_merge($english['entries'], $languageSpecific['entries']);
     $clean = [];
     foreach ($merged as $keyword) {
         $k = trim((string)$keyword);
@@ -1595,6 +1590,8 @@ function generate_crossword_answer($question, $llm_provider, $llm_model, $langua
     $lang  = strtolower((string)($language ?? 'english')) ?: 'english';
 
     if (
+        !is_blocklist_config_ready_for_generation()
+        ||
         is_inappropriate_text($theme, $lang)
         || is_inappropriate_text_any_language($theme)
         || is_inappropriate_text_any_language($question)
@@ -1886,6 +1883,8 @@ function generate_word_find_answer($question, $llm_provider, $llm_model, $langua
     $count = $req['count'];
 
     if (
+        !is_blocklist_config_ready_for_generation()
+        ||
         is_inappropriate_text($theme, $language)
         || is_inappropriate_text_any_language($theme)
         || is_inappropriate_text_any_language($question)
@@ -2214,7 +2213,8 @@ $isGenerationRequest = is_generation_request($question);
 if (
     $isGenerationRequest
     && (
-        is_inappropriate_text($question, $language)
+        !is_blocklist_config_ready_for_generation()
+        || is_inappropriate_text($question, $language)
         || is_inappropriate_text_any_language($question)
         || is_disallowed_theme_or_topic($question, $language)
         || is_disallowed_theme_or_topic_any_language($question)
